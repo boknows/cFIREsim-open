@@ -17,5 +17,24 @@
 	<div class="page-header">
         <h1 class="text-center">The Crowdsourced FIRE Simulator (cFIREsim) - Open Source</h1>
     </div>
+    <div class="container">
+    	<div class="row">
+			<div class="input-group col-md-9">
+				<span class='input-group-addon'><b>Portfolio:</b></span><input type='text' name='portfolio' class='form-control' id='portfolio' value="1000000">
+			</div>
+			<div class="input-group col-md-9">
+				<span class='input-group-addon'><b>Spending:</b></span><input type='text' name='spending' class='form-control' id='spending' value="40000">
+			</div>
+			<div class="input-group col-md-9">
+				<span class='input-group-addon'><b>Retirement Start Year:</b></span><input type='text' name='retirementStartYear' class='form-control' id='retirementStartYear' value="2014">
+			</div>
+			<div class="input-group col-md-9">
+				<span class='input-group-addon'><b>Retirement End Year:</b></span><input type='text' name='retirementEndYear' class='form-control' id='retirementEndYear' value="2044">
+			</div>
+			<div class='input-group'>
+				<button class="btn btn-success btn-large" id='submit' type='button'>Run Simulation</button>
+			</div>
+    	</div>
+    </div>
 </body>
 </html>
