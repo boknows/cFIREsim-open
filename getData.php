@@ -1,6 +1,6 @@
 <?php
 ### getData.php - Retrieves historical data for simulation
-$db = new PDO('mysql:host=localhost;dbname=firecalc;charset=utf8', 'root', '');
+$db = new PDO('mysql:host=localhost;dbname=cfiresim;charset=utf8', 'root', '');
 
 $sql = "SELECT * FROM multipliers"; 
 foreach ($db->query($sql) as $row) {
