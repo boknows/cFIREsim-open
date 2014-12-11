@@ -12,3 +12,4 @@ Disclaimers:
 	
 Collaboration: Primary discussion of the project can be done on the cFIREsim forums: http://www.cfiresim.com/phpBB3/viewforum.php?f=6    To request access to the Open Source forum, PM bo_knows.
 
+License: This software falls under the Apache License 2.0
