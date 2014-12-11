@@ -10,6 +10,7 @@
 	<script type="text/javascript" src="js/bootstrap-select.min.js"></script> 
 	<?php
 		echo '<script type="text/javascript" src="js/cFIREsimOpen.js?v='.time().'"></script>';
+		echo '<script type="text/javascript" src="js/formData-stub.js?v='.time().'"></script>';
 	?>
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
