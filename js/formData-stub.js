@@ -27,9 +27,30 @@ var formData = {
 			"val": 0,
 			"startYear": 2032,
 			"endYear": 2100
-		}
+		},
+		"pensions": [
+			{
+				"label": "",
+				"val": 0,
+				"startYear": 2030,
+				"endYear": null,
+				"recurring": true,
+				"inflationAdjusted": true,
+				"inflationType": "CPI"
+			}
+		],
+		"extraSavings": [
+			{
+				"label": "",
+				"val": 0,
+				"startYear": 2030,
+				"endYear": 2034,
+				"recurring": true,
+				"inflationAdjusted": true,
+				"inflationType": "CPI"
+			}
+		]
 	},
-	
 	"extraSpending": [
 		{
 			"label": "",
