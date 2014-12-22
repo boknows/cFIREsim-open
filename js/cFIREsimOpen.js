@@ -1,17 +1,20 @@
-
  $("#runSim").click(function() {
       simulation(formData);
  });
 
 var sim = [];	//primary simulation output container
-function simulation (form, data){ //For iterating over each cycle
-	var years = (form.retirementEndYear-form.retirementStartYear+1); //years per simulation cycle
-	var cycles = Market.getLength()-years+1;
-	
-	for(var i=0;i<cycles;i++){
-		var cyc = cycle(i, (i+years));
+
+function simulation(form, data){ //For iterating over each cycle
+    var startYear = form.retirementStartYear;
+    var endYear = form.retirementEndYear;
+	var cycleLength = endYear-startYear+1;
+	var numCycles = Object.keys(Market).length-cycleLength+1;
+
+	for(var cycleStart=1871; cycleStart<1871+numCycles; cycleStart++){
+		var cyc = cycle(cycleStart, cycleStart+cycleLength);
 		sim.push(cyc);
 	}
+
 	for(var i=0;i<sim.length;i++){
 		for(var j=0;j<sim[i].length;j++){
 			if(j>0){
@@ -24,24 +27,32 @@ function simulation (form, data){ //For iterating over each cycle
 	console.log(sim);
 };
 
-function cycle (start, end){ //For iterating over each year of each cycle
-	var startCPI = Market.getCPI(start + 1871);  //The starting CPI value of this cycle, for comparison throughout the cycle.
-	var cyc = [];
-	for(var i=start;i<end;i++){
+//For iterating over each year of each cycle
+function cycle(startOfRange, endOfRange){
+    //The starting CPI value of this cycle, for comparison throughout the cycle.
+	var startCPI = Market[startOfRange.toString()].cpi;
+
+    var cyc = [];
+
+    for(var year=startOfRange; year<endOfRange; year++) {
+        data = Market[year.toString()]
         cyc.push({
-            "data": Market.getData(i + 1871),
+            "year": year,
+            "data": data,
             "portfolio": null,
             "infAdjPortfolio": null,
             "spending": null,
             "infAdjSpending": null,
-            "cumulativeInflation": (1+((Market.getCPI(i + 1871) - startCPI)/startCPI)),
+            "cumulativeInflation": cumulativeInflation(startCPI, data.cpi),
         });
 	}
-	//1+(($data[$i+$j+1]['CPI']-$data[$i]['CPI'])/$data[$i]['CPI']);
+
 	return cyc;
 };
 
-
+function cumulativeInflation(startCPI, endCPI) {
+    return 1+((endCPI-startCPI)/startCPI)
+}
 
 function doWork(){ //Placeholder
 
