@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="cFIREsim">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,9 +8,8 @@
     <script src='http://code.jquery.com/jquery-1.10.2.min.js' language='Javascript' type='text/javascript'></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/bootstrap-select.min.js"></script> 
-    
-
     <script type="text/javascript" src="js/formData-stub.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.7/angular.min.js"></script>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -20,27 +19,1057 @@
     <div class="page-header">
     	<h1 class="text-center">The Crowdsourced FIRE Simulator (cFIREsim) - Open Source</h1>
     </div>
-    <div class="container">
-    	<div class="row">
-			<div class="input-group col-md-9">
-				<span class='input-group-addon'><b>Portfolio:</b></span><input type='text' name='portfolio' class='form-control' id='portfolio' value="1000000">
-			</div>
-			<div class="input-group col-md-9">
-				<span class='input-group-addon'><b>Spending:</b></span><input type='text' name='spending' class='form-control' id='spending' value="40000">
-			</div>
-			<div class="input-group col-md-9">
-				<span class='input-group-addon'><b>Retirement Start Year:</b></span><input type='text' name='retirementStartYear' class='form-control' id='retirementStartYear' value="2014">
-			</div>
-			<div class="input-group col-md-9">
-				<span class='input-group-addon'><b>Retirement End Year:</b></span><input type='text' name='retirementEndYear' class='form-control' id='retirementEndYear' value="2044">
-			</div>
-			<div class='input-group'>
-				<button class="btn btn-success btn-large" id='runSim' type='button'>Run Simulation</button>
-			</div>
-    	</div>
+
+    <div ng-controller="simulationInputController">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        Basics
+                    </div>
+                    <div class="panel-body">
+                        <label>Retirement Year:<input type="text" class="form-control" ng-model="data.retirementStartYear"></label>
+                        <label>Retirement End Year:<input type="text" class="form-control" ng-model="data.retirementEndYear"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-primary" id="portfolioPanel">
+                    <div class="panel-heading">
+                        Portfolio
+                    </div>
+                    <div class="panel-body">
+                        <label>Portfolio Value:<input type="text" class="form-control" ng-model="data.portfolio.initial"></label>
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Initial Assets
+                            </div>
+                            <div class="panel-body">  
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Equities:
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" ng-model="data.portfolio.percentEquities">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Bonds:
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" ng-model="data.portfolio.percentBonds">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </label>
+                                    </div>                                    
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Gold:
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" ng-model="data.portfolio.percentGold">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Cash:
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" ng-model="data.portfolio.percentCash">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Fees:
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" ng-model="data.portfolio.percentFees">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Growth of Cash:
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" ng-model="data.portfolio.growthOfCash">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </label>  
+                                    </div>
+                                </div>               
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">       
+                                    <label>Rebalance Annually:</label>
+                                    <div>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="rebalanceProtfolioRadio" value="true" ng-model="data.portfolio.rebalanceAnnually" ng-value="true" ng-change="enableRebalancing(true)">Yes
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="rebalanceProtfolioRadio" value="false" ng-model="data.portfolio.rebalanceAnnually" ng-value="false" ng-change="enableRebalancing(false)">No
+                                        </label>
+                                    </div>  
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">       
+                                    <label>Keep Allocation Constant:</label>
+                                    <div>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="constantAllocationRadio" value="true" ng-model="data.portfolio.constantAllocation" ng-value="true" ng-change="enableChangeAllocation(true)">Yes
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="constantAllocationRadio" value="false" ng-model="data.portfolio.constantAllocation" ng-value="false" ng-change="enableChangeAllocation(false)">No
+                                        </label>
+                                    </div>  
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Target Assets
+                            </div>
+                            <div class="panel-body">  
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Start Year:
+                                                <input type="text" class="form-control" ng-model="data.portfolio.changeAllocationStartYear">
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>End Year:
+                                                <input type="text" class="form-control" ng-model="data.portfolio.changeAllocationEndYear">
+                                        </label>
+                                    </div>                                    
+                                </div><div class="row">
+                                    <div class="col-md-6">
+                                        <label>Equities:
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" ng-model="data.portfolio.targetPercentEquities">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Bonds:
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" ng-model="data.portfolio.targetPercentBonds">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </label>
+                                    </div>                                    
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Gold:
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" ng-model="data.portfolio.targetPercentEquities">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Cash:
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" ng-model="data.portfolio.targetPercentBonds">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </label>
+                                    </div>                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        Spending Plan
+                    </div>
+                    <div class="panel-body">
+                        <label>Spending Plan:
+                            <select class="form-control"
+                                    ng-model="data.spending.method"
+                                    ng-change="refreshSpendingForm()"
+                                    ng-options="spendingPlan.value as spendingPlan.text for spendingPlan in spendingPlanTypes">
+                            </select>                                
+                        </label>
+                        <div id="yearlySpendingOptions" class="spendingOptions">
+                            <label>Yearly Spending:
+                                <div class="input-group">
+                                    <span class="input-group-addon">$</span>
+                                    <input type="text" class="form-control" ng-model="data.spending.initial">
+                                </div>
+                            </label>
+                        </div>
+                        <div id="percentageOfPortfolioOptions" class="spendingOptions">
+                            <label>Yearly Spending (% of portfolio):
+                                <div class="input-group">
+                                    <input  type="text"
+                                            class="form-control"
+                                            ng-model="data.spending.percentageOfPortfolioPercentage">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </label>
+                            <label>Percentage Type:
+                                <select class="form-control"
+                                        ng-model="data.spending.percentageOfPortfolioType"
+                                        ng-change="clearFields('#percentageOfPortfolioLimits')"
+                                        ng-options="percentageType.value as percentageType.text for percentageType in percentageOfPortfolioTypes">
+                                </select>                                
+                            </label>
+                            <div id="percentageOfPortfolioLimits" ng-show="data.spending.percentageOfPortfolioType == 'withFloorAndCeiling'">
+                                <label>Floor Spending:
+                                    <select class="form-control"
+                                            ng-model="data.spending.percentageOfPortfolioFloorType"
+                                            ng-change="clearProperty(data.spending.percentageOfPortfolioFloorType == 'none', 'data.spending.percentageOfPortfolioFloorPercentage')"
+                                            ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioLimitTypes">
+                                    </select>                                
+                                </label>
+                                <label>Never Less Than:
+                                    <div class="input-group">
+                                        <input  type="text"
+                                                class="form-control"
+                                                ng-model="data.spending.percentageOfPortfolioFloorPercentage"
+                                                ng-disabled="data.spending.percentageOfPortfolioFloorType == 'none'">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </label>                              
+                                <label>Ceiling Spending:
+                                    <select class="form-control"
+                                            ng-model="data.spending.percentageOfPortfolioCeilingType"
+                                            ng-change="clearProperty(data.spending.percentageOfPortfolioCeilingType == 'none', 'data.spending.percentageOfPortfolioCeilingPercentage')"
+                                            ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioLimitTypes">
+                                    </select>                                
+                                </label>
+                                <label>Never More Than:
+                                    <div class="input-group">
+                                        <input  type="text"
+                                                class="form-control"
+                                                ng-model="data.spending.percentageOfPortfolioCeilingPercentage"
+                                                ng-disabled="data.spending.percentageOfPortfolioCeilingType == 'none'">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div id="hebelerAutiopilotOptions" class="spendingOptions">
+                            <label>Age of Retirement:
+                                    <input type="text" class="form-control" ng-model="data.spending.hebelerAgeOfRetirement">
+                            </label>
+                            <label>Weighted CMD:
+                                <div class="input-group">
+                                    <span class="input-group-addon">$</span>
+                                    <input  type="text"
+                                            class="form-control"
+                                            ng-model="data.spending.hebelerWeightedRMD">
+                                </div>
+                            </label>
+                            <label>Weighted CPI:
+                                <div class="input-group">
+                                    <span class="input-group-addon">$</span>
+                                    <input  type="text"
+                                            class="form-control"
+                                            ng-model="data.spending.hebelerWeightedCPI">
+                                </div>
+                            </label>
+
+                        </div>
+                        <div id="variableSpendingOptions" class="spendingOptions">
+                            <label>Z Value (0.000 - 1.000):
+                                    <input type="text" class="form-control" ng-model="data.spending.variableSpendingZValue">
+                            </label>
+                        </div>
+                        <div id="guytonKlingerOptions" class="spendingOptions">                      
+                            <label>Exceeds:
+                                <div class="input-group">
+                                    <input  type="text"
+                                            class="form-control"
+                                            ng-model="data.spending.guytonKlingerExceeds">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </label>
+                            <label>Cut:
+                                <div class="input-group">
+                                    <input  type="text"
+                                            class="form-control"
+                                            ng-model="data.spending.guytonKlingerCut">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </label>
+                            <label>Fall:
+                                <div class="input-group">
+                                    <input  type="text"
+                                            class="form-control"
+                                            ng-model="data.spending.guytonKlingerFall">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </label>
+                            <label>Raise:
+                                <div class="input-group">
+                                    <input  type="text"
+                                            class="form-control"
+                                            ng-model="data.spending.guytonKlingerRaise">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="retireAgainAndAgainOptions" class="spendingOptions">
+                            <label>RAA Target Portfolio Amount:
+                                <select class="form-control"
+                                        ng-model="data.spending.retireAgainAmountType"
+                                        ng-options="retireAgainAmountType.value as retireAgainAmountType.text for retireAgainAmountType in retireAgainAmountTypes">
+                                </select>                                
+                            </label>                                    
+                            <label>RAA Custom Portfolio Target:
+                                <div class="input-group">
+                                    <span class="input-group-addon">$</span>
+                                    <input  type="text"
+                                            class="form-control"
+                                            ng-model="data.spending.retireAgainCustomTarget">
+                                </div>
+                            <label>Threshold for Spending Increase:
+                                <div class="input-group">
+                                    <input  type="text"
+                                            class="form-control"
+                                            ng-model="data.spending.retireAgainThreshold">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="customVPWOptions" class="spendingOptions">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                   <p>The PMT function used in VPW is calculated based on the "Years to model" and your actual retirement year. The Initial Withdrawal Rate is based on the portfolio during the first year of retirement, and your "Yearly Spending" listed in the Spending Plan section.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="spendingLimitOptions" class="spendingOptions">
+                            <label>Spending Floor (Inflation Adjusted):          
+                                <select class="form-control"
+                                        ng-model="data.spending.floor"
+                                        ng-options="floor.value as floor.text for floor in spendingFloorTypes">
+                                </select>    
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-addon">$</span>
+                                <input  type="text"
+                                        class="form-control"
+                                        ng-model="data.spending.floorValue"
+                                        ng-disabled="data.spending.floor != 'definedValue'">
+                            </div>
+                            <label>Spending Ceiling (Inflation Adjusted):     
+                                <select class="form-control"
+                                        ng-model="data.spending.ceiling"
+                                        ng-options="ceiling.value as ceiling.text for ceiling in spendingCeilingTypes">
+                                </select>    
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-addon">$</span>
+                                <input  type="text"
+                                        class="form-control"
+                                        ng-model="data.spending.ceilingValue"
+                                        ng-disabled="data.spending.ceiling != 'definedValue'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        Extra Income/Savings
+                    </div>
+                    <div class="panel-body">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Social Security
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Annual:
+                                            <div class="input-group">
+                                                <span class="input-group-addon">$</span>
+                                                <input type="text" class="form-control" ng-model="data.extraIncome.socialSecurity.val">
+                                            </div>
+                                        </label>
+                                    </div> 
+                                    <div class="col-md-4">
+                                        <label>Start Year:<input type="text" class="form-control" ng-model="data.extraIncome.socialSecurity.startYear"></label>       
+                                    </div>                            
+                                    <div class="col-md-4">
+                                        <label>End Year:<input type="text" class="form-control" ng-model="data.extraIncome.socialSecurity.endYear"></label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Annual Spousal:
+                                            <div class="input-group">
+                                                <span class="input-group-addon">$</span>
+                                                <input type="text" class="form-control" ng-model="data.extraIncome.socialSecuritySpouse.val">
+                                            </div>
+                                        </label>
+                                    </div> 
+                                    <div class="col-md-4">
+                                        <label>Start Year:<input type="text" class="form-control" ng-model="data.extraIncome.socialSecuritySpouse.startYear"></label>       
+                                    </div>                            
+                                    <div class="col-md-4">
+                                        <label>End Year:<input type="text" class="form-control" ng-model="data.extraIncome.socialSecuritySpouse.endYear"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Pensions
+                            </div>
+                            <div class="panel-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Label
+                                            </th>
+                                            <th>
+                                                Amount ($)
+                                            </th>
+                                            <th>
+                                                Start Year
+                                            </th>
+                                            <th>
+                                                Inflation Adjusted
+                                            </th>
+                                            <th>
+                                                Inflation Type
+                                            </th>
+                                            <th>
+                                                Inflation %
+                                            </th>
+                                            <th>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="pension in data.extraIncome.pensions">
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="pension.label">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="pension.val">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="pension.startYear">
+                                            </td>
+                                            <td>
+                                                <select class="form-control"
+                                                        ng-model="pension.inflationAdjusted"
+                                                        ng-options="bool for bool in boolOptions"
+                                                        ng-change="changeInflationAdjusted($index, data.extraIncome.pensions)">
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control"
+                                                        ng-model="pension.inflationType"
+                                                        ng-options="option.value as option.text for option in inflationTypes"
+                                                        ng-change="changeInflationType($index, data.extraIncome.pensions)"
+                                                        ng-disabled="!pension.inflationAdjusted">
+                                                    <option value=""></option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text"
+                                                        class="form-control"
+                                                        ng-model="pension.inflationRate"
+                                                        ng-disabled="pension.inflationType != 'constant'">
+                                            </td>
+                                            <td>
+                                                <input type="button" ng-click="removeObject($index, data.extraIncome.pensions)" value="Delete"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <input type="button" ng-click="addObject(data.extraIncome.pensions)" value="Add Pension"/>                                
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Other Income
+                            </div>
+                            <div class="panel-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Label
+                                            </th>
+                                            <th>
+                                                Amount ($)
+                                            </th>
+                                            <th>
+                                                Recurring
+                                            </th>
+                                            <th>
+                                                Start year
+                                            </th>
+                                            <th>
+                                                End Year
+                                            </th>
+                                            <th>
+                                                Inflation Adjusted
+                                            </th>
+                                            <th>
+                                                Inflation Type
+                                            </th>
+                                            <th>
+                                                Inflation %
+                                            </th>
+                                            <th>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="extraSaving in data.extraIncome.extraSavings">
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="extraSaving.label">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="extraSaving.val">
+                                            </td>
+                                            <td>
+                                                <select class="form-control"
+                                                        ng-model="extraSaving.recurring"
+                                                        ng-options="bool for bool in boolOptions"
+                                                        ng-change="clearEndYear($index, data.extraIncome.extraSavings)">
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="extraSaving.startYear">
+                                            </td>
+                                            <td>
+                                                <input  type="text"
+                                                        class="form-control"
+                                                        ng-model="extraSaving.endYear"
+                                                        ng-disabled="!extraSaving.recurring">
+                                            </td>
+                                            <td>
+                                                <select class="form-control"
+                                                        ng-model="extraSaving.inflationAdjusted"
+                                                        ng-options="bool for bool in boolOptions"
+                                                        ng-change="changeInflationAdjusted($index, data.extraIncome.extraSavings)">
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control"
+                                                        ng-model="extraSaving.inflationType"
+                                                        ng-options="option.value as option.text for option in inflationTypes"
+                                                        ng-change="changeInflationType($index, data.extraIncome.extraSavings)"
+                                                        ng-disabled="!extraSaving.inflationAdjusted">
+                                                    <option value=""></option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text"
+                                                        class="form-control"
+                                                        ng-model="extraSaving.inflationRate"
+                                                        ng-disabled="extraSaving.inflationType != 'constant'">
+                                            </td>
+                                            <td>
+                                                <input type="button" ng-click="removeObject($index, data.extraIncome.extraSavings)" value="Delete"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <input type="button" ng-click="addObject(data.extraIncome.extraSavings)" value="Add Savings"/>                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        Extra Spending
+                    </div>
+                    <div class="panel-body">
+                    <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Other Income
+                            </div>
+                            <div class="panel-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Label
+                                            </th>
+                                            <th>
+                                                Amount ($)
+                                            </th>
+                                            <th>
+                                                Recurring
+                                            </th>
+                                            <th>
+                                                Start year
+                                            </th>
+                                            <th>
+                                                End Year
+                                            </th>
+                                            <th>
+                                                Inflation Adjusted
+                                            </th>
+                                            <th>
+                                                Inflation Type
+                                            </th>
+                                            <th>
+                                                Inflation %
+                                            </th>
+                                            <th>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="extraSpending in data.extraSpending">
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="extraSpending.label">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="extraSpending.val">
+                                            </td>
+                                            <td>
+                                                <select class="form-control"
+                                                        ng-model="extraSpending.recurring"
+                                                        ng-options="bool for bool in boolOptions"
+                                                        ng-change="clearEndYear($index, data.extraSpending)">
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="extraSpending.startYear">
+                                            </td>
+                                            <td>
+                                                <input  type="text"
+                                                        class="form-control"
+                                                        ng-model="extraSpending.endYear"
+                                                        ng-disabled="!extraSpending.recurring">
+                                            </td>
+                                            <td>
+                                                <select class="form-control"
+                                                        ng-model="extraSpending.inflationAdjusted"
+                                                        ng-options="bool for bool in boolOptions"
+                                                        ng-change="changeInflationAdjusted($index, data.extraSpending)">
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control"
+                                                        ng-model="extraSpending.inflationType"
+                                                        ng-options="option.value as option.text for option in inflationTypes"
+                                                        ng-change="changeInflationType($index, data.extraSpending)"
+                                                        ng-disabled="!extraSpending.inflationAdjusted">
+                                                    <option value=""></option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text"
+                                                        class="form-control"
+                                                        ng-model="extraSpending.inflationRate"
+                                                        ng-disabled="extraSpending.inflationType != 'constant'">
+                                            </td>
+                                            <td>
+                                                <input type="button" ng-click="removeObject($index, data.extraSpending)" value="Delete"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <input type="button" ng-click="addObject(data.extraSpending)" value="Add Spending"/>                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="button" value="Run Simulation" ng-click="runSimulation()"/>
     </div>
     <script type="text/javascript" src="js/marketData.js"></script>
     <script type="text/javascript" src="js/cFIREsimOpen.js"></script>
 </body>
-
 </html>
+<script type="text/javascript">
+    angular.module('cFIREsim', [])
+        .controller('simulationInputController', ['$scope', function($scope) {
+            $scope.data = {
+                retirementStartYear: 2014,
+                retirementEndYear: 2043,
+                portfolio: {
+                    initial: 8000,
+                    percentEquities: 75,
+                    percentBonds: 25,
+                    percentGold: 0,
+                    percentCash: 0,
+                    percentFees: 0,
+                    growthOfCash: 0.25,
+                    rebalanceAnnually: true,
+                    constantAllocation: true
+                },
+                spending: {
+                    method: 'inflationAdjusted',
+                    floor: 'none',
+                    ceiling: 'none',
+                    percentageOfPortfolioType: 'constant',
+                    percentageOfPortfolioFloorType: 'percentageOfPortfolio',
+                    percentageOfPortfolioCeilingType: 'percentageOfPreviousYear',
+                    percentageOfPortfolioFloorPercentage: 7,
+                    retireAgainAmountType: 'valueAtRetirement'
+                },
+                extraIncome: {
+                    socialSecurity: {
+                        val: 0,
+                        startYear: 2032,
+                        endYear: 2100
+                    },
+                    socialSecuritySpouse: {
+                        val: 0,
+                        startYear: 2032,
+                        endYear: 2100
+                    },
+                    pensions: [{
+                        label: 'One',
+                        val: 0,
+                        startYear: 2030,
+                        endYear: null,
+                        recurring: true,
+                        inflationAdjusted: true,
+                        inflationType: 'constant',
+                        inflationRate: 5
+                    },{
+                        label: 'Two',
+                        val: 0,
+                        startYear: 2030,
+                        endYear: null,
+                        recurring: true,
+                        inflationAdjusted: true,
+                        inflationType: 'RPI',
+                        inflationRate: ''
+                    }],
+                    extraSavings: [{
+                        label: 'One',
+                        val: 0,
+                        startYear: 2030,
+                        endYear: null,
+                        recurring: true,
+                        inflationAdjusted: true,
+                        inflationType: 'constant',
+                        inflationRate: 5
+                    },{
+                        label: 'Two',
+                        val: 0,
+                        startYear: 2030,
+                        endYear: null,
+                        recurring: true,
+                        inflationAdjusted: true,
+                        inflationType: 'RPI',
+                        inflationRate: ''
+                    }]
+                },
+                extraSpending: [{
+                    label: 'One',
+                    val: 0,
+                    startYear: 2030,
+                    endYear: null,
+                    recurring: true,
+                    inflationAdjusted: true,
+                    inflationType: 'constant',
+                    inflationRate: 5
+                },{
+                    label: 'Two',
+                    val: 0,
+                    startYear: 2030,
+                    endYear: null,
+                    recurring: true,
+                    inflationAdjusted: true,
+                    inflationType: 'RPI',
+                    inflationRate: ''
+                }]
+            }
+
+            $scope.boolOptions = [
+                true,
+                false
+            ]
+
+            $scope.inflationTypes = [            
+                {
+                    text: 'RPI',
+                    value: 'RPI'
+                },
+                {
+                    text: 'Constant %',
+                    value: 'constant'
+                }
+            ]
+
+            $scope.spendingPlanTypes = [
+                {
+                    text: 'Inflation Adjusted',
+                    value: 'inflationAdjusted',
+                    formInputs: [
+                        'yearlySpendingOptions'
+                    ]
+                },{
+                    text: 'Not Inflation Adjusted',
+                    value: 'notInflationAdjusted',
+                    formInputs: [
+                        'yearlySpendingOptions',
+                        'spendingLimitOptions'
+                    ]
+                },{
+                    text: '% of Portfolio',
+                    value: 'percentOfPortfolio',
+                    formInputs: [
+                        'percentageOfPortfolioOptions'
+                    ]
+                },{
+                    text: 'Hebeler Autopilot',
+                    value: 'hebelerAutopilot',
+                    formInputs: [
+                        'yearlySpendingOptions',
+                        'hebelerAutiopilotOptions',
+                        'spendingLimitOptions'
+                    ]
+                },{
+                    text: 'Variable Spending',
+                    value: 'variableSpending',
+                    formInputs: [
+                        'yearlySpendingOptions',
+                        'variableSpendingOptions',
+                        'spendingLimitOptions'
+                    ]
+                },{
+                    text: 'Guyton-Clinger',
+                    value: 'guytonClinger',
+                    formInputs: [
+                        'yearlySpendingOptions',
+                        'guytonKlingerOptions',
+                        'spendingLimitOptions'
+                    ]
+                },{
+                    text: 'Retire Again and Again',
+                    value: 'retireAgainAndAgain',
+                    formInputs: [
+                        'yearlySpendingOptions',
+                        'retireAgainAndAgainOptions',
+                        'spendingLimitOptions'
+                    ]
+                },{
+                    text: 'Original VPW',
+                    value: 'originalVPW',
+                    formInputs: [
+                        'spendingLimitOptions'
+                    ]
+                },{
+                    text: 'Custom VPW',
+                    value: 'customVPW',
+                    formInputs: [
+                        'yearlySpendingOptions',
+                        'customVPWOptions',
+                        'spendingLimitOptions'
+                    ]
+                }
+            ]
+
+            $scope.spendingFloorTypes = [
+                {
+                    text: 'No Floor',
+                    value: 'none'
+                },
+                {
+                    text: 'Pensions/SS',
+                    value: 'pensions'
+                },
+                {
+                    text: 'Defined Value',
+                    value: 'definedValue'
+                }
+            ]
+
+            $scope.spendingCeilingTypes = [
+                {
+                    text: 'No Ceiling',
+                    value: 'none'
+                },
+                {
+                    text: 'Defined Value',
+                    value: 'definedValue'
+                }
+            ]
+
+            $scope.percentageOfPortfolioTypes = [
+                {
+                    text: 'Constant %',
+                    value: 'constant'
+                },
+                {
+                    text: 'With Floor and Ceiling Values',
+                    value: 'withFloorAndCeiling'
+                }
+            ]
+
+            $scope.percentOfPortfolioLimitTypes = [
+                {
+                    text: 'As a % of Portfolio',
+                    value: 'percentageOfPortfolio'
+                },
+                {
+                    text: '% of Previous Year',
+                    value: 'percentageOfPreviousYear'
+                },
+                {
+                    text: 'No Limit',
+                    value: 'none'
+                }
+            ]
+
+            $scope.retireAgainAmountTypes = [
+                {
+                    text: 'Portfolio Value at Retirement',
+                    value: 'valueAtRetirement'
+                },
+                {
+                    text: 'Custom Portfolio Value',
+                    value: 'customValue'
+                }
+            ]
+
+            // Refreshes the spending form by hiding all the sections, showing the correct ones, then wiping the data in the still hidden ones.
+            $scope.refreshSpendingForm = function () {
+                var spendingPlan = $.grep($scope.spendingPlanTypes, function (spendingPlanType) {
+                    return spendingPlanType.value == $scope.data.spending.method
+                });
+
+                $('.spendingOptions').hide();
+
+                if (spendingPlan.length == 1) {
+                    $.each(spendingPlan[0].formInputs, function (index, formInput) {
+                        $('#' + formInput).show();
+                    });
+                }
+
+                $scope.clearFields('.spendingOptions:hidden');
+            }
+
+            // Clears all the inputs and selects within the items returned by the selector.
+            $scope.clearFields = function (selector) {
+                // For the spending option sections which are still hidden, clear their values.
+                $.each($(selector), function (index, option) {
+                    $('input', option).val('');
+                    $('select', option).prop('selectedIndex', 0);
+
+                    // If called without the timeout Angular with throw and error the first time this function is called.
+                    setTimeout(
+                        function () {
+                            $('select', option).trigger('change')
+                        }, 0, option);
+                });
+            }
+
+            $scope.runSimulation = function () {
+                alert(JSON.stringify($scope.data));
+            }
+
+            // TODO: Could these 2 be turned into declarative Angular statements?
+            $scope.enableRebalancing = function (enable) {
+                $('#portfolioPanel [name=constantAllocationRadio]').attr('disabled', !enable);
+                $scope.enableChangeAllocation(enable);
+            }
+
+            $scope.enableChangeAllocation = function (enable) {
+                var inputs = $('#targetAssetsPanel input');
+
+                if (!enable) {
+                    inputs.val('');
+                }
+
+                inputs.attr('disabled', !enable);
+            }
+
+            // Adds a saving or pension object.
+            $scope.addObject = function (array) {
+                array.push({
+                    label: '',
+                    val: 0,
+                    startYear: 2030,
+                    endYear: null,
+                    recurring: true,
+                    inflationAdjusted: true,
+                    inflationType: 'RPI',
+                    inflationRate: ''
+                });
+            }
+
+            $scope.removeObject = function (index, array) {
+                array.splice(index, 1);
+            }
+
+            // TODO: These there methods which clear a property of an object in an array could probably be generalized.
+            $scope.changeInflationAdjusted = function (index, array) {
+                var object = array[index];
+
+                if (!object.inflationAdjusted) {
+                    object.inflationType = '';
+                }
+                $scope.changeInflationType(index, array);
+            }
+
+            $scope.changeInflationType = function (index, array) {
+                var object = array[index];
+
+                if (object.inflationType != 'constant') {
+                    object.inflationRate = '';
+                }
+            }
+
+            $scope.clearEndYear = function (index, array) {
+                var object = array[index];
+
+                if (!object.recurring) {
+                    object.endYear = '';
+                }
+            }
+
+            $scope.clearProperty = function (clear, path) {
+                if (clear) {
+                    var pathArray = path.split('.');
+                    var property = $scope;
+
+                    for (var i = 0; i < pathArray.length; i++) {
+                        if (i == (pathArray.length - 1)) {
+                            property[pathArray[i]] = '';
+                        }
+                        else {
+                            property = property[pathArray[i]];                            
+                        }
+                    }
+                }
+            }
+
+            // Setup the spending form when the controller loads.
+            $scope.refreshSpendingForm()
+        }]);
+
+</script>
