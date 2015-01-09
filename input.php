@@ -11,6 +11,7 @@
 	<?php
 		echo '<script type="text/javascript" src="js/cFIREsimOpen.js?v='.time().'"></script>';
 		echo '<script type="text/javascript" src="js/formData-stub.js?v='.time().'"></script>';
+		echo '<script type="text/javascript" src="js/marketData.js?v='.time().'"></script>';
 	?>
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -22,6 +23,7 @@
     </div>
     <div class="container">
     	<div class="row">
+    		<p>Press button below, and see results in the Javascript Console</p>
 			<div class="input-group col-md-9">
 				<span class='input-group-addon'><b>Portfolio:</b></span><input type='text' name='portfolio' class='form-control' id='portfolio' value="1000000">
 			</div>
