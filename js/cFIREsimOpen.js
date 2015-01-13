@@ -18,10 +18,9 @@ var Simulation = {
         }
 
         for (var i = 0; i < this.sim.length; i++) {
-            for (var j = 0; j < this.sim[i].length; j++) {
-            	
+            for (var j = 0; j < this.sim[i].length; j++) {	
                 if (j > 0) {
-                    this.sim[i][j].portfolio = this.roundTwoDecimals(this.sim[i][(j - 1)].portfolio - form.spending.initial);
+                    this.sim[i][j].portfolio = this.roundTwoDecimals(this.sim[i][(j - 1)].portfolio.end - form.spending.initial);
                     this.sim[i][j].infAdjPortfolio = this.roundTwoDecimals(this.sim[i][j].portfolio * this.sim[i][j].cumulativeInflation);
                     this.sim[i][j].infAdjSpending = this.roundTwoDecimals(this.sim[i][j].spending / this.sim[i][j].cumulativeInflation);
                 } else {
@@ -43,15 +42,15 @@ var Simulation = {
             cyc.push({
                 "year": year,
                 "data": data,
-                "portfolio": null,
+                "portfolio": {"start": null, "end": null},
                 "infAdjPortfolio": null,
                 "spending": null,
                 "infAdjSpending": null,
-                "equities": null,
-                "bonds": null,
-                "gold": null,
-                "cash": null,
-                "dividends": null,
+                "equities": {"growth": null, "val": null},
+                "bonds": {"growth": null, "val": null},
+                "gold": {"growth": null, "val": null},
+                "cash": {"growth": null, "val": null},
+                "dividends": {"growth": null, "val": null},
                 "cumulativeInflation": this.cumulativeInflation(startCPI, data.cpi),
             });
         }
@@ -75,20 +74,41 @@ var Simulation = {
     	this.sim[i][j].infAdjSpending = this.roundTwoDecimals(spending / this.sim[i][j].cumulativeInflation);
     },
     calcMarketGains: function(form, i, j){
-    	var portfolio = this.sim[i][j].portfolio;
-    	var equities = (form.portfolio.percentEquities/100 * this.sim[i][j].portfolio);
-    	var bonds = (form.portfolio.percentBonds* this.sim[i][j].portfolio);
-    	var gold = (form.portfolio.percentGold * this.sim[i][j].portfolio);
-    	var cash = (form.portfolio.percentCash * this.sim[i][j].portfolio);
+        var portfolio;
+        if(j==0){
+            portfolio = form.portfolio.initial; 
+        }else{
+            portfolio = this.sim[i][(j - 1)].portfolio.end;
+        }
+        this.sim[i][j].portfolio.start = portfolio;
+        portfolio = portfolio - this.sim[i][j].spending; //Take out spending before calculating asset allocation. This simulates taking your spending out at the beginning of a year.
+    	
+        var equities = (form.portfolio.percentEquities/100 * portfolio);
+    	var bonds = (form.portfolio.percentBonds/100 * portfolio);
+    	var gold = (form.portfolio.percentGold/100 * portfolio);
+    	var cash = (form.portfolio.percentCash/100 * portfolio);
 
-    	this.sim[i][j].equities = equities * (1+this.sim[i][j].data.growth);
-    	this.sim[i][j].dividends = equities * this.sim[i][j].data.dividends;
-    	this.sim[i][j].bonds = bonds * (1+this.sim[i][j].data.fixed_income);
-    	this.sim[i][j].gold = gold * (1+this.sim[i][j].data.gold);
-    	this.sim[i][j].cash = cash * (1+(form.portfolio.growthOfCash/100));
+        //Calculate growth
+    	this.sim[i][j].equities.growth = this.roundTwoDecimals(equities * (this.sim[i][j].data.growth));
+    	this.sim[i][j].dividends.growth = this.roundTwoDecimals(equities * this.sim[i][j].data.dividends);
+    	this.sim[i][j].bonds.growth = this.roundTwoDecimals(bonds * (this.sim[i][j].data.fixed_income));
+    	this.sim[i][j].gold.growth = this.roundTwoDecimals(gold * (this.sim[i][j].data.gold));
+    	this.sim[i][j].cash.growth = this.roundTwoDecimals(cash * ((form.portfolio.growthOfCash/100)));
+
+        //Calculate total value
+        this.sim[i][j].equities.val = this.roundTwoDecimals(equities + this.sim[i][j].equities.growth);
+        this.sim[i][j].dividends.val = this.sim[i][j].dividends.growth;
+        this.sim[i][j].bonds.val = this.roundTwoDecimals(bonds + this.sim[i][j].bonds.growth);
+        this.sim[i][j].gold.val = this.roundTwoDecimals(gold + this.sim[i][j].gold.growth);
+        this.sim[i][j].cash.val = this.roundTwoDecimals(cash + this.sim[i][j].cash.growth);
+
     },
-    calcPortfolio: function(form,i, j){
+    calcEndPortfolio: function(form , i, j){
+        if(form.portfolio.rebalanceAnnually == true){
+            
+        }else{ //Add logic for non-rebalancing portfolios
 
+        }
     },
 
 };
