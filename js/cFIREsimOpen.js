@@ -7,7 +7,7 @@ $(document).ready(function() {
 var Simulation = {
     sim: [],
     runSimulation: function(form) {
-        var startYear = form.retirementStartYear;
+        var startYear = new Date().getFullYear();
         var endYear = form.retirementEndYear;
         var cycleLength = endYear - startYear + 1;
         var numCycles = Object.keys(Market).length - cycleLength + 1;
@@ -23,7 +23,6 @@ var Simulation = {
                 this.calcSpending(form, i, j); //Nominal spending for this specific cycle
             	this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
                 this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
-                
             }
         }
         this.calcFailures(this.sim);
@@ -48,6 +47,7 @@ var Simulation = {
                 "cash": {"growth": null, "val": null},
                 "dividends": {"growth": null, "val": null},
                 "cumulativeInflation": this.cumulativeInflation(startCPI, data.cpi),
+                "sumOfAdjustments": null,
             });
         }
 
@@ -115,11 +115,8 @@ var Simulation = {
     calcEndPortfolio: function(form, i, j) {
         if (form.portfolio.rebalanceAnnually == true) {
             var feesIncurred = this.roundTwoDecimals((this.sim[i][j].portfolio.start - this.sim[i][j].spending + this.sim[i][j].equities.growth + this.sim[i][j].bonds.growth + this.sim[i][j].cash.growth + this.sim[i][j].gold.growth) * (form.portfolio.percentFees / 100));
-            if (i == 0) {
-                console.log(this.sim[i][j].portfolio.start, this.sim[i][j].equities.growth, this.sim[i][j].bonds.growth, this.sim[i][j].cash.growth, this.sim[i][j].gold.growth, feesIncurred);
-            }
             this.sim[i][j].portfolio.fees = feesIncurred;
-            var sumOfAdjustments = 0; //Sum of all portfolio adjustments for this given year. SS/Pensions/Extra Income/Extra Spending.
+            var sumOfAdjustments = this.calcSumOfAdjustments(form, i, j); //Sum of all portfolio adjustments for this given year. SS/Pensions/Extra Income/Extra Spending.
 
             //Calculate current allocation percentages after all market gains are taken into consideration
             var curPercEquities = this.sim[i][j].equities.val / (this.sim[i][j].equities.val + this.sim[i][j].bonds.val + this.sim[i][j].cash.val + this.sim[i][j].gold.val);
@@ -148,7 +145,6 @@ var Simulation = {
             for (var j = 0; j < results[i].length; j++) {
                 if (results[i][j].portfolio.end < 0) {
                     cycleFailure = true;
-                    //console.log("Failed ", i, j, results[i][j])
                 }
             }
             if (cycleFailure == true) {
@@ -156,6 +152,32 @@ var Simulation = {
             }
         }
         console.log("Failed " + totalFailures + " out of " + results.length + " cycles.");
+    },
+    calcSumOfAdjustments: function(form, i, j){
+        var currentYear = new Date().getFullYear();
+        var sumOfAdjustments = 0; 
+    //Evaluate ExtraIncome given cycle i, year j
+        //Social Security
+        if((j >= (form.extraIncome.socialSecurity.startYear-currentYear)) && (j <= (form.extraIncome.socialSecurity.endYear-currentYear))){
+            sumOfAdjustments += form.extraIncome.socialSecurity.val * this.sim[i][j].cumulativeInflation;
+        }
+        if((j >= (form.extraIncome.socialSecuritySpouse.startYear-currentYear)) && (j <= (form.extraIncome.socialSecuritySpouse.endYear-currentYear))){
+            sumOfAdjustments += form.extraIncome.socialSecuritySpouse.val * this.sim[i][j].cumulativeInflation;
+        }
+
+        //Pensions
+        for(var i=0; i<form.extraIncome.pensions.length; i++){
+            if((j >= (form.extraIncome.pensions[i].startYear-currentYear)) && (j <= (form.extraIncome.pensions[i].endYear-currentYear))){
+                sumOfAdjustments += form.extraIncome.pensions[i].val * this.sim[i][j].cumulativeInflation;
+            }
+        }
+        
+        //Extra Savings
+
+    //Evaluate ExtraSpending
+
+        this.sim[i][j].sumOfAdjustments = sumOfAdjustments;
+        return sumOfAdjustments;
     }
 
 };
