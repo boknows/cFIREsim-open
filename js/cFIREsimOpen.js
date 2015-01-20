@@ -78,19 +78,19 @@ var Simulation = {
     	this.sim[i][j].spending = spending; //assign value to main sim container
     	this.sim[i][j].infAdjSpending = this.roundTwoDecimals(spending / this.sim[i][j].cumulativeInflation);
     },
-    calcMarketGains: function(form, i, j){
+    calcMarketGains: function(form, i, j) {
         var portfolio = this.sim[i][j].portfolio.start;
         portfolio = portfolio - this.sim[i][j].spending; //Take out spending before calculating asset allocation. This simulates taking your spending out at the beginning of a year.
 
         //Calculate value of each asset class based on allocation percentages
-        var equities = (form.portfolio.percentEquities/100 * portfolio);
-    	var bonds = (form.portfolio.percentBonds/100 * portfolio);
-    	var gold = (form.portfolio.percentGold/100 * portfolio);
-    	var cash = (form.portfolio.percentCash/100 * portfolio);
+        var equities = (form.portfolio.percentEquities / 100 * portfolio);
+        var bonds = (form.portfolio.percentBonds / 100 * portfolio);
+        var gold = (form.portfolio.percentGold / 100 * portfolio);
+        var cash = (form.portfolio.percentCash / 100 * portfolio);
 
         //Calculate growth
-    	this.sim[i][j].equities.growth = this.roundTwoDecimals(equities * (this.sim[i][j].data.growth));
-    	this.sim[i][j].dividends.growth = this.roundTwoDecimals(equities * this.sim[i][j].data.dividends);
+        this.sim[i][j].equities.growth = this.roundTwoDecimals(equities * (this.sim[i][j].data.growth));
+        this.sim[i][j].dividends.growth = this.roundTwoDecimals(equities * this.sim[i][j].data.dividends);
 
         //New Bond Calculation to incorporate capital appreciation. 
         if (typeof(Market[this.sim[i][j].year + 1]) == "undefined") {
@@ -101,8 +101,8 @@ var Simulation = {
             this.sim[i][j].bonds.growth = this.roundTwoDecimals(bonds * (bondsGrowth1 + bondsGrowth2 + this.sim[i][j].data.fixed_income));
         }
 
-    	this.sim[i][j].gold.growth = this.roundTwoDecimals(gold * (this.sim[i][j].data.gold));
-    	this.sim[i][j].cash.growth = this.roundTwoDecimals(cash * ((form.portfolio.growthOfCash/100)));
+        this.sim[i][j].gold.growth = this.roundTwoDecimals(gold * (this.sim[i][j].data.gold));
+        this.sim[i][j].cash.growth = this.roundTwoDecimals(cash * ((form.portfolio.growthOfCash / 100)));
 
         //Calculate total value
         this.sim[i][j].equities.val = this.roundTwoDecimals(equities + this.sim[i][j].equities.growth + this.sim[i][j].dividends.growth);
@@ -115,7 +115,7 @@ var Simulation = {
     calcEndPortfolio: function(form, i, j) {
         if (form.portfolio.rebalanceAnnually == true) {
             var feesIncurred = this.roundTwoDecimals((this.sim[i][j].portfolio.start - this.sim[i][j].spending + this.sim[i][j].equities.growth + this.sim[i][j].bonds.growth + this.sim[i][j].cash.growth + this.sim[i][j].gold.growth) * (form.portfolio.percentFees / 100));
-            if(i==0){
+            if (i == 0) {
                 console.log(this.sim[i][j].portfolio.start, this.sim[i][j].equities.growth, this.sim[i][j].bonds.growth, this.sim[i][j].cash.growth, this.sim[i][j].gold.growth, feesIncurred);
             }
             this.sim[i][j].portfolio.fees = feesIncurred;
@@ -128,10 +128,10 @@ var Simulation = {
             var currPercGold = this.sim[i][j].gold.val / (this.sim[i][j].equities.val + this.sim[i][j].bonds.val + this.sim[i][j].cash.val + this.sim[i][j].gold.val);
 
             //Equally distribute fees and portoflio adjustments amongst portfolio based on allocation percentages
-            this.sim[i][j].equities.val = this.roundTwoDecimals(this.sim[i][j].equities.val + (curPercEquities*sumOfAdjustments) - (curPercEquities*feesIncurred));
-            this.sim[i][j].cash.val = this.roundTwoDecimals(this.sim[i][j].cash.val + (currPercCash*sumOfAdjustments) - (currPercCash*feesIncurred));
-            this.sim[i][j].bonds.val = this.roundTwoDecimals(this.sim[i][j].bonds.val + (currPercBonds*sumOfAdjustments) - (currPercBonds*feesIncurred));
-            this.sim[i][j].gold.val = this.roundTwoDecimals(this.sim[i][j].gold.val + (currPercGold*sumOfAdjustments) - (currPercGold*feesIncurred));
+            this.sim[i][j].equities.val = this.roundTwoDecimals(this.sim[i][j].equities.val + (curPercEquities * sumOfAdjustments) - (curPercEquities * feesIncurred));
+            this.sim[i][j].cash.val = this.roundTwoDecimals(this.sim[i][j].cash.val + (currPercCash * sumOfAdjustments) - (currPercCash * feesIncurred));
+            this.sim[i][j].bonds.val = this.roundTwoDecimals(this.sim[i][j].bonds.val + (currPercBonds * sumOfAdjustments) - (currPercBonds * feesIncurred));
+            this.sim[i][j].gold.val = this.roundTwoDecimals(this.sim[i][j].gold.val + (currPercGold * sumOfAdjustments) - (currPercGold * feesIncurred));
 
             //Sum all assets to determine portfolio end value.
             this.sim[i][j].portfolio.end = this.roundTwoDecimals(this.sim[i][j].equities.val + this.sim[i][j].bonds.val + this.sim[i][j].cash.val + this.sim[i][j].gold.val);
@@ -143,15 +143,15 @@ var Simulation = {
     },
     calcFailures: function(results) {
         var totalFailures = 0;
-        for(var i=0;i<results.length;i++){
+        for (var i = 0; i < results.length; i++) {
             var cycleFailure = false;
-            for(var j=0;j<results[i].length;j++){
-                if(results[i][j].portfolio.end < 0){
+            for (var j = 0; j < results[i].length; j++) {
+                if (results[i][j].portfolio.end < 0) {
                     cycleFailure = true;
                     //console.log("Failed ", i, j, results[i][j])
                 }
             }
-            if(cycleFailure == true){
+            if (cycleFailure == true) {
                 totalFailures++;
             }
         }
