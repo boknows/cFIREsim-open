@@ -1,5 +1,6 @@
 $(document).ready(function() {
     $("#runSim").click(function() {
+        Simulation.sim = [];
         Simulation.runSimulation(formData);
     });
 });
@@ -7,6 +8,7 @@ $(document).ready(function() {
 var Simulation = {
     sim: [],
     runSimulation: function(form) {
+        this.sim = []; //Deletes previous simulation values if they exist.
         var startYear = new Date().getFullYear();
         var endYear = form.retirementEndYear;
         var cycleLength = endYear - startYear + 1;
@@ -16,7 +18,7 @@ var Simulation = {
             var cyc = this.cycle(cycleStart, cycleStart + cycleLength);
             this.sim.push(cyc);
         }
-        
+        console.log("NumCycles:", cyc.length);
         for (var i = 0; i < this.sim.length; i++) {
             for (var j = 0; j < this.sim[i].length; j++) {	
                 this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
@@ -69,12 +71,12 @@ var Simulation = {
         this.sim[i][j].portfolio.infAdjStart = this.roundTwoDecimals(this.sim[i][j].portfolio.start * this.sim[i][j].cumulativeInflation);
     },
     calcSpending: function(form, i, j){
-    	var spending;
-    	if(j==0){
-    		spending = form.spending.initial;
-    	}else{
-    		spending = this.roundTwoDecimals(form.spending.initial * this.sim[i][j].cumulativeInflation);
-    	}
+        var spending;
+        var currentYear = new Date().getFullYear();
+        if(j>=(form.retirementStartYear-currentYear)){
+            spending = SpendingModule[form.spending.method].calcSpending(form, this.sim, i, j);
+        }
+        
     	this.sim[i][j].spending = spending; //assign value to main sim container
     	this.sim[i][j].infAdjSpending = this.roundTwoDecimals(spending / this.sim[i][j].cumulativeInflation);
     },
@@ -157,27 +159,47 @@ var Simulation = {
         var currentYear = new Date().getFullYear();
         var sumOfAdjustments = 0; 
     //Evaluate ExtraIncome given cycle i, year j
-        //Social Security
+        //Social Security - always adjusted by CPI
         if((j >= (form.extraIncome.socialSecurity.startYear-currentYear)) && (j <= (form.extraIncome.socialSecurity.endYear-currentYear))){
-            sumOfAdjustments += form.extraIncome.socialSecurity.val * this.sim[i][j].cumulativeInflation;
+            sumOfAdjustments += (form.extraIncome.socialSecurity.val * this.sim[i][j].cumulativeInflation);
         }
         if((j >= (form.extraIncome.socialSecuritySpouse.startYear-currentYear)) && (j <= (form.extraIncome.socialSecuritySpouse.endYear-currentYear))){
-            sumOfAdjustments += form.extraIncome.socialSecuritySpouse.val * this.sim[i][j].cumulativeInflation;
+            sumOfAdjustments += (form.extraIncome.socialSecuritySpouse.val * this.sim[i][j].cumulativeInflation);
         }
 
         //Pensions
-        for(var i=0; i<form.extraIncome.pensions.length; i++){
-            if((j >= (form.extraIncome.pensions[i].startYear-currentYear)) && (j <= (form.extraIncome.pensions[i].endYear-currentYear))){
-                sumOfAdjustments += form.extraIncome.pensions[i].val * this.sim[i][j].cumulativeInflation;
+        for(var k=0; k<form.extraIncome.pensions.length; k++){
+            if((j >= (form.extraIncome.pensions[k].startYear-currentYear))){
+                sumOfAdjustments += this.calcAdjustmentVal(form.extraIncome.pensions[k], i, j);
             }
         }
         
         //Extra Savings
+        for(var k=0; k<form.extraIncome.extraSavings.length; k++){
+            if((j >= (form.extraIncome.extraSavings[k].startYear-currentYear)) && (j <= (form.extraIncome.extraSavings[k].endYear-currentYear))){
+                sumOfAdjustments += this.calcAdjustmentVal(form.extraIncome.extraSavings[k], i, j);
+            }
+        }
 
     //Evaluate ExtraSpending
+        for(var k=0; k<form.extraSpending.length; k++){
+            if((j >= (form.extraSpending[k].startYear-currentYear)) && (j <= (form.extraSpending[k].endYear-currentYear))){
+                sumOfAdjustments -= this.calcAdjustmentVal(form.extraSpending[k], i, j);
+            }
+        }
 
+    //Add sumOfAdjustments to sim container and return value.
         this.sim[i][j].sumOfAdjustments = sumOfAdjustments;
         return sumOfAdjustments;
+    },
+    calcAdjustmentVal: function(adj, i, j){
+        //Take in parameter of a portfolio adjustment object, return correct inflation-adjusted amount based on object parameters
+        if(adj.inflationType == "CPI"){
+            return (adj.val * this.sim[i][j].cumulativeInflation);
+        }else if(adj.inflationType == "constant"){
+            var percentage = 1+(adj.inflationRate/100);
+            return (adj.val * Math.pow(percentage,(j+1)));
+        }
     }
 
 };
