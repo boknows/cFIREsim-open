@@ -234,35 +234,42 @@
                                 </div>
                             </label>
                             <label>Percentage Type:
-                                <select class="form-control"
-                                        ng-model="data.spending.percentageOfPortfolioType"
-                                        ng-change="clearFields('#percentageOfPortfolioLimits')"
-                                        ng-options="percentageType.value as percentageType.text for percentageType in percentageOfPortfolioTypes">
-                                </select>                                
+                                <div class="input-group">
+                                    <select class="form-control"
+                                            ng-model="data.spending.percentageOfPortfolioType"
+                                            ng-change="clearFields('#percentageOfPortfolioLimits')"
+                                            ng-options="percentageType.value as percentageType.text for percentageType in percentageOfPortfolioTypes">
+                                    </select>  
+                                </div>                              
                             </label>
                             <div id="percentageOfPortfolioLimits" ng-show="data.spending.percentageOfPortfolioType == 'withFloorAndCeiling'">
                                 <label>Floor Spending:
-                                    <select class="form-control"
-                                            ng-model="data.spending.percentageOfPortfolioFloorType"
-                                            ng-change="clearProperty(data.spending.percentageOfPortfolioFloorType == 'none', 'data.spending.percentageOfPortfolioFloorPercentage')"
-                                            ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioFloorLimitTypes">
-                                    </select>                                
+                                    <div class="input-group">
+                                        <select class="form-control"
+                                                ng-model="data.spending.percentageOfPortfolioFloorType"
+                                                ng-change="clearProperty(data.spending.percentageOfPortfolioFloorType == 'none', 'data.spending.percentageOfPortfolioFloorPercentage')"
+                                                ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioFloorLimitTypes">
+                                        </select>     
+                                    </div>                           
                                 </label>
                                 <label>Never Less Than:
                                     <div class="input-group">
-                                        <input  type="text"
+                                        <input type="text"
                                                 class="form-control"
                                                 ng-model="data.spending.percentageOfPortfolioFloorPercentage"
                                                 ng-disabled="data.spending.percentageOfPortfolioFloorType == 'none'">
                                         <span class="input-group-addon">%</span>
                                     </div>
-                                </label>                              
+                                </label>
+                                <br>                              
                                 <label>Ceiling Spending:
-                                    <select class="form-control"
-                                            ng-model="data.spending.percentageOfPortfolioCeilingType"
-                                            ng-change="clearProperty(data.spending.percentageOfPortfolioCeilingType == 'none', 'data.spending.percentageOfPortfolioCeilingPercentage')"
-                                            ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioCeilingLimitTypes">
-                                    </select>                                
+                                    <div class="input-group">
+                                        <select class="form-control"
+                                                ng-model="data.spending.percentageOfPortfolioCeilingType"
+                                                ng-change="clearProperty(data.spending.percentageOfPortfolioCeilingType == 'none', 'data.spending.percentageOfPortfolioCeilingPercentage')"
+                                                ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioCeilingLimitTypes">
+                                        </select>   
+                                    </div>                             
                                 </label>
                                 <label>Never More Than:
                                     <div class="input-group">
@@ -319,6 +326,7 @@
                                     <span class="input-group-addon">%</span>
                                 </div>
                             </label>
+                            <br>
                             <label>Fall:
                                 <div class="input-group">
                                     <input  type="text"
@@ -338,10 +346,12 @@
                         </div>
                         <div id="retireAgainAndAgainOptions" class="spendingOptions">
                             <label>RAA Target Portfolio Amount:
-                                <select class="form-control"
-                                        ng-model="data.spending.retireAgainAmountType"
-                                        ng-options="retireAgainAmountType.value as retireAgainAmountType.text for retireAgainAmountType in retireAgainAmountTypes">
-                                </select>                                
+                                <div class="input-group">
+                                    <select class="form-control"
+                                            ng-model="data.spending.retireAgainAmountType"
+                                            ng-options="retireAgainAmountType.value as retireAgainAmountType.text for retireAgainAmountType in retireAgainAmountTypes">
+                                    </select>        
+                                </div>                        
                             </label>                                    
                             <label>RAA Custom Portfolio Target:
                                 <div class="input-group">
@@ -350,6 +360,7 @@
                                             class="form-control"
                                             ng-model="data.spending.retireAgainCustomTarget">
                                 </div>
+                            </label>
                             <label>Threshold for Spending Increase:
                                 <div class="input-group">
                                     <input  type="text"
@@ -874,8 +885,8 @@
                         'spendingLimitOptions'
                     ]
                 },{
-                    text: 'Guyton-Clinger',
-                    value: 'guytonClinger',
+                    text: 'Guyton-Klinger',
+                    value: 'guytonKlinger',
                     formInputs: [
                         'yearlySpendingOptions',
                         'guytonKlingerOptions',
