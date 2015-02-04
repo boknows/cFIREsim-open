@@ -8,6 +8,7 @@ $(document).ready(function() {
 var Simulation = {
     sim: [],
     runSimulation: function(form) {
+        console.log("Form Data:", form);
         this.sim = []; //Deletes previous simulation values if they exist.
         var startYear = new Date().getFullYear();
         var endYear = form.retirementEndYear;
@@ -18,7 +19,6 @@ var Simulation = {
             var cyc = this.cycle(cycleStart, cycleStart + cycleLength);
             this.sim.push(cyc);
         }
-        console.log("NumCycles:", cyc.length);
         for (var i = 0; i < this.sim.length; i++) {
             for (var j = 0; j < this.sim[i].length; j++) {	
                 this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
@@ -27,8 +27,8 @@ var Simulation = {
                 this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
             }
         }
+        console.log("Results:", this.sim);
         this.calcFailures(this.sim);
-        console.log(this.sim);
         this.displayGraph(this.sim);
     },
     cycle: function(startOfRange, endOfRange) {
@@ -228,7 +228,8 @@ var Simulation = {
         for (var i = 0; i < simLength; i++) {  // Add year to the front of each series array. This is a Dygraphs format standard
             chartData[i].unshift((i+results[0][0].year));    
         }
-        console.log(chartData);
+
+        //Chart Formatting - Dygraphs
         var labels = ['x'];
         for (var i = 0; i < simLength;i++) {
             var labelyear = i+results[0][0].year;
@@ -241,7 +242,6 @@ var Simulation = {
             document.getElementById("graphdiv"),
             // CSV or path to a CSV file.
             chartData, {
-
                 labels: labels.slice(),
                 title: 'cFIREsim Simulation Cycles',
                 ylabel: 'Portfolio ($)',
