@@ -11,6 +11,108 @@ The "sim" parameter for each function is a multi-dimensional array of the simula
 */
 
 var StatsModule = {
+	"finalStats":  {
+		"successRate": null,
+		"avgPortfolioAtRetirement": null,
+		"average": {
+			"endingPortfolio": null,
+			"yearlyWithdrawals": null,
+			"totalWithdrawals": null
+		},
+		"median": {
+			"endingPortfolio": null,
+			"yearlyWithdrawals": null,
+			"totalWithdrawals": null
+		},
+		"stDev": {
+			"endingPortfolio": null,
+			"yearlyWithdrawals": null,
+			"totalWithdrawals": null
+		},
+		"highest": {
+			"endingPortfolio": null,
+			"yearlyWithdrawals": null,
+			"totalWithdrawals": null
+		},
+		"lowest": {
+			"endingPortfolio": null,
+			"yearlyWithdrawals": null,
+			"totalWithdrawals": null
+		},
+		"withdrawalAnalysis": {
+			"average": {
+				"first5years": null,
+				"begThird": null,
+				"midThird": null,
+				"finalThird": null
+			},
+			"median": {
+				"first5years": null,
+				"begThird": null,
+				"midThird": null,
+				"finalThird": null
+			},
+			"stDev": {
+				"first5years": null,
+				"begThird": null,
+				"midThird": null,
+				"finalThird": null
+			},
+			"highest": {
+				"first5years": null,
+				"begThird": null,
+				"midThird": null,
+				"finalThird": null
+			},
+			"lowest": {
+				"first5years": null,
+				"begThird": null,
+				"midThird": null,
+				"finalThird": null
+			},
+			"failures": {
+				"first5years": null,
+				"begThird": null,
+				"midThird": null,
+				"finalThird": null
+			}
+		},
+		"dipAnalysis": {
+			"below10": {
+				"portfolioDips": null,
+				"maxPortfolioDips": null,
+				"withdrawalDips": null,
+				"maxWithdrawalDips": null
+			},
+			"below20": {
+				"portfolioDips": null,
+				"maxPortfolioDips": null,
+				"withdrawalDips": null,
+				"maxWithdrawalDips": null
+			},
+			"below40": {
+				"portfolioDips": null,
+				"maxPortfolioDips": null,
+				"withdrawalDips": null,
+				"maxWithdrawalDips": null
+			},
+			"below60": {
+				"portfolioDips": null,
+				"maxPortfolioDips": null,
+				"withdrawalDips": null,
+				"maxWithdrawalDips": null
+			}
+		},
+		"individualDips": [ 
+			{
+				"portfolioDip": null,
+				"portfolioCycleStartDipYear": null,
+				"withdrawalDip": null,
+				"withdrawalCycleStartDipYear": null
+			}
+		]
+	},
+	//General Statistical Functions
 	average: function(data) {
         var sum = data.reduce(function(sum, value) {
             return sum + value;
@@ -31,4 +133,13 @@ var StatsModule = {
         var stdDev = Math.sqrt(avgSquareDiff);
         return stdDev;
     },
+    calcAvgEndingPortfolio: function(sim){
+    	var values = [];
+    	for(var i = 0; i < sim.length; i++){
+    		for(var j = 0; j < sim[i].length; j++){
+    			values.push(sim[i][j].portfolio.infAdjEnd);
+    		}
+    	}
+    	return this.average(values);
+    }
 };

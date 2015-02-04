@@ -31,6 +31,7 @@ var Simulation = {
         this.convertToCSV(this.sim);
         this.calcFailures(this.sim);
         this.displayGraph(this.sim);
+        console.log("Avg Ending Portfolio:", StatsModule.calcAvgEndingPortfolio(this.sim));
     },
     cycle: function(startOfRange, endOfRange) {
         //The starting CPI value of this cycle, for comparison throughout the cycle.
