@@ -28,7 +28,8 @@ var Simulation = {
             }
         }
         this.calcFailures(this.sim);
-        console.log(this.sim[0]);
+        console.log(this.sim);
+        this.displayGraph(this.sim);
     },
     cycle: function(startOfRange, endOfRange) {
         //The starting CPI value of this cycle, for comparison throughout the cycle.
@@ -200,6 +201,87 @@ var Simulation = {
             var percentage = 1+(adj.inflationRate/100);
             return (adj.val * Math.pow(percentage,(j+1)));
         }
-    }
+    },
+    displayGraph: function(results){
+        var chartData = [];
+        var interval = results.length;
+        var cycLength = results[0].length - 1;
+        var simLength = results.length + cycLength;
 
+        //Logic to create array for Dygraphs display. Each series must have an entry for every year in the dataset. If there is no entry for that year in the "results" array, a null value is given so that dygraphs doesn't plot there. This provides the unique look of cFIREsims graph
+        for (var i = 0; i < simLength; i++) {
+            chartData[i] = [];
+            for (var j = 0; j < simLength; j++) {
+                chartData[i].push(null);
+            }
+        }
+        var interval = results[0].length;
+        for (var a = 0; a < simLength; a++) {
+            for (var i = 0; i < results.length; i++) {
+                for (var b = 0; b < interval; b++) {
+                    if (results[i][b].year == (a + results[0][0].year)) {
+                        chartData[a][i] = results[i][b].portfolio.infAdjEnd;
+                    }
+                }
+            }
+        }
+        for (var i = 0; i < simLength; i++) {  // Add year to the front of each series array. This is a Dygraphs format standard
+            chartData[i].unshift((i+results[0][0].year));    
+        }
+        console.log(chartData);
+        var labels = ['x'];
+        for (var i = 0; i < simLength;i++) {
+            var labelyear = i+results[0][0].year;
+            var label = '';
+            label = 'Cycle Start Year: ' + labelyear;
+            labels[i + 1] = label;
+        }
+        g = new Dygraph(
+            // containing div
+            document.getElementById("graphdiv"),
+            // CSV or path to a CSV file.
+            chartData, {
+
+                labels: labels.slice(),
+                title: 'cFIREsim Simulation Cycles',
+                ylabel: 'Portfolio ($)',
+                xlabel: 'Year',
+                labelsDivStyles: {
+                    'textAlign': 'right'
+                },
+                labelsDivWidth: 500,
+                labelsDiv: 'labelsdiv',
+                digitsAfterDecimal: 0,
+                axes: {
+                    y: {
+                        axisLabelWidth:100, 
+                        labelsKMB: false,
+                        maxNumberWidth: 11,
+                        valueFormatter: function numberWithCommas(x) {
+                            return 'Portfolio: $' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        },
+                        axisLabelFormatter: function numberWithCommas(x) {
+                            return '$' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        }
+                    },
+                    x: {
+                        valueFormatter: function numberWithCommas(x) {
+                            return 'Selected Year: ' + x;
+                        },
+                    },
+                },
+                showLabelsOnHighlight: true,
+                highlightCircleSize: 3,
+                strokeWidth: 1.5,
+                strokeBorderWidth: 0,
+                highlightSeriesBackgroundAlpha: 1.0,
+                highlightSeriesOpts: {
+                    strokeWidth: 4,
+                    strokeBorderWidth: 2,
+                    highlightCircleSize: 5,
+                },
+            }
+        );
+
+}
 };
