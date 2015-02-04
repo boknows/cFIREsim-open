@@ -2,8 +2,6 @@
 spendingModule.js - A template for modular spending methods for cFIREsim
 Each module object will have a standard set of properties that will allow the main cFIREsim function to properly determine spending for any given year, given this particular spending method. 
 
-This template is going to be based on Hebeler's Autopilot method, as I find that it is a fairly straightforward method. 
-
 Required properties:
 	- fullName - A textual representation of the name of this spending method
 	- calcSpending - this is the primary spending calculation. This must always have the parameters (form, sim, i, j) to represent the input form, the simulation container, i - the current simulation cycle, and j - the current year within the simulation cycle. 
