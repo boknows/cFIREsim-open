@@ -245,7 +245,7 @@
                                     <select class="form-control"
                                             ng-model="data.spending.percentageOfPortfolioFloorType"
                                             ng-change="clearProperty(data.spending.percentageOfPortfolioFloorType == 'none', 'data.spending.percentageOfPortfolioFloorPercentage')"
-                                            ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioLimitTypes">
+                                            ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioFloorLimitTypes">
                                     </select>                                
                                 </label>
                                 <label>Never Less Than:
@@ -261,7 +261,7 @@
                                     <select class="form-control"
                                             ng-model="data.spending.percentageOfPortfolioCeilingType"
                                             ng-change="clearProperty(data.spending.percentageOfPortfolioCeilingType == 'none', 'data.spending.percentageOfPortfolioCeilingPercentage')"
-                                            ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioLimitTypes">
+                                            ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioCeilingLimitTypes">
                                     </select>                                
                                 </label>
                                 <label>Never More Than:
@@ -943,14 +943,25 @@
                 }
             ]
 
-            $scope.percentOfPortfolioLimitTypes = [
+            $scope.percentOfPortfolioFloorLimitTypes = [
                 {
-                    text: 'As a % of Portfolio',
+                    text: 'As a % of Starting Portfolio',
                     value: 'percentageOfPortfolio'
                 },
                 {
                     text: '% of Previous Year',
                     value: 'percentageOfPreviousYear'
+                },
+                {
+                    text: 'No Limit',
+                    value: 'none'
+                }
+            ]
+
+            $scope.percentOfPortfolioCeilingLimitTypes = [
+                {
+                    text: 'As a % of Starting Portfolio',
+                    value: 'percentageOfPortfolio'
                 },
                 {
                     text: 'No Limit',

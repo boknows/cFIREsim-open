@@ -57,57 +57,41 @@ var SpendingModule = {
         calcSpending: function(form, sim, i, j) {
         	var spending = 0;
         	if(form.spending.percentageOfPortfolioType == "withFloorAndCeiling"){
+        		//Calculate floor value
+        		var floor;
+				if (form.spending.percentageOfPortfolioFloorType == "percentageOfPortfolio") {
+                    floor = sim[0][0].portfolio.start * (form.spending.percentageOfPortfolioFloorPercentage / 100);
+                }else if(form.spending.percentageOfPortfolioFloorType == "percentageOfPreviousYear"){
+                	floor = sim[i][j - 1].spending * (form.spending.percentageOfPortfolioFloorPercentage / 100);
+                }else if(form.spending.percentageOfPortfolioFloorType == "none"){
+					floor = 0;
+                }
+
+                //Calculate Ceiling
+                var ceiling;
+				if (form.spending.percentageOfPortfolioCeilingType == "percentageOfPortfolio") {
+                    ceiling = sim[0][0].portfolio.start * (form.spending.percentageOfPortfolioCeilingPercentage / 100);
+                }else if(form.spending.percentageOfPortfolioCeilingType == "percentageOfPreviousYear"){
+                	ceiling = sim[i][j - 1].spending * (form.spending.percentageOfPortfolioCeilingPercentage / 100);
+                }else if(form.spending.percentageOfPortfolioCeilingType == "none"){
+					ceiling = 0;
+                }
+
+                //Determine spending based on floor/ceiling values and the given % of portfolio value
+                var baseSpending = sim[i][j].portfolio.start * (form.spending.percentageOfPortfolioPercentage/100);
+                if(baseSpending > ceiling){
+                	spending = ceiling;
+                }else if(baseSpending < floor){
+                	spending = floor;
+                }else{
+                	spending = baseSpending;
+                }
 
         	}else{
         		spending = sim[i][j].portfolio.start * (form.spending.percentageOfPortfolioPercentage/100);
         	}
 
         	return spending;
-
-        	/* PHP legacy code
-            if ($variables['pOPFloorCeiling'] == "floorCeiling") {
-                if ($variables['pOPUpperLimit'] == "popFlat") {
-                    $percentage = ($variables['percentOfPortfolioUpperLimitValue'] / 100);
-                    $ceiling = ($variables['portfolio'] * $percentage) * $inflationFactor;
-                }
-                if ($variables['pOPFloorType'] == "pOPFloorPercentage") {
-                    $floor = $lastYearSpending * ($variables['SpendingNLTPercentOfPortfolio'] / 100);
-                }
-                if ($variables['pOPFloorType'] == "pOPFloorTypeConstant") {
-                    $percentage = ($variables['pOPFloorConstantPercentValue'] / 100);
-                    $floor = ($variables['portfolio'] * $percentage) * $inflationFactor;
-                }
-                if ($variables['pOPFloorType'] == 'pOPFloorNone' && $variables['pOPUpperLimit'] == 'popNone') {
-                    $spendingInternal = $portfolioInternal * ($variables['SpendingPercentOfPortfolio'] / 100);
-                }
-                if ($variables['pOPFloorType'] == 'pOPFloorNone' && !($variables['pOPUpperLimit'] == 'popNone')) {
-                    if (($portfolioInternal * ($variables['SpendingPercentOfPortfolio'] / 100)) > $ceiling) {
-                        $spendingInternal = $ceiling;
-                    } else {
-                        $spendingInternal = $portfolioInternal * ($variables['SpendingPercentOfPortfolio'] / 100);
-                    }
-                }
-                if (!($variables['pOPFloorType'] == 'pOPFloorNone') && $variables['pOPUpperLimit'] == 'popNone') {
-                    if (($portfolioInternal * ($variables['SpendingPercentOfPortfolio'] / 100)) < $floor) {
-                        $spendingInternal = $floor;
-                    } else {
-                        $spendingInternal = $portfolioInternal * ($variables['SpendingPercentOfPortfolio'] / 100);
-                    }
-                }
-                if (!($variables['pOPFloorType'] == 'pOPFloorNone') && !($variables['pOPUpperLimit'] == 'popNone')) {
-                    if (($portfolioInternal * ($variables['SpendingPercentOfPortfolio'] / 100)) < $floor) {
-                        $spendingInternal = $floor;
-                    }
-                    elseif(($portfolioInternal * ($variables['SpendingPercentOfPortfolio'] / 100)) > $ceiling) {
-                        $spendingInternal = $ceiling;
-                    } else {
-                        $spendingInternal = $portfolioInternal * ($variables['SpendingPercentOfPortfolio'] / 100);
-                    }
-                }
-            } else {
-                $spendingInternal = $portfolioInternal * ($variables['SpendingPercentOfPortfolio'] / 100);
-            }
-            */
         }
     },
 };
