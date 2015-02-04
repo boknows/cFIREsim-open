@@ -1005,7 +1005,8 @@
                     });
                 }
 
-                $scope.clearFields('.spendingOptions:hidden');
+                //Removed clearing of fields, so that initial spending value wouldn't disappear when percentOfPortfolio was selected. I don't think this adversely affects the code, but will leave this for posterity. 
+                //$scope.clearFields('.spendingOptions:hidden');
             }
 
             // Clears all the inputs and selects within the items returned by the selector.
