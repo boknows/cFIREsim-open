@@ -103,7 +103,7 @@ var StatsModule = {
     init: function(sim) {
         this.calcGeneralStats(sim);
         this.calcWithdrawalAnalysis(sim);
-        console.log(this.finalStats);
+        console.log("Final Stats: ", this.finalStats);
     },
     //General Statistical Functions
     average: function(data) {

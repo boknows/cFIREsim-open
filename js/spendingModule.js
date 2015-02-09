@@ -95,4 +95,47 @@ var SpendingModule = {
         	return spending;
         }
     },
+    "guytonKlinger": {
+    	"iwr": 0,
+        calcSpending: function(form, sim, i, j) {
+            var spending = 0;
+            var currentYear = new Date().getFullYear();
+            var exceeds = (form.spending.guytonKlingerExceeds / 100);
+            var cut = form.spending.guytonKlingerCut / 100;
+            var fall = (form.spending.guytonKlingerFall / 100);
+            var raise = form.spending.guytonKlingerRaise / 100;
+            if (j == (form.retirementStartYear - currentYear)) {
+                //Set Initial Withdrawal Rate for comparison each year.
+                SpendingModule.guytonKlinger.iwr = form.spending.initial / sim[i][j].portfolio.start;
+                spending = form.spending.initial;
+            }
+            if (j > (form.retirementStartYear - currentYear)) {
+            	var iwr = SpendingModule.guytonKlinger.iwr;
+                var wr = (sim[i][j - 1].spending) / sim[i][j].portfolio.start;
+                if (i == 2) {console.log(j, wr, iwr, exceeds, fall);}
+                if (((wr / iwr) - 1) > exceeds) {
+                    spending = ((wr * (1 - cut)) * sim[i][j].portfolio.start);
+                    if (i == 2) {
+                        console.log("CPR active - This Year Spending=" + spending);
+                    }
+                }else if((1 - (wr / iwr)) > fall) {
+                    spending = ((wr * (1 + raise)) * sim[i][j].portfolio.start);
+                    if (i == 2) {
+                        console.log("PR active - This Year Spending=" + spending);
+                    }
+                }else{
+                    spending = sim[i][j-1].spending * sim[i][j].cumulativeInflation;
+                    if (i == 2) {
+                        console.log("No rules active - This Year Spending=" + spending);
+                    }
+                }
+            }
+            if(form.spending.floor == "definedValue" && form.spending.floorValue > (spending*sim[i][j].cumulativeInflation)){
+            	spending = form.spending.floorValue;
+            }else if(form.spending.ceiling == "definedValue" && form.spending.ceilingValue < (spending*sim[i][j].cumulativeInflation)){
+            	spending = form.spending.ceilingValue;
+            }
+            return spending;
+        }
+    }
 };

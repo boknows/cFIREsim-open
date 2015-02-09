@@ -28,13 +28,14 @@ var Simulation = {
             }
         }
         console.log("Results:", this.sim);
+
+        //Run post-simulation functions
         this.convertToCSV(this.sim);
         this.calcFailures(this.sim);
         this.displayGraph(this.sim);
 
         //Initialize statistics calculations
         StatsModule.init(this.sim);
-        console.log("Avg Ending Portfolio:", StatsModule.finalStats.average.endingPortfolios);
     },
     cycle: function(startOfRange, endOfRange) {
         //The starting CPI value of this cycle, for comparison throughout the cycle.
