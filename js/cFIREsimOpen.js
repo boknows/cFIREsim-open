@@ -211,45 +211,45 @@ var Simulation = {
         }
 
         //Extra Savings
-        if (form.extraSavings[k].recurring == "true") {
-            for (var k = 0; k < form.extraIncome.extraSavings.length; k++) {
+        for (var k = 0; k < form.extraIncome.extraSavings.length; k++) {
+            if (form.extraIncome.extraSavings[k].recurring == true) {
                 if ((j >= (form.extraIncome.extraSavings[k].startYear - currentYear)) && (j <= (form.extraIncome.extraSavings[k].endYear - currentYear))) {
                     sumOfAdjustments += this.calcAdjustmentVal(form.extraIncome.extraSavings[k], i, j);
                 }
-            }
-        }else if (form.extraSavings[k].recurring == "false"){
-            if(j == form.extraSavings[k].startYear){
-                sumOfAdjustments += this.calcAdjustmentVal(form.extraSavings[k], i, j);
+            } else if (form.extraIncome.extraSavings[k].recurring == false) {
+                if (j == form.extraIncome.extraSavings[k].startYear) {
+                    sumOfAdjustments += this.calcAdjustmentVal(form.extraIncome.extraSavings[k], i, j);
+                }
             }
         }
 
         //Evaluate ExtraSpending
-        if (form.extraSpending[k].recurring == "true") {
-            for (var k = 0; k < form.extraSpending.length; k++) {
+        for (var k = 0; k < form.extraSpending.length; k++) {
+            if (form.extraSpending[k].recurring == true) {
                 if ((j >= (form.extraSpending[k].startYear - currentYear)) && (j <= (form.extraSpending[k].endYear - currentYear))) {
                     sumOfAdjustments -= this.calcAdjustmentVal(form.extraSpending[k], i, j);
                 }
-            }
-        } else if(form.extraSpending[k].recurring == "false"){
-            if(j == form.extraSpending[k].startYear){
-                sumOfAdjustments -= this.calcAdjustmentVal(form.extraSpending[k], i, j);
+            } else if (form.extraSpending[k].recurring == false) {
+                if (j == form.extraSpending[k].startYear) {
+                    sumOfAdjustments -= this.calcAdjustmentVal(form.extraSpending[k], i, j);
+                }
             }
         }
-
+         
         //Add sumOfAdjustments to sim container and return value.
         this.sim[i][j].sumOfAdjustments = sumOfAdjustments;
         return sumOfAdjustments;
     },
     calcAdjustmentVal: function(adj, i, j) {
         //Take in parameter of a portfolio adjustment object, return correct inflation-adjusted amount based on object parameters
-        if (adj.inflationAdjusted == "true") {
+        if (adj.inflationAdjusted == true) {
             if (adj.inflationType == "CPI") {
                 return (adj.val * this.sim[i][j].cumulativeInflation);
             } else if (adj.inflationType == "constant") {
                 var percentage = 1 + (adj.inflationRate / 100);
                 return (adj.val * Math.pow(percentage, (j + 1)));
             }
-        }else if (adj.inflationAdjusted == "false"){
+        }else if (adj.inflationAdjusted == false){
             return adj.val;
         }
     },
@@ -313,7 +313,6 @@ var Simulation = {
         g = new Dygraph(
             // containing div
             document.getElementById("graphdiv"),
-            // CSV or path to a CSV file.
             chartData, {
                 labels: labels.slice(),
                 title: 'cFIREsim Simulation Cycles',
@@ -361,7 +360,6 @@ var Simulation = {
             gr = new Dygraph(
                 // containing div
                 document.getElementById("graphdiv2"),
-                // CSV or path to a CSV file.
                 spendingData, {
                     labels: labels.slice(),
                     title: 'Spending Level',

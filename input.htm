@@ -9,6 +9,8 @@
     .dygraph-axis-label-y { padding-right:10px; padding-left:10px;}
     #labelsdiv > span { display: none; }
     #labelsdiv > span.highlight { display: inline; }
+    #labelsdiv2 > span { display: none; }
+    #labelsdiv2 > span.highlight { display: inline; }
     </style>
     <script type="text/javascript" src="http://dygraphs.com/dygraph-combined.js"></script>
     <script src='http://code.jquery.com/jquery-1.10.2.min.js' language='Javascript' type='text/javascript'></script>
@@ -631,7 +633,7 @@
                     <div class="panel-body">
                     <div class="panel panel-default">
                             <div class="panel-heading">
-                                Other Income
+                                Other Spending
                             </div>
                             <div class="panel-body">
                                 <table class="table">
@@ -726,6 +728,7 @@
         </div>
 
         <input type="button" value="Run Simulation" ng-click="runSimulation()"/>
+
     </div>
     <script type="text/javascript" src="js/marketData.js"></script>
     <script type="text/javascript" src="js/cFIREsimOpen.js"></script>
@@ -764,6 +767,7 @@
                     hebelerAgeOfRetirement: 60, 
                     hebelerWeightedCPI: 50,
                     hebelerWeightedRMD: 50,
+                    variableSpendingZValue: 0.5,
                     guytonKlingerExceeds: 20,
                     guytonKlingerFall: 20,
                     guytonKlingerRaise: 10,
@@ -1035,6 +1039,28 @@
 
             $scope.runSimulation = function () {
                 Simulation.runSimulation($scope.data);
+            }
+
+            $scope.saveSimulation = function () {
+                console.log($scope.data);
+
+                var uri = 'data:text/csv;charset=utf-8,' + JSON.stringify($scope.data);
+                var link = document.createElement("a");
+                link.href = uri;
+
+                //set the visibility hidden so it will not effect on your web-layout
+                link.style = "visibility:hidden";
+                link.download = "simulation.json";
+
+                //this part will append the anchor tag and remove it after automatic click
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            $scope.loadSimulation = function () {
+               // $scope.data =   
+               //Load from JSON
             }
 
             // TODO: Could these 2 be turned into declarative Angular statements?
