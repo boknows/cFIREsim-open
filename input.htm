@@ -289,18 +289,18 @@
                             </label>
                             <label>Weighted RMD:
                                 <div class="input-group">
-                                    <span class="input-group-addon">$</span>
                                     <input  type="text"
                                             class="form-control"
                                             ng-model="data.spending.hebelerWeightedRMD">
+                                    <span class="input-group-addon">%</span>
                                 </div>
                             </label>
                             <label>Weighted CPI:
                                 <div class="input-group">
-                                    <span class="input-group-addon">$</span>
                                     <input  type="text"
                                             class="form-control"
                                             ng-model="data.spending.hebelerWeightedCPI">
+                                    <span class="input-group-addon">%</span>
                                 </div>
                             </label>
 
@@ -753,13 +753,17 @@
                 spending: {
                     initial: 40000,
                     method: 'inflationAdjusted',
-                    floor: 'none',
+                    floor: 'pensions',
                     ceiling: 'none',
                     percentageOfPortfolioType: 'constant',
                     percentageOfPortfolioFloorType: 'percentageOfPortfolio',
                     percentageOfPortfolioCeilingType: 'percentageOfPreviousYear',
                     percentageOfPortfolioFloorPercentage: 7,
+                    percentageOfPortfolioPercentage: 4,
                     retireAgainAmountType: 'valueAtRetirement',
+                    hebelerAgeOfRetirement: 60, 
+                    hebelerWeightedCPI: 50,
+                    hebelerWeightedRMD: 50,
                     guytonKlingerExceeds: 20,
                     guytonKlingerFall: 20,
                     guytonKlingerRaise: 10,
@@ -896,7 +900,7 @@
                         'guytonKlingerOptions',
                         'spendingLimitOptions'
                     ]
-                },{
+                }/*,{
                     text: 'Retire Again and Again',
                     value: 'retireAgainAndAgain',
                     formInputs: [
@@ -904,7 +908,8 @@
                         'retireAgainAndAgainOptions',
                         'spendingLimitOptions'
                     ]
-                },{
+                }
+                ,{
                     text: 'Original VPW',
                     value: 'originalVPW',
                     formInputs: [
@@ -918,14 +923,10 @@
                         'customVPWOptions',
                         'spendingLimitOptions'
                     ]
-                }
+                }*/
             ]
 
             $scope.spendingFloorTypes = [
-                {
-                    text: 'No Floor',
-                    value: 'none'
-                },
                 {
                     text: 'Pensions/SS',
                     value: 'pensions'
@@ -933,6 +934,10 @@
                 {
                     text: 'Defined Value',
                     value: 'definedValue'
+                },
+                {
+                    text: 'No Floor',
+                    value: 'none'
                 }
             ]
 

@@ -104,9 +104,9 @@ var SpendingModule = {
             var cut = form.spending.guytonKlingerCut / 100;
             var fall = (form.spending.guytonKlingerFall / 100);
             var raise = form.spending.guytonKlingerRaise / 100;
+            SpendingModule.guytonKlinger.iwr = form.spending.initial / sim[i][j].portfolio.start;
             if (j == (form.retirementStartYear - currentYear)) {
                 //Set Initial Withdrawal Rate for comparison each year.
-                SpendingModule.guytonKlinger.iwr = form.spending.initial / sim[i][j].portfolio.start;
                 spending = form.spending.initial;
             }
             if (j > (form.retirementStartYear - currentYear)) {

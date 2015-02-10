@@ -32,7 +32,7 @@ var Simulation = {
         //Run post-simulation functions
         this.convertToCSV(this.sim);
         this.calcFailures(this.sim);
-        this.displayGraph(this.sim);
+        this.displayGraph(this.sim, form);
 
         //Initialize statistics calculations
         StatsModule.init(this.sim);
@@ -114,7 +114,8 @@ var Simulation = {
     },
     calcMarketGains: function(form, i, j) {
         var portfolio = this.sim[i][j].portfolio.start;
-        portfolio = portfolio - this.sim[i][j].spending; //Take out spending before calculating asset allocation. This simulates taking your spending out at the beginning of a year.
+        var sumOfAdjustments = this.calcSumOfAdjustments(form, i, j); //Sum of all portfolio adjustments for this given year. SS/Pensions/Extra Income/Extra Spending.
+        portfolio = portfolio - this.sim[i][j].spending + sumOfAdjustments; //Take out spending and portfolio adjustments before calculating asset allocation. This simulates taking your spending out at the beginning of a year.
 
         //Calculate value of each asset class based on allocation percentages
         var equities = (form.portfolio.percentEquities / 100 * portfolio);
@@ -154,7 +155,6 @@ var Simulation = {
         if (form.portfolio.rebalanceAnnually == true) {
             var feesIncurred = this.roundTwoDecimals((this.sim[i][j].portfolio.start - this.sim[i][j].spending + this.sim[i][j].equities.growth + this.sim[i][j].bonds.growth + this.sim[i][j].cash.growth + this.sim[i][j].gold.growth) * (form.portfolio.percentFees / 100));
             this.sim[i][j].portfolio.fees = feesIncurred;
-            var sumOfAdjustments = this.calcSumOfAdjustments(form, i, j); //Sum of all portfolio adjustments for this given year. SS/Pensions/Extra Income/Extra Spending.
 
             //Calculate current allocation percentages after all market gains are taken into consideration
             var curPercEquities = this.sim[i][j].equities.end / (this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end);
@@ -163,10 +163,10 @@ var Simulation = {
             var currPercGold = this.sim[i][j].gold.end / (this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end);
 
             //Equally distribute fees and portoflio adjustments amongst portfolio based on allocation percentages
-            this.sim[i][j].equities.end = this.roundTwoDecimals(this.sim[i][j].equities.end + (curPercEquities * sumOfAdjustments) - (curPercEquities * feesIncurred));
-            this.sim[i][j].cash.end = this.roundTwoDecimals(this.sim[i][j].cash.end + (currPercCash * sumOfAdjustments) - (currPercCash * feesIncurred));
-            this.sim[i][j].bonds.end = this.roundTwoDecimals(this.sim[i][j].bonds.end + (currPercBonds * sumOfAdjustments) - (currPercBonds * feesIncurred));
-            this.sim[i][j].gold.end = this.roundTwoDecimals(this.sim[i][j].gold.end + (currPercGold * sumOfAdjustments) - (currPercGold * feesIncurred));
+            this.sim[i][j].equities.end = this.roundTwoDecimals(this.sim[i][j].equities.end - (curPercEquities * feesIncurred));
+            this.sim[i][j].cash.end = this.roundTwoDecimals(this.sim[i][j].cash.end - (currPercCash * feesIncurred));
+            this.sim[i][j].bonds.end = this.roundTwoDecimals(this.sim[i][j].bonds.end - (currPercBonds * feesIncurred));
+            this.sim[i][j].gold.end = this.roundTwoDecimals(this.sim[i][j].gold.end - (currPercGold * feesIncurred));
 
             //Sum all assets to determine portfolio end value.
             this.sim[i][j].portfolio.end = this.roundTwoDecimals(this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end);
@@ -191,7 +191,7 @@ var Simulation = {
         }
         console.log("Failed " + totalFailures + " out of " + results.length + " cycles.");
     },
-    calcSumOfAdjustments: function(form, i, j) {
+    calcSumOfAdjustments: function(form, i, j) { //Calculate the sum of all portfolio adjustments for a given year (pensions, extra income, extra spending, etc)
         var currentYear = new Date().getFullYear();
         var sumOfAdjustments = 0;
         //Evaluate ExtraIncome given cycle i, year j
@@ -211,15 +211,27 @@ var Simulation = {
         }
 
         //Extra Savings
-        for (var k = 0; k < form.extraIncome.extraSavings.length; k++) {
-            if ((j >= (form.extraIncome.extraSavings[k].startYear - currentYear)) && (j <= (form.extraIncome.extraSavings[k].endYear - currentYear))) {
-                sumOfAdjustments += this.calcAdjustmentVal(form.extraIncome.extraSavings[k], i, j);
+        if (form.extraSavings[k].recurring == "true") {
+            for (var k = 0; k < form.extraIncome.extraSavings.length; k++) {
+                if ((j >= (form.extraIncome.extraSavings[k].startYear - currentYear)) && (j <= (form.extraIncome.extraSavings[k].endYear - currentYear))) {
+                    sumOfAdjustments += this.calcAdjustmentVal(form.extraIncome.extraSavings[k], i, j);
+                }
+            }
+        }else if (form.extraSavings[k].recurring == "false"){
+            if(j == form.extraSavings[k].startYear){
+                sumOfAdjustments += this.calcAdjustmentVal(form.extraSavings[k], i, j);
             }
         }
 
         //Evaluate ExtraSpending
-        for (var k = 0; k < form.extraSpending.length; k++) {
-            if ((j >= (form.extraSpending[k].startYear - currentYear)) && (j <= (form.extraSpending[k].endYear - currentYear))) {
+        if (form.extraSpending[k].recurring == "true") {
+            for (var k = 0; k < form.extraSpending.length; k++) {
+                if ((j >= (form.extraSpending[k].startYear - currentYear)) && (j <= (form.extraSpending[k].endYear - currentYear))) {
+                    sumOfAdjustments -= this.calcAdjustmentVal(form.extraSpending[k], i, j);
+                }
+            }
+        } else if(form.extraSpending[k].recurring == "false"){
+            if(j == form.extraSpending[k].startYear){
                 sumOfAdjustments -= this.calcAdjustmentVal(form.extraSpending[k], i, j);
             }
         }
@@ -230,15 +242,20 @@ var Simulation = {
     },
     calcAdjustmentVal: function(adj, i, j) {
         //Take in parameter of a portfolio adjustment object, return correct inflation-adjusted amount based on object parameters
-        if (adj.inflationType == "CPI") {
-            return (adj.val * this.sim[i][j].cumulativeInflation);
-        } else if (adj.inflationType == "constant") {
-            var percentage = 1 + (adj.inflationRate / 100);
-            return (adj.val * Math.pow(percentage, (j + 1)));
+        if (adj.inflationAdjusted == "true") {
+            if (adj.inflationType == "CPI") {
+                return (adj.val * this.sim[i][j].cumulativeInflation);
+            } else if (adj.inflationType == "constant") {
+                var percentage = 1 + (adj.inflationRate / 100);
+                return (adj.val * Math.pow(percentage, (j + 1)));
+            }
+        }else if (adj.inflationAdjusted == "false"){
+            return adj.val;
         }
     },
-    displayGraph: function(results) {
+    displayGraph: function(results, form) {
         var chartData = [];
+        var spendingData = [];
         var interval = results.length;
         var cycLength = results[0].length - 1;
         var simLength = results.length + cycLength;
@@ -262,6 +279,27 @@ var Simulation = {
         }
         for (var i = 0; i < simLength; i++) { // Add year to the front of each series array. This is a Dygraphs format standard
             chartData[i].unshift((i + results[0][0].year));
+        }
+
+        //Create Spending Data array in dygraphs format
+        for (var i = 0; i < simLength; i++) {
+            spendingData[i] = [];
+            for (var j = 0; j < simLength; j++) {
+                spendingData[i].push(null);
+            }
+        }
+        var interval = results[0].length;
+        for (var a = 0; a < simLength; a++) {
+            for (var i = 0; i < results.length; i++) {
+                for (var b = 0; b < interval; b++) {
+                    if (results[i][b].year == (a + results[0][0].year)) {
+                        spendingData[a][i] = results[i][b].infAdjSpending;
+                    }
+                }
+            }
+        }
+        for (var i = 0; i < simLength; i++) { // Add year to the front of each series array. This is a Dygraphs format standard
+            spendingData[i].unshift((i + results[0][0].year));
         }
 
         //Chart Formatting - Dygraphs
@@ -317,15 +355,65 @@ var Simulation = {
                 },
             }
         );
+        if (form.spending.method != "inflationAdjusted" && form.spending.method != "notInflationAdjusted") {
+            $('#graphdiv').append("<div id='graphdiv2' style='width:1100px; height:550px;background:white'>content</div>");
+            $('#graphdiv').append("<div id='labelsdiv2' style='background:white;width:1100px;height:20px;'></div>");
+            gr = new Dygraph(
+                // containing div
+                document.getElementById("graphdiv2"),
+                // CSV or path to a CSV file.
+                spendingData, {
+                    labels: labels.slice(),
+                    title: 'Spending Level',
+                    ylabel: 'Spending ($)',
+                    xlabel: 'Year',
+                    labelsDivStyles: {
+                        'textAlign': 'right'
+                    },
+                    labelsDiv: 'labelsdiv2',
+                    labelsDivWidth: 500,
+                    digitsAfterDecimal: 0,
+                    axes: {
+                        y: {
+                            axisLabelWidth: 100,
+                            labelsKMB: false,
+                            maxNumberWidth: 11,
+                            valueFormatter: function numberWithCommas(x) {
+                                return 'Spending: $' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            },
+                            axisLabelFormatter: function numberWithCommas(x) {
+                                return '$' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            }
+                        },
+                        x: {
+                            valueFormatter: function numberWithCommas(x) {
+                                return 'Year: ' + x;
+                            },
+                        },
+                    },
+                    showLabelsOnHighlight: true,
+                    highlightCircleSize: 3,
+                    strokeWidth: 1.5,
+                    strokeBorderWidth: 0,
+                    highlightSeriesBackgroundAlpha: 1.0,
+                    highlightSeriesOpts: {
+                        strokeWidth: 4,
+                        strokeBorderWidth: 2,
+                        highlightCircleSize: 5,
+                    },
+                }
+            );
+        }
     },
-    convertToCSV: function (results){ //converts a random cycle of simulation into a CSV file, for users to easily view
+    convertToCSV: function(results) { //converts a random cycle of simulation into a CSV file, for users to easily view
         var csv = "";
+
         function getRandomInt(min, max) {
-          return Math.floor(Math.random() * (max - min)) + min;
+            return Math.floor(Math.random() * (max - min)) + min;
         }
         var num = getRandomInt(0, results.length);
         csv = csv.concat("Year,CumulativeInflation,portfolio.start,portfolio.infAdjStart,spending,infAdjSpending,PortfolioAdjustments,Equities,Bonds,Gold,Cash,equities.growth,dividends,bonds.growth,gold.growth,cash.growth,fees,portfolio.end,portfolio.infAdjEnd\r\n");
-        for(var i = 0; i< results[num].length; i++){
+        for (var i = 0; i < results[num].length; i++) {
             csv = csv.concat(results[num][i].year + ",");
             csv = csv.concat(results[num][i].cumulativeInflation + ",");
             csv = csv.concat(results[num][i].portfolio.start + ",");
@@ -352,18 +440,18 @@ var Simulation = {
         // you can use either>> window.open(uri);
         // but this will not work in some browsers
         // or you will not get the correct file extension    
-        
+
         //this trick will generate a temp <a /> tag
-        var link = document.createElement("a"); 
-        var linkText = document.createTextNode("download CSV"); 
-        link.title = "download CSV"; 
-        link.appendChild(linkText); 
+        var link = document.createElement("a");
+        var linkText = document.createTextNode("download CSV");
+        link.title = "download CSV";
+        link.appendChild(linkText);
         link.href = uri;
-        
+
         //set the visibility hidden so it will not effect on your web-layout
         //link.style = "visibility:hidden";
         link.download = "cfiresim.csv";
-        
+
         //this part will append the anchor tag and remove it after automatic click
         document.body.appendChild(link);
         //link.click();
