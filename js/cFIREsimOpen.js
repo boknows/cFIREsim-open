@@ -100,7 +100,7 @@ var Simulation = {
         } else {
             this.sim[i][j].portfolio.start = this.roundTwoDecimals(form.portfolio.initial);
         }
-        this.sim[i][j].portfolio.infAdjStart = this.roundTwoDecimals(this.sim[i][j].portfolio.start * this.sim[i][j].cumulativeInflation);
+        this.sim[i][j].portfolio.infAdjStart = this.roundTwoDecimals(this.sim[i][j].portfolio.start / this.sim[i][j].cumulativeInflation);
     },
     calcSpending: function(form, i, j) {
         var spending;
@@ -170,7 +170,7 @@ var Simulation = {
 
             //Sum all assets to determine portfolio end value.
             this.sim[i][j].portfolio.end = this.roundTwoDecimals(this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end);
-            this.sim[i][j].portfolio.infAdjEnd = this.roundTwoDecimals(this.sim[i][j].portfolio.end * this.sim[i][j].cumulativeInflation);
+            this.sim[i][j].portfolio.infAdjEnd = this.roundTwoDecimals(this.sim[i][j].portfolio.end / this.sim[i][j].cumulativeInflation);
 
         } else { //Add logic for non-rebalancing portfolios
 
