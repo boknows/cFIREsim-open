@@ -34,7 +34,7 @@
 
     <div ng-controller="simulationInputController">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         Basics
@@ -42,6 +42,60 @@
                     <div class="panel-body">
                         <label>Retirement Year:<input type="text" class="form-control" ng-model="data.retirementStartYear"></label>
                         <label>Retirement End Year:<input type="text" class="form-control" ng-model="data.retirementEndYear"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        Data Options
+                    </div>
+                    <div class="panel-body">
+                        <label>Data To Use:
+                            <select class="form-control"
+                                    ng-model="data.data.method"
+                                    ng-change="refreshDataForm()"
+                                    ng-options="dataOptions.value as dataOptions.text for dataOptions in dataOptionTypes">
+                            </select>                                
+                        </label>
+                        <div id="historicalSpecificOptions" class="dataOptions" style="display:none">
+                            <label>Starting Data Year:
+                                <div class="input-group">
+                                    <input type="text" class="form-control" ng-model="data.data.start">
+                                </div>
+                            </label>
+                            <label>Ending Data Year:
+                                <div class="input-group">
+                                    <input type="text" class="form-control" ng-model="data.data.end">
+                                </div>
+                            </label>
+                        </div>
+                        <div id="constantGrowthOptions" class="dataOptions" style="display:none">
+                            <label>Market Growth:
+                                <div class="input-group">
+                                    <input type="text" class="form-control" ng-model="data.data.growth">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>Investigate:
+                                    <select class="form-control"
+                                            ng-model="data.investigate.type"
+                                            ng-change="refreshInvestigateForm()"
+                                            ng-options="investigateOptions.value as investigateOptions.text for investigateOptions in investigateOptionTypes">
+                                    </select>                                
+                                </label>
+                                <div id="singleCycleOptions" class="dataOptions" style="display:none">
+                                    <label>Starting Data Year:
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" ng-model="data.investigate.single">
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -118,7 +172,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div class="row" style="display:none">
                             <div class="col-md-6">
                                 <div class="form-group">       
                                     <label>Rebalance Annually:</label>
@@ -148,7 +202,7 @@
                         </div>
 
 
-                        <div class="panel panel-default">
+                        <div class="panel panel-default" style="display:none">
                             <div class="panel-heading">
                                 Target Assets
                             </div>
@@ -742,6 +796,16 @@
             $scope.data = {
                 retirementStartYear: 2015,
                 retirementEndYear: 2044,
+                data: {
+                    method: "historicalAll",
+                    start: 1900,
+                    end: 1970,
+                    growth: 8
+                },
+                investigate: {
+                    type: "none",
+                    single: 1966
+                },
                 portfolio: {
                     initial: 1000000,
                     percentEquities: 75,
@@ -857,6 +921,41 @@
                 {
                     text: 'Constant %',
                     value: 'constant'
+                }
+            ]
+
+            $scope.dataOptionTypes = [
+                {
+                    text: 'Historical Data - All',
+                    value: 'historicalAll'
+                },
+                {
+                    text: 'Historical Data - Specific Years',
+                    value: 'historicalSpecific',
+                    formInputs: [
+                        'historicalSpecificOptions'
+                    ]
+                },
+                {
+                    text: 'Constant Market Growth',
+                    value: 'constant',
+                    formInputs: [
+                        'constantGrowthOptions'
+                    ]
+                }
+            ]
+
+            $scope.investigateOptionTypes = [
+                {
+                    text: 'None ',
+                    value: 'none',
+                },
+                {
+                    text: 'Single Simulation Cycle ',
+                    value: 'single',
+                    formInputs: [
+                        'singleCycleOptions'
+                    ]
                 }
             ]
 
@@ -1021,6 +1120,27 @@
                 //Removed clearing of fields, so that initial spending value wouldn't disappear when percentOfPortfolio was selected. I don't think this adversely affects the code, but will leave this for posterity. 
                 //$scope.clearFields('.spendingOptions:hidden');
             }
+
+            $scope.refreshDataForm = function () {
+                if($scope.data.data.method == "historicalSpecific"){
+                   $('#historicalSpecificOptions').show(); 
+                   $('#constantGrowthOptions').hide(); 
+                }else if($scope.data.data.method == "constant"){
+                    $('#constantGrowthOptions').show();
+                    $('#historicalSpecificOptions').hide();
+                }else if($scope.data.data.method == "historicalAll"){
+                    $('#constantGrowthOptions').hide();
+                    $('#historicalSpecificOptions').hide();
+                }
+            }
+            $scope.refreshInvestigateForm = function () {
+                if($scope.data.investigate.type == "single"){
+                    $('#singleCycleOptions').show(); 
+                }else{
+                    $('#singleCycleOptions').hide();
+                }
+                
+            } 
 
             // Clears all the inputs and selects within the items returned by the selector.
             $scope.clearFields = function (selector) {
