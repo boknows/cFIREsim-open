@@ -405,34 +405,42 @@ var Simulation = {
     },
     convertToCSV: function(results) { //converts a random cycle of simulation into a CSV file, for users to easily view
         var csv = "";
-
+        /*
+        //Random number generator for supplying a CSV of only 1 random cycle. Disabled for debugging purposes.
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min)) + min;
         }
         var num = getRandomInt(0, results.length);
-        csv = csv.concat("Year,CumulativeInflation,portfolio.start,portfolio.infAdjStart,spending,infAdjSpending,PortfolioAdjustments,Equities,Bonds,Gold,Cash,equities.growth,dividends,bonds.growth,gold.growth,cash.growth,fees,portfolio.end,portfolio.infAdjEnd\r\n");
-        for (var i = 0; i < results[num].length; i++) {
-            csv = csv.concat(results[num][i].year + ",");
-            csv = csv.concat(results[num][i].cumulativeInflation + ",");
-            csv = csv.concat(results[num][i].portfolio.start + ",");
-            csv = csv.concat(results[num][i].portfolio.infAdjStart + ",");
-            csv = csv.concat(results[num][i].spending + ",");
-            csv = csv.concat(results[num][i].infAdjSpending + ",");
-            csv = csv.concat(results[num][i].sumOfAdjustments + ",");
-            csv = csv.concat(results[num][i].equities.start + ",");
-            csv = csv.concat(results[num][i].bonds.start + ",");
-            csv = csv.concat(results[num][i].gold.start + ",");
-            csv = csv.concat(results[num][i].cash.start + ",");
-            csv = csv.concat(results[num][i].equities.growth + ",");
-            csv = csv.concat(results[num][i].dividends.growth + ",");
-            csv = csv.concat(results[num][i].bonds.growth + ",");
-            csv = csv.concat(results[num][i].gold.growth + ",");
-            csv = csv.concat(results[num][i].cash.growth + ",");
-            csv = csv.concat(results[num][i].portfolio.fees + ",");
-            csv = csv.concat(results[num][i].portfolio.end + ",");
-            csv = csv.concat(results[num][i].portfolio.infAdjEnd + ",");
-            csv = csv.concat("\r\n");
+        */
+
+        for (var j = 0; j < results.length; j++) {
+            csv = csv.concat("Year,CumulativeInflation,portfolio.start,portfolio.infAdjStart,spending,infAdjSpending,PortfolioAdjustments,Equities,Bonds,Gold,Cash,equities.growth,dividends,bonds.growth,gold.growth,cash.growth,fees,portfolio.end,portfolio.infAdjEnd\r\n");
+            for (var i = 0; i < results[j].length; i++) {
+                csv = csv.concat(results[j][i].year + ",");
+                csv = csv.concat(results[j][i].cumulativeInflation + ",");
+                csv = csv.concat(results[j][i].portfolio.start + ",");
+                csv = csv.concat(results[j][i].portfolio.infAdjStart + ",");
+                csv = csv.concat(results[j][i].spending + ",");
+                csv = csv.concat(results[j][i].infAdjSpending + ",");
+                csv = csv.concat(results[j][i].sumOfAdjustments + ",");
+                csv = csv.concat(results[j][i].equities.start + ",");
+                csv = csv.concat(results[j][i].bonds.start + ",");
+                csv = csv.concat(results[j][i].gold.start + ",");
+                csv = csv.concat(results[j][i].cash.start + ",");
+                csv = csv.concat(results[j][i].equities.growth + ",");
+                csv = csv.concat(results[j][i].dividends.growth + ",");
+                csv = csv.concat(results[j][i].bonds.growth + ",");
+                csv = csv.concat(results[j][i].gold.growth + ",");
+                csv = csv.concat(results[j][i].cash.growth + ",");
+                csv = csv.concat(results[j][i].portfolio.fees + ",");
+                csv = csv.concat(results[j][i].portfolio.end + ",");
+                csv = csv.concat(results[j][i].portfolio.infAdjEnd + ",");
+                csv = csv.concat("\r\n");
+            }
+            csv = csv.concat("Year,CumulativeInflation,portfolio.start,portfolio.infAdjStart,spending,infAdjSpending,PortfolioAdjustments,Equities,Bonds,Gold,Cash,equities.growth,dividends,bonds.growth,gold.growth,cash.growth,fees,portfolio.end,portfolio.infAdjEnd\r\n\r\n");
+
         }
+        
         var uri = 'data:text/csv;charset=utf-8,' + escape(csv);
         // Now the little tricky part.
         // you can use either>> window.open(uri);
