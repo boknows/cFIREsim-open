@@ -439,10 +439,17 @@ var Simulation = {
         // but this will not work in some browsers
         // or you will not get the correct file extension    
 
+        // See if the link already exists and if it does, delete it.
+        var oldLink = document.getElementById("csvDownloadLink");
+        if(oldLink !== null) {
+            oldLink.parentNode.removeChild(oldLink);
+        }
         //this trick will generate a temp <a /> tag
         var link = document.createElement("a");
         var linkText = document.createTextNode("download CSV");
         link.title = "download CSV";
+        // Add an id to the link to be able to remove it
+        link.id = "csvDownloadLink";
         link.appendChild(linkText);
         link.href = uri;
 
