@@ -125,6 +125,8 @@ var Simulation = {
         var currentYear = new Date().getFullYear();
         if (j >= (form.retirementStartYear - currentYear)) {
             spending = SpendingModule[form.spending.method].calcSpending(form, this.sim, i, j);
+        }else{
+            spending = 0;
         }
 
         this.sim[i][j].spending = spending; //assign value to main sim container
