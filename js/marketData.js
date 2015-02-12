@@ -997,14 +997,14 @@ var Market = {
         "cpi": 230.28, 
         "dividends": 0.0213028, 
         "fixed_income": 0.0191, 
-        "gold": 0.0, 
-        "growth": 0.13495676
+        "gold": -.276, 
+        "growth": 0.22114293
     },
     "2014": {
         "cpi": 233.916, 
         "dividends": 0.01942536, 
         "fixed_income": 0.0286, 
-        "gold": 0.0, 
+        "gold": -0.00004, 
         "growth": 0.13694330
     }
 };
