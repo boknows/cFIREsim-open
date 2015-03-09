@@ -46,7 +46,7 @@ var SpendingModule = {
             if (isInitialYearInCycle) {
                 return form.spending.initial;
             } else if (isAfterInitialYearInCycle) {
-                var spendingAdjustment = ((sim[i][j].portfolio.start / sim[i][0].portfolio.start - 1) * form.spending.variableSpendingZValue) + 1;
+                var spendingAdjustment = ((sim[i][j].portfolio.start / (sim[i][0].portfolio.start * sim[i][j].cumulativeInflation) - 1) * form.spending.variableSpendingZValue) + 1;
                 var spending = form.spending.initial * spendingAdjustment * sim[i][j].cumulativeInflation;
                 return Math.min(ceiling, Math.max(floor, spending));
             }

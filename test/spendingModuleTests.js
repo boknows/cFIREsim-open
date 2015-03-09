@@ -29,7 +29,8 @@ describe("variableSpending", function() {
 
             var actualSpending = SpendingModule['variableSpending'].calcSpending(form, sim, 0, 1);
 
-            expect(actualSpending).toBe(38000 * 1.05);
+            var expectedSpendingAdjustment = (((900000 / (1000000 * 1.05) - 1) * 0.5) + 1)
+            expect(actualSpending).toBe(expectedSpendingAdjustment * 40000 * 1.05);
         });
 
         describe("and it hits the floor", function() {
@@ -70,11 +71,12 @@ describe("variableSpending", function() {
 
                 var actualSpending = SpendingModule['variableSpending'].calcSpending(form, sim, 0, 1);
 
-                expect(actualSpending).toBe(38000 * 1.05);
+                var expectedSpendingAdjustment = (((900000 / (1000000 * 1.05) - 1) * 0.5) + 1)
+                expect(actualSpending).toBe(expectedSpendingAdjustment * 40000 * 1.05);
             });
         });
 
-        describe("and it goes below the ceiling", function() {
+        describe("and it goes back below the ceiling", function() {
 
             it("should return the adjusted spending", function() {
 
@@ -92,7 +94,8 @@ describe("variableSpending", function() {
 
                 var actualSpending = SpendingModule['variableSpending'].calcSpending(form, sim, 0, 2);
 
-                expect(actualSpending).toBe(40000 * 1.05);
+                var expectedSpendingAdjustment = (((1000000 / (1000000 * 1.05) - 1) * 0.5) + 1);
+                expect(actualSpending).toBe(expectedSpendingAdjustment * 40000 * 1.05);
             });
         });
 
@@ -113,7 +116,8 @@ describe("variableSpending", function() {
 
                 var actualSpending = SpendingModule['variableSpending'].calcSpending(form, sim, 0, 1);
 
-                expect(actualSpending).toBe(60000 * 1.05);
+                var expectedSpendingAdjustment = (((2000000 / (1000000 * 1.05) - 1) * 0.5) + 1);
+                expect(actualSpending).toBe(expectedSpendingAdjustment * 40000 * 1.05);
             });
         });
     });
