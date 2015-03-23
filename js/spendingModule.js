@@ -36,28 +36,27 @@ var SpendingModule = {
     },
     "variableSpending": {
         calcSpending: function(form, sim, i, j) {
-            var spending = 0;
             var currentYear = new Date().getFullYear();
-            if (j == (form.retirementStartYear - currentYear)) {
-                spending = form.spending.initial;
-            } else if (j > (form.retirementStartYear - currentYear)) {
-                if (sim[i][j - 1].portfolio.start > sim[i][j].portfolio.start) {
-                    var loss = (sim[i][j - 1].portfolio.start - sim[i][j].portfolio.start) / sim[i][j - 1].portfolio.start;
-                    var adjustedLoss = 1 - (loss * form.spending.variableSpendingZValue);
-                    spending = adjustedLoss * sim[i][j - 1].infAdjSpending * sim[i][j].cumulativeInflation;
-                } else if (sim[i][j].portfolio.start > sim[i][j - 1].portfolio.start) {
-                    var gain = (sim[i][j].portfolio.start - sim[i][j - 1].portfolio.start) / sim[i][j - 1].portfolio.start;
-                    var adjustedGain = 1 + (gain * form.spending.variableSpendingZValue);
-                    spending = adjustedGain * sim[i][j - 1].infAdjSpending * sim[i][j].cumulativeInflation;
-                }
+            var isInitialYearInCycle = j == (form.retirementStartYear - currentYear);
+            var isAfterInitialYearInCycle = j > (form.retirementStartYear - currentYear);
+
+            var floor = (form.spending.floor == 'definedValue') && ("floorValue" in form.spending) ? form.spending.floorValue * sim[i][j].cumulativeInflation : Number.NEGATIVE_INFINITY;
+            var ceiling = (form.spending.ceiling == 'definedValue') && ("ceilingValue" in form.spending) ? form.spending.ceilingValue * sim[i][j].cumulativeInflation : Number.POSITIVE_INFINITY;
+
+            if (isInitialYearInCycle) {
+                return form.spending.initial;
+            } else if (isAfterInitialYearInCycle) {
+                var spendingAdjustment = ((sim[i][j].portfolio.start / (sim[i][0].portfolio.start * sim[i][j].cumulativeInflation) - 1) * form.spending.variableSpendingZValue) + 1;
+                var spending = form.spending.initial * spendingAdjustment * sim[i][j].cumulativeInflation;
+                return Math.min(ceiling, Math.max(floor, spending));
             }
-            return spending;
+            return 0;
         }
     },
     "percentOfPortfolio": {
         calcSpending: function(form, sim, i, j) {
         	var spending = 0;
-        	if(form.spending.percentageOfPortfolioType == "withFloorAndCeiling"){
+        	if(form.spending.percentageOfPortfolioType == "withFloorAndCeiling") {
         		//Calculate floor value
         		var floor;
 				if (form.spending.percentageOfPortfolioFloorType == "percentageOfPortfolio") {
