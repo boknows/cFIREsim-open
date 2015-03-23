@@ -58,35 +58,22 @@ var SpendingModule = {
         	var spending = 0;
         	if(form.spending.percentageOfPortfolioType == "withFloorAndCeiling") {
         		//Calculate floor value
-        		var floor;
-				if (form.spending.percentageOfPortfolioFloorType == "percentageOfPortfolio") {
-                    floor = sim[0][0].portfolio.start * (form.spending.percentageOfPortfolioFloorPercentage / 100);
-                }else if(form.spending.percentageOfPortfolioFloorType == "percentageOfPreviousYear"){
-                	floor = sim[i][j - 1].spending * (form.spending.percentageOfPortfolioFloorPercentage / 100);
-                }else if(form.spending.percentageOfPortfolioFloorType == "none"){
-					floor = 0;
+        		var floor = 0;
+				if (form.spending.percentageOfPortfolioFloorType == "percentageOfPortfolio" && "percentageOfPortfolioFloorPercentage" in form.spending) {
+                    floor = sim[0][0].portfolio.start * (form.spending.percentageOfPortfolioFloorPercentage / 100) * sim[i][j].cumulativeInflation;
+                }else if(form.spending.percentageOfPortfolioFloorType == "percentageOfPreviousYear" && "percentageOfPortfolioFloorPercentage" in form.spending && form.spending.percentageOfPortfolioFloorPercentage != ""){
+                    floor = (j == 0) ? 0 : sim[i][j - 1].spending * (form.spending.percentageOfPortfolioFloorPercentage / 100);
                 }
 
                 //Calculate Ceiling
-                var ceiling;
-				if (form.spending.percentageOfPortfolioCeilingType == "percentageOfPortfolio") {
-                    ceiling = sim[0][0].portfolio.start * (form.spending.percentageOfPortfolioCeilingPercentage / 100);
-                }else if(form.spending.percentageOfPortfolioCeilingType == "percentageOfPreviousYear"){
-                	ceiling = sim[i][j - 1].spending * (form.spending.percentageOfPortfolioCeilingPercentage / 100);
-                }else if(form.spending.percentageOfPortfolioCeilingType == "none"){
-					ceiling = 0;
+                var ceiling = Number.POSITIVE_INFINITY;
+				if (form.spending.percentageOfPortfolioCeilingType == "percentageOfPortfolio" && "percentageOfPortfolioCeilingPercentage" in form.spending && form.spending.percentageOfPortfolioCeilingPercentage != "") {
+                    ceiling = sim[0][0].portfolio.start * (form.spending.percentageOfPortfolioCeilingPercentage / 100) * sim[i][j].cumulativeInflation;
                 }
 
                 //Determine spending based on floor/ceiling values and the given % of portfolio value
                 var baseSpending = sim[i][j].portfolio.start * (form.spending.percentageOfPortfolioPercentage/100);
-                if(baseSpending > ceiling){
-                	spending = ceiling;
-                }else if(baseSpending < floor){
-                	spending = floor;
-                }else{
-                	spending = baseSpending;
-                }
-
+                spending = Math.min(ceiling, Math.max(floor, baseSpending))
         	}else{
         		spending = sim[i][j].portfolio.start * (form.spending.percentageOfPortfolioPercentage/100);
         	}
