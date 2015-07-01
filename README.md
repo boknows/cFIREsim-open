@@ -11,6 +11,6 @@ Disclaimers:
 
 - I have a full-time job AND another for-fun programming project. This project originally took me months to develop.  With those things in mind, progress may be slow. 
 	
-Collaboration: Primary discussion of the project can be done on the cFIREsim forums: http://www.cfiresim.com/phpBB3/viewforum.php?f=6    To request access to the Open Source forum, PM bo_knows.
+Collaboration: Primary discussion of the project can be done on the cFIREsim forums: http://www.cfiresim.com/phpBB3/viewforum.php?f=6    To request access to the Open Source forum, PM bo_knows. Alternatively, email me at cfiresim@gmail.com
 
 License: This software falls under the Apache License 2.0
