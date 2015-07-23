@@ -7,22 +7,19 @@ $(document).ready(function() {
 
 var Simulation = {
     sim: [],
-    getData: function(callback) {
+    getQueries: function(callback) {
         $.ajax({
             url: "getData.php",
             type: "POST",
             dataType: 'JSON',
             data: {
-                param: "getAll",
+                param: "getNames",
             },
-            success: function(){
-
-            }
         }).success(callback);
     },
     runSimulation: function(form) {
         console.log("Form Data:", form);
-        this.getData(function(data){
+        this.getQueries(function(data){
             console.log(data);
         });
         this.sim = []; //Deletes previous simulation values if they exist.
