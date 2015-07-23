@@ -1,18 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="cFIREsim">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
-	<meta name="description" content="A Crowdsourced Financial Independence and Early Retirement Simulator and Calculator. Uses historic stock data to model your retirement and give you a success rate based on all of the possible periods of time in the stock market (good and bad)."><title>Crowdsourced Financial Independence and Early Retirement Simulator/Calculator</title>
+    <meta name="description" content="A Crowdsourced Financial Independence and Early Retirement Simulator and Calculator. Uses historic stock data to model your retirement and give you a success rate based on all of the possible periods of time in the stock market (good and bad)."><title>Crowdsourced Financial Independence and Early Retirement Simulator/Calculator</title>
+     <style>
+    .dygraph-axis-label-y { padding-right:10px; padding-left:10px;}
+    #labelsdiv > span { display: none; }
+    #labelsdiv > span.highlight { display: inline; }
+    #labelsdiv2 > span { display: none; }
+    #labelsdiv2 > span.highlight { display: inline; }
+    </style>
     <script src='http://code.jquery.com/jquery-1.10.2.min.js' language='Javascript' type='text/javascript'></script>
+    <script type="text/javascript" src="http://dygraphs.com/dygraph-combined.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap-select.min.js"></script> 
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.7/angular.min.js"></script>
 	<?php
 		echo '<script type="text/javascript" src="js/cFIREsimOpen.js?v='.time().'"></script>';
 		echo '<script type="text/javascript" src="js/formData-stub.js?v='.time().'"></script>';
 		echo '<script type="text/javascript" src="js/marketData.js?v='.time().'"></script>';
+		echo '<script type="text/javascript" src="js/spendingModule.js?v='.time().'"></script>';
+		echo '<script type="text/javascript" src="js/statsModule.js?v='.time().'"></script>';
 	?>
+
+
+
+
+
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 	<link href="css/bootstrap-select.min.css" rel="stylesheet">

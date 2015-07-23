@@ -7,8 +7,24 @@ $(document).ready(function() {
 
 var Simulation = {
     sim: [],
+    getData: function(callback) {
+        $.ajax({
+            url: "getData.php",
+            type: "POST",
+            dataType: 'JSON',
+            data: {
+                param: "getAll",
+            },
+            success: function(){
+
+            }
+        }).success(callback);
+    },
     runSimulation: function(form) {
         console.log("Form Data:", form);
+        this.getData(function(data){
+            console.log(data);
+        });
         this.sim = []; //Deletes previous simulation values if they exist.
         var startYear = new Date().getFullYear();
         var endYear = form.retirementEndYear;
