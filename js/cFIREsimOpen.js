@@ -3,6 +3,18 @@ $(document).ready(function() {
         Simulation.sim = [];
         Simulation.runSimulation(formData);
     });
+    $("#loadSimBtn").click(function() {
+        Simulation.getQueries(function(data){
+            var html = "<table>";
+            console.log(data);
+            for(var i=0; i<data.qid.length; i++){
+                html += data.qid[i] + "<br>";
+            }
+            html += "</table>";
+            console.log(html);
+            alert(html);
+        });
+    });
 });
 
 var Simulation = {

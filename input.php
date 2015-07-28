@@ -18,7 +18,7 @@
 	<script type="text/javascript" src="js/bootstrap-select.min.js"></script> 
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.7/angular.min.js"></script>
 	<?php
-		echo '<script type="text/javascript" src="js/cFIREsimOpen.js?v='.time().'"></script>';
+		echo '<script type="text/javascript" src="js/cFIREsimOpen.js"></script>';
 		echo '<script type="text/javascript" src="js/formData-stub.js?v='.time().'"></script>';
 		echo '<script type="text/javascript" src="js/marketData.js?v='.time().'"></script>';
 		echo '<script type="text/javascript" src="js/spendingModule.js?v='.time().'"></script>';
@@ -43,7 +43,7 @@
             <div class="col-md-6">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        Basics
+                        Basics  <button type="button" class="btn btn-success btn-sm" id="loadSimBtn">Load Saved Sim</button>
                     </div>
                     <div class="panel-body">
                         <label>Retirement Year:<input type="text" class="form-control" ng-model="data.retirementStartYear"></label>
