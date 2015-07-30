@@ -30,6 +30,7 @@ var Simulation = {
         }).success(callback);
     },
     runSimulation: function(form) {
+        $("#outputPopup").show();
         console.log("Form Data:", form);
         this.getQueries(function(data){
             console.log(data);

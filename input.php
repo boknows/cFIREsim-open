@@ -11,6 +11,21 @@
     #labelsdiv > span.highlight { display: inline; }
     #labelsdiv2 > span { display: none; }
     #labelsdiv2 > span.highlight { display: inline; }
+	.popup {
+        display: none;
+        position: absolute;
+        top: 5%;
+        left: 5%;
+        bottom: 5%;
+        right: 5%;
+        width: 90%;
+        height: 100%;
+        padding: 16px;
+        border: 4px solid black;
+        background-color: white;
+        z-index:1002;
+        overflow: auto;
+	}
     </style>
     <script src='http://code.jquery.com/jquery-1.10.2.min.js' language='Javascript' type='text/javascript'></script>
     <script type="text/javascript" src="http://dygraphs.com/dygraph-combined.js"></script>
@@ -37,7 +52,6 @@
     <div class="page-header">
     	<h1 class="text-center">The Crowdsourced FIRE Simulator (cFIREsim) - Open Source</h1>
     </div>
-
     <div ng-controller="simulationInputController">
         <div class="row">
             <div class="col-md-6">
@@ -310,7 +324,7 @@
                                     <div class="input-group">
                                         <select class="form-control"
                                                 ng-model="data.spending.percentageOfPortfolioFloorType"
-                                                ng-change="clearProperty(data.spending.percentageOfPortfolioFloorType == 'none', 'data.spending.percentageOfPortfolioFloorPercentage')"
+                                                ng-change="clearProperty(data.spending.percentageOfPortfolioFloorType == 'none', 'data.spending.percentageOfPortfolioFloorPercentage'); changeLabel()"
                                                 ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioFloorLimitTypes">
                                         </select>     
                                     </div>                           
@@ -321,7 +335,7 @@
                                                 class="form-control"
                                                 ng-model="data.spending.percentageOfPortfolioFloorPercentage"
                                                 ng-disabled="data.spending.percentageOfPortfolioFloorType == 'none'">
-                                        <span class="input-group-addon">%</span>
+                                        <span class="input-group-addon spending-floor-span">%</span>
                                     </div>
                                 </label>
                                 <br>                              
@@ -340,7 +354,7 @@
                                                 class="form-control"
                                                 ng-model="data.spending.percentageOfPortfolioCeilingPercentage"
                                                 ng-disabled="data.spending.percentageOfPortfolioCeilingType == 'none'">
-                                        <span class="input-group-addon">%</span>
+                                        <span class="input-group-addon spending-ceiling-span">%</span>
                                     </div>
                                 </label>
                             </div>
@@ -787,13 +801,23 @@
             </div>
         </div>
 
-        <input type="button" value="Run Simulation" ng-click="runSimulation()"/>
-
+        <input type="button" value="Run Simulation" ng-click="runSimulation()">
+        <!-- Modal -->
+		<div class="modal fade" id="outputModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog modal-lg" role="document">
+		    <div class="modal-content">
+		      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		      
+		    </div>
+		  </div>
+		</div>
+    </div>
+    <div id="outputPopup" style="display:none" class="popup">
+    	<div id='graphdiv' style='width:1100px; height:550px;background:white'></div>
+    	<div id="labelsdiv" style="background:white;width:1100px;height:20px;"></div>
     </div>
     <script type="text/javascript" src="js/marketData.js"></script>
     <script type="text/javascript" src="js/cFIREsimOpen.js"></script>
-    <div id="graphdiv" style="width:1100px; height:550px;background:white"></div>
-    <div id="labelsdiv" style="background:white;width:1100px;height:20px;"></div>
 </body>
 </html>
 <script type="text/javascript">
@@ -1082,6 +1106,10 @@
                     value: 'percentageOfPreviousYear'
                 },
                 {
+                    text: 'Defined $ value',
+                    value: 'definedValue'
+                },
+                {
                     text: 'No Limit',
                     value: 'none'
                 }
@@ -1263,6 +1291,18 @@
                         }
                     }
                 }
+            }
+            $scope.changeLabel = function (label){
+            	if($scope.data.spending.percentageOfPortfolioFloorType == "definedValue"){
+            		$(".spending-floor-span").html("$");
+            	}else{
+            		$(".spending-floor-span").html("%");
+            	}
+            	if($scope.data.spending.percentageOfPortfolioCeilingType == "definedValue"){
+            		$(".spending-ceiling-span").html("$");
+            	}else{
+            		$(".spending-ceiling-span").html("%");
+            	}
             }
 
             // Setup the spending form when the controller loads.
