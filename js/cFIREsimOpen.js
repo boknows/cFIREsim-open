@@ -3,38 +3,113 @@ $(document).ready(function() {
         Simulation.sim = [];
         Simulation.runSimulation(formData);
     });
-    $("#loadSimBtn").click(function() {
-        Simulation.getQueries(function(data){
-            var html = "<table>";
-            console.log(data);
-            for(var i=0; i<data.qid.length; i++){
-                html += data.qid[i] + "<br>";
+    $("#closeOutputPopup").click(function() {
+        $("#outputPopup").hide();
+    });
+    
+    //Populate Saved Sims dropdown if user is logged in
+    if ($("#username").html() != undefined) {
+        Simulation.getQueries($("#username").html(), function(data) {
+            var html = "";
+            for (var i = 0; i < data.qid.length; i++) {
+                html += "<li><a href='#' id='" + data.qid[i] + "' class='savedSim'>" + data.simName[i] + "</a></li>"
             }
-            html += "</table>";
-            console.log(html);
-            alert(html);
+            $("#savedSimsDropdown").html(html);
+            $('.dropdown-menu a').click(function() {
+                var id = $(this).attr('id');
+                Simulation.getSavedSim(id);
+            });
+            
         });
+        //Open the Save Sim input field containing simName input and submit/cancel buttons
+        $('#saveSimBtn').click(function(e) {
+            $('#saveSimPopup').show();
+        });
+
+        //When Saved Sim is submitted, save to DB
+        $('#confirmSaveSim').click(function(e) {
+            e.stopImmediatePropagation();
+            Simulation.saveSim($("#username").html());
+        });
+
+        //Close Save Sim input div if cancelled
+        $('#cancelSaveSim').click(function(e) {
+            $('#saveSimPopup').hide();
+        });    
+
+        //Close Save Sim success popup
+        $('#closeSaveSuccess').click(function(e) {
+            $('#saveSimSuccess').hide();
+        });
+    }
+
+    $("#signInBtn").click(function() {
+        window.location.href = "../phpbb/login.php";
     });
 });
 
 var Simulation = {
     sim: [],
-    getQueries: function(callback) {
+    getQueries: function(username, callback) {
         $.ajax({
             url: "getData.php",
             type: "POST",
             dataType: 'JSON',
             data: {
                 param: "getNames",
+                username: username,
             },
         }).success(callback);
+    },
+    getSavedSim: function(qid) {
+        $.ajax({
+            url: "getData.php",
+            type: "POST",
+            dataType: "JSON",
+            data: {
+                param: "getSavedSim",
+                qid: qid,
+            }
+        }).success(function(data) {
+            Simulation.loadSavedSim(data);   
+        });
+    },
+    loadSavedSim: function(data){
+        //Load in angular scope from outside the controller
+        var scope = angular.element($("#input")).scope();
+        scope.$apply(function() {
+            scope.data = JSON.parse(data); 
+            //Refresh form to show proper data options after loading
+            scope.refreshDataForm();
+            scope.refreshSpendingForm();
+            scope.clearFields('#percentageOfPortfolioLimits');
+            scope.refreshInvestigateForm();
+        });
+    },
+    saveSim: function(username){
+        var scope = angular.element($("#input")).scope();
+        scope.$apply(function() {
+            var json_savedSim = JSON.stringify(scope.data, null, 2);
+            $.ajax({
+                url: "getData.php",
+                type: "POST",
+                dataType: 'JSON',
+                data: {
+                    param: "saveSim",
+                    json: json_savedSim,
+                    username: username,
+                    simName: $('#simNameInput').val(),
+                },
+            }).success(function(){
+                $('#saveSimPopup').hide();
+                console.log("Save Success!");
+                $('#saveSimSuccess').fadeIn( 300, "linear" );
+            });
+        });
     },
     runSimulation: function(form) {
         $("#outputPopup").show();
         console.log("Form Data:", form);
-        this.getQueries(function(data){
-            console.log(data);
-        });
         this.sim = []; //Deletes previous simulation values if they exist.
         var startYear = new Date().getFullYear();
         var endYear = form.retirementEndYear;
@@ -43,26 +118,26 @@ var Simulation = {
         var cycleStart = 1871;
 
         //Set number of cycles and cycleStart Year depending on Data options
-        if(form.data.method == "historicalAll" || form.data.method == "constant"){
+        if (form.data.method == "historicalAll" || form.data.method == "constant") {
             numCycles = Object.keys(Market).length - cycleLength + 1;
-        }else if (form.data.method == "historicalSpecific"){
+        } else if (form.data.method == "historicalSpecific") {
             numCycles = form.data.end - form.data.start + cycleLength;
             cycleStart = parseInt(form.data.start);
-        } 
-        if(form.investigate.type == "single"){
+        }
+        if (form.investigate.type == "single") {
             numCycles = 1;
             cycleStart = parseInt(form.investigate.single);
         }
-        if(form.investigate.type == "single"){
+        if (form.investigate.type == "single") {
             var cyc = this.cycle(cycleStart, cycleStart + cycleLength);
             this.sim.push(cyc);
-        }else{
+        } else {
             for (cycleStart; cycleStart < 1871 + numCycles; cycleStart++) {
                 var cyc = this.cycle(cycleStart, cycleStart + cycleLength);
                 this.sim.push(cyc);
             }
         }
-        
+
         for (var i = 0; i < this.sim.length; i++) {
             for (var j = 0; j < this.sim[i].length; j++) {
                 this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
@@ -151,7 +226,7 @@ var Simulation = {
         var currentYear = new Date().getFullYear();
         if (j >= (form.retirementStartYear - currentYear)) {
             spending = SpendingModule[form.spending.method].calcSpending(form, this.sim, i, j);
-        }else{
+        } else {
             spending = 0;
         }
 
@@ -174,13 +249,13 @@ var Simulation = {
         this.sim[i][j].cash.start = cash;
 
         //Calculate growth
-        if(form.data.method == "constant"){
-            this.sim[i][j].equities.growth = this.roundTwoDecimals(equities * (parseInt(form.data.growth)/100));
+        if (form.data.method == "constant") {
+            this.sim[i][j].equities.growth = this.roundTwoDecimals(equities * (parseInt(form.data.growth) / 100));
             this.sim[i][j].dividends.growth = 0;
-            this.sim[i][j].bonds.growth = this.roundTwoDecimals(bonds * (parseInt(form.data.growth)/100));
-            this.sim[i][j].gold.growth = this.roundTwoDecimals(gold * (parseInt(form.data.growth)/100));
+            this.sim[i][j].bonds.growth = this.roundTwoDecimals(bonds * (parseInt(form.data.growth) / 100));
+            this.sim[i][j].gold.growth = this.roundTwoDecimals(gold * (parseInt(form.data.growth) / 100));
             this.sim[i][j].cash.growth = this.roundTwoDecimals(cash * ((form.portfolio.growthOfCash / 100)));
-        }else{
+        } else {
             this.sim[i][j].equities.growth = this.roundTwoDecimals(equities * (this.sim[i][j].data.growth));
             this.sim[i][j].dividends.growth = this.roundTwoDecimals(equities * this.sim[i][j].data.dividends);
 
@@ -196,7 +271,7 @@ var Simulation = {
             this.sim[i][j].gold.growth = this.roundTwoDecimals(gold * (this.sim[i][j].data.gold));
             this.sim[i][j].cash.growth = this.roundTwoDecimals(cash * ((form.portfolio.growthOfCash / 100)));
         }
-        
+
         //Calculate total value
         this.sim[i][j].equities.end = this.roundTwoDecimals(equities + this.sim[i][j].equities.growth + this.sim[i][j].dividends.growth);
         this.sim[i][j].dividends.val = this.sim[i][j].dividends.growth;
@@ -288,7 +363,7 @@ var Simulation = {
                 }
             }
         }
-         
+
         //Add sumOfAdjustments to sim container and return value.
         this.sim[i][j].sumOfAdjustments = sumOfAdjustments;
         return sumOfAdjustments;
@@ -302,7 +377,7 @@ var Simulation = {
                 var percentage = 1 + (adj.inflationRate / 100);
                 return (adj.val * Math.pow(percentage, (j + 1)));
             }
-        }else if (adj.inflationAdjusted == false){
+        } else if (adj.inflationAdjusted == false) {
             return adj.val;
         }
     },
@@ -408,8 +483,8 @@ var Simulation = {
             }
         );
         if (form.spending.method != "inflationAdjusted" && form.spending.method != "notInflationAdjusted") {
-            $('#graphdiv').append("<div id='graphdiv2' style='width:1100px; height:550px;background:white'>content</div>");
-            $('#graphdiv').append("<div id='labelsdiv2' style='background:white;width:1100px;height:20px;'></div>");
+            $('#graphdiv').append("<div id='graphdiv2' style='width:95%; height:85%;background:white;'>content</div>");
+            $('#graphdiv').append("<div id='labelsdiv2' style='background:white;width:95%;height:20px;'></div>");
             gr = new Dygraph(
                 // containing div
                 document.getElementById("graphdiv2"),
@@ -493,7 +568,7 @@ var Simulation = {
             csv = csv.concat("Year,CumulativeInflation,portfolio.start,portfolio.infAdjStart,spending,infAdjSpending,PortfolioAdjustments,Equities,Bonds,Gold,Cash,equities.growth,dividends,bonds.growth,gold.growth,cash.growth,fees,portfolio.end,portfolio.infAdjEnd\r\n\r\n");
 
         }
-        
+
         var uri = 'data:text/csv;charset=utf-8,' + escape(csv);
         // Now the little tricky part.
         // you can use either>> window.open(uri);
@@ -502,7 +577,7 @@ var Simulation = {
 
         // See if the link already exists and if it does, delete it.
         var oldLink = document.getElementById("csvDownloadLink");
-        if(oldLink !== null) {
+        if (oldLink !== null) {
             oldLink.parentNode.removeChild(oldLink);
         }
         //this trick will generate a temp <a /> tag
@@ -520,7 +595,9 @@ var Simulation = {
 
         //this part will append the anchor tag and remove it after automatic click
         document.body.appendChild(link);
+        $(link).appendTo("#outputPopup");
         //link.click();
         //document.body.removeChild(link);
     }
 };
+
