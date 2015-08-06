@@ -44,7 +44,7 @@ $(document).ready(function() {
     }
 
     $("#signInBtn").click(function() {
-        window.location.href = "../phpbb/login.php";
+        window.location.href = "../phpBB3/login.php";
     });
 });
 

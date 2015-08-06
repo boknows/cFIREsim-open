@@ -1,5 +1,5 @@
 <?php
-	include 'headers.php';
+	//include 'headers.php';
 error_reporting(0);
 ?>
 <!DOCTYPE html>
