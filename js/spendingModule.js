@@ -82,46 +82,36 @@ var SpendingModule = {
         }
     },
     "guytonKlinger": {
-    	"iwr": 0,
         calcSpending: function(form, sim, i, j) {
-            var spending = 0;
+            if(j == 0)
+            {
+                return form.spending.initial;
+            }
+
             var currentYear = new Date().getFullYear();
+            var initialWithdrawalRate = form.spending.initial / sim[i][0].portfolio.start;
             var exceeds = (form.spending.guytonKlingerExceeds / 100);
             var cut = form.spending.guytonKlingerCut / 100;
             var fall = (form.spending.guytonKlingerFall / 100);
             var raise = form.spending.guytonKlingerRaise / 100;
-            SpendingModule.guytonKlinger.iwr = form.spending.initial / sim[i][j].portfolio.start;
-            if (j == (form.retirementStartYear - currentYear)) {
-                //Set Initial Withdrawal Rate for comparison each year.
-                spending = form.spending.initial;
+
+            var currentWithdrawalRate = sim[i][j-1].spending / sim[i][j].portfolio.start;
+            var exceedsRate = initialWithdrawalRate * (1 + exceeds);
+            var fallRate = initialWithdrawalRate * (1 - fall);
+
+            var floor = form.spending.floor == "definedValue" ? form.spending.floorValue * sim[i][j].cumulativeInflation : 0;
+            var ceiling = form.spending.ceiling == "definedValue" ? form.spending.ceilingValue * sim[i][j].cumulativeInflation : Number.POSITIVE_INFINITY;
+
+            var currentYearInflation = ((sim[i][j].cumulativeInflation - sim[i][j-1].cumulativeInflation) / sim[i][j-1].cumulativeInflation + 1);
+            if(currentWithdrawalRate > exceedsRate)
+            {
+                return Math.max(sim[i][j-1].spending * (1 - cut) * currentYearInflation, floor);
             }
-            if (j > (form.retirementStartYear - currentYear)) {
-            	var iwr = SpendingModule.guytonKlinger.iwr;
-                var wr = (sim[i][j - 1].spending) / sim[i][j].portfolio.start;
-                if (i == 2) {console.log(j, wr, iwr, exceeds, fall);}
-                if (((wr / iwr) - 1) > exceeds) {
-                    spending = ((wr * (1 - cut)) * sim[i][j].portfolio.start);
-                    if (i == 2) {
-                        console.log("CPR active - This Year Spending=" + spending);
-                    }
-                }else if((1 - (wr / iwr)) > fall) {
-                    spending = ((wr * (1 + raise)) * sim[i][j].portfolio.start);
-                    if (i == 2) {
-                        console.log("PR active - This Year Spending=" + spending);
-                    }
-                }else{
-                    spending = sim[i][j-1].spending * sim[i][j].cumulativeInflation;
-                    if (i == 2) {
-                        console.log("No rules active - This Year Spending=" + spending);
-                    }
-                }
+            if(currentWithdrawalRate < fallRate)
+            {
+                return Math.min(sim[i][j-1].spending * (1 + raise) * currentYearInflation, ceiling);
             }
-            if(form.spending.floor == "definedValue" && form.spending.floorValue > (spending*sim[i][j].cumulativeInflation)){
-            	spending = form.spending.floorValue;
-            }else if(form.spending.ceiling == "definedValue" && form.spending.ceilingValue < (spending*sim[i][j].cumulativeInflation)){
-            	spending = form.spending.ceilingValue;
-            }
-            return spending;
+            return sim[i][j-1].spending * currentYearInflation;
         }
     }
 };
