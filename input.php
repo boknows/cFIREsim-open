@@ -1,5 +1,5 @@
 <?php
-	//include 'headers.php';
+	include 'headers.php';
 error_reporting(0);
 ?>
 <!DOCTYPE html>
@@ -90,13 +90,14 @@ error_reporting(0);
 						?>
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
-						<li><form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="display:inline;">
+						<li><button class="btn btn-default navbar-btn"><a href="phpBB3/index.php">cFIREsim Forums</a></button></li>
+						<!--<li><form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="display:inline;">
 							<input type="hidden" name="cmd" value="_s-xclick">
 							<input type="hidden" name="hosted_button_id" value="6GFG7N3JXP8HN">
 							<input type="image" src="../docs/paypal-donate.jpg" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" style='padding-top: 15px;'>
 							<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
 						</form>
-					</li>
+					</li> -->
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Blogs/Forums <span class="caret"></span></a>
 						<ul class="dropdown-menu">
@@ -151,6 +152,7 @@ error_reporting(0);
 										ng-options="dataOptions.value as dataOptions.text for dataOptions in dataOptionTypes">
 									</select>
 								</label>
+
 								<div id="historicalSpecificOptions" class="dataOptions" style="display:none">
 									<label>Starting Data Year:
 										<div class="input-group">
@@ -187,6 +189,7 @@ error_reporting(0);
 												</div>
 											</label>
 										</div>
+										<br><input type="button" value="Run Simulation" ng-click="runSimulation()" class="btn btn-success">
 									</div>
 								</div>
 							</div>
@@ -866,13 +869,12 @@ error_reporting(0);
 				</div>
 			</div>
 			</form>
-			<input type="button" value="Run Simulation" ng-click="runSimulation()">
+			<input type="button" value="Run Simulation" ng-click="runSimulation()" class="btn btn-success">
 			<!-- Modal -->
 			<div class="modal fade" id="outputModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 				<div class="modal-dialog modal-lg" role="document">
 					<div class="modal-content">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						
 					</div>
 				</div>
 			</div>
