@@ -103,7 +103,9 @@ var SpendingModule = {
             var ceiling = form.spending.ceiling == "definedValue" ? form.spending.ceilingValue * sim[i][j].cumulativeInflation : Number.POSITIVE_INFINITY;
 
             var currentYearInflation = ((sim[i][j].cumulativeInflation - sim[i][j-1].cumulativeInflation) / sim[i][j-1].cumulativeInflation + 1);
-            if(currentWithdrawalRate > exceedsRate)
+            var simulationDuration = form.retirementEndYear - form.retirementStartYear + 1;
+            var yearsLeftInSimulation = simulationDuration - j;
+            if(currentWithdrawalRate > exceedsRate && yearsLeftInSimulation > 15)
             {
                 return Math.max(sim[i][j-1].spending * (1 - cut) * currentYearInflation, floor);
             }
