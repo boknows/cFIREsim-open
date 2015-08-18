@@ -3,10 +3,24 @@ $(document).ready(function() {
         Simulation.sim = [];
         Simulation.runSimulation(formData);
     });
-    $("#closeOutputPopup").click(function() {
-        $("#outputPopup").hide();
-    });
-    
+    $('#outputModal').on('shown.bs.modal', function () {
+        $(this).find('.modal-dialog').css({width:'auto',
+                                   height:'auto', 
+                                  'max-height':'100%'});
+
+		//Dygraphs window resize. Workaround for blank graphs at load time. This is for the initial load.
+		for(var i=0;i<Simulation.g.length;i++){
+			Simulation.g[i].resize();
+		}
+	});
+
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		//Dygraphs window resize. Workaround for blank graphs at load time. This is for resizing when changing tabs. 
+		for(var i=0;i<Simulation.g.length;i++){
+			Simulation.g[i].resize();
+		}
+	});
+
     //Populate Saved Sims dropdown if user is logged in
     if ($("#username").html() != undefined) {
         Simulation.getQueries($("#username").html(), function(data) {
@@ -50,6 +64,8 @@ $(document).ready(function() {
 
 var Simulation = {
     sim: [],
+    tabs: 0,
+	g: [],
     getQueries: function(username, callback) {
         $.ajax({
             url: "getData.php",
@@ -108,7 +124,7 @@ var Simulation = {
         });
     },
     runSimulation: function(form) {
-        $("#outputPopup").show();
+        this.tabs++;
         console.log("Form Data:", form);
         this.sim = []; //Deletes previous simulation values if they exist.
         var startYear = new Date().getFullYear();
@@ -155,6 +171,7 @@ var Simulation = {
 
         //Initialize statistics calculations
         StatsModule.init(this.sim);
+
     },
     cycle: function(startOfRange, endOfRange) {
         //The starting CPI value of this cycle, for comparison throughout the cycle.
@@ -438,9 +455,11 @@ var Simulation = {
             label = 'Cycle Start Year: ' + labelyear;
             labels[i + 1] = label;
         }
-        g = new Dygraph(
+		
+		//Portfolio Graph
+        Simulation.g.push(new Dygraph(
             // containing div
-            document.getElementById("graphdiv"),
+            document.getElementById("graph" + Simulation.tabs),
             chartData, {
                 labels: labels.slice(),
                 title: 'cFIREsim Simulation Cycles',
@@ -450,7 +469,7 @@ var Simulation = {
                     'textAlign': 'right'
                 },
                 labelsDivWidth: 500,
-                labelsDiv: 'labelsdiv',
+                labelsDiv: 'labels' + this.tabs,
                 digitsAfterDecimal: 0,
                 axes: {
                     y: {
@@ -481,55 +500,57 @@ var Simulation = {
                     highlightCircleSize: 5,
                 },
             }
-        );
-        if (form.spending.method != "inflationAdjusted" && form.spending.method != "notInflationAdjusted") {
-            $('#graphdiv').append("<div id='graphdiv2' style='width:95%; height:85%;background:white;'>content</div>");
-            $('#graphdiv').append("<div id='labelsdiv2' style='background:white;width:95%;height:20px;'></div>");
-            gr = new Dygraph(
-                // containing div
-                document.getElementById("graphdiv2"),
-                spendingData, {
-                    labels: labels.slice(),
-                    title: 'Spending Level',
-                    ylabel: 'Spending ($)',
-                    xlabel: 'Year',
-                    labelsDivStyles: {
-                        'textAlign': 'right'
-                    },
-                    labelsDiv: 'labelsdiv2',
-                    labelsDivWidth: 500,
-                    digitsAfterDecimal: 0,
-                    axes: {
-                        y: {
-                            axisLabelWidth: 100,
-                            labelsKMB: false,
-                            maxNumberWidth: 11,
-                            valueFormatter: function numberWithCommas(x) {
-                                return 'Spending: $' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                            },
-                            axisLabelFormatter: function numberWithCommas(x) {
-                                return '$' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                            }
-                        },
-                        x: {
-                            valueFormatter: function numberWithCommas(x) {
-                                return 'Year: ' + x;
-                            },
-                        },
-                    },
-                    showLabelsOnHighlight: true,
-                    highlightCircleSize: 3,
-                    strokeWidth: 1.5,
-                    strokeBorderWidth: 0,
-                    highlightSeriesBackgroundAlpha: 1.0,
-                    highlightSeriesOpts: {
-                        strokeWidth: 4,
-                        strokeBorderWidth: 2,
-                        highlightCircleSize: 5,
-                    },
-                }
-            );
-        }
+        ));
+
+		//Spending Graph
+		Simulation.g.push(new Dygraph(
+			// containing div
+			document.getElementById("graph" + Simulation.tabs + "b"),
+			spendingData, {
+				labels: labels.slice(),
+				title: 'Spending Level',
+				ylabel: 'Spending ($)',
+				xlabel: 'Year',
+				labelsDivStyles: {
+					'textAlign': 'right'
+				},
+				labelsDiv: 'labels' + Simulation.tabs + "b",
+				labelsDivWidth: 500,
+				digitsAfterDecimal: 0,
+				axes: {
+					y: {
+						axisLabelWidth: 100,
+						labelsKMB: false,
+						maxNumberWidth: 11,
+						valueFormatter: function numberWithCommas(x) {
+							return 'Spending: $' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+						},
+						axisLabelFormatter: function numberWithCommas(x) {
+							return '$' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+						}
+					},
+					x: {
+						valueFormatter: function numberWithCommas(x) {
+							return 'Year: ' + x;
+						},
+					},
+				},
+				showLabelsOnHighlight: true,
+				highlightCircleSize: 3,
+				strokeWidth: 1.5,
+				strokeBorderWidth: 0,
+				highlightSeriesBackgroundAlpha: 1.0,
+				highlightSeriesOpts: {
+					strokeWidth: 4,
+					strokeBorderWidth: 2,
+					highlightCircleSize: 5,
+				},
+			}
+		));
+            
+
+        $('#tabNav a[href="#' + Simulation.tabs + 'a"]').tab('show');
+		$('a[href="#'+ Simulation.tabs+'a"]').parent('li').show();
     },
     convertToCSV: function(results) { //converts a random cycle of simulation into a CSV file, for users to easily view
         var csv = "";
@@ -595,7 +616,7 @@ var Simulation = {
 
         //this part will append the anchor tag and remove it after automatic click
         document.body.appendChild(link);
-        $(link).appendTo("#outputPopup");
+        $(link).appendTo("#output");
         //link.click();
         //document.body.removeChild(link);
     }

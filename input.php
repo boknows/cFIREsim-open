@@ -11,19 +11,16 @@ error_reporting(0);
 		<meta name="description" content="A Crowdsourced Financial Independence and Early Retirement Simulator and Calculator. Uses historic stock data to model your retirement and give you a success rate based on all of the possible periods of time in the stock market (good and bad)."><title>Crowdsourced Financial Independence and Early Retirement Simulator/Calculator</title>
 		<style>
 		.dygraph-axis-label-y { padding-right:10px; padding-left:10px;}
-		#labelsdiv > span { display: none; }
-		#labelsdiv > span.highlight { display: inline; }
-		#labelsdiv2 > span { display: none; }
-		#labelsdiv2 > span.highlight { display: inline; }
+		.output > span { display: none; }
+		.output > span.highlight { display: inline; }
 		.popup {
 			display: none;
 			position: fixed;
-			top: 5%;
 			left: 5%;
 			bottom: 5%;
 			right: 5%;
-			width: 90%;
-			height: 90%;
+			width: 95%;
+			height: 100%;
 			padding: 16px;
 			border: 4px solid black;
 			background-color: white;
@@ -33,6 +30,17 @@ error_reporting(0);
 		.popup .small {
 			width: 20%;
 			height: 10%;
+		}
+		#tabNav .nav-pills > li > a {
+		  border-radius: 4px 4px 0 0 ;
+		}
+
+		#tabNav .tab-content {
+		  color : white;
+		  background-color: #428bca;
+		}
+		.tab-graph {
+			height: 800px;
 		}
 		</style>
 		<script src='http://code.jquery.com/jquery-1.10.2.min.js' language='Javascript' type='text/javascript'></script>
@@ -380,16 +388,7 @@ error_reporting(0);
 										<span class="input-group-addon">%</span>
 									</div>
 								</label>
-								<label>Percentage Type:
-									<div class="input-group">
-										<select class="form-control"
-											ng-model="data.spending.percentageOfPortfolioType"
-											ng-change="clearFields('#percentageOfPortfolioLimits')"
-											ng-options="percentageType.value as percentageType.text for percentageType in percentageOfPortfolioTypes">
-										</select>
-									</div>
-								</label>
-								<div id="percentageOfPortfolioLimits" ng-show="data.spending.percentageOfPortfolioType == 'withFloorAndCeiling'">
+								<div id="percentageOfPortfolioLimits">
 									<label>Floor Spending:
 										<div class="input-group">
 											<select class="form-control"
@@ -870,19 +869,10 @@ error_reporting(0);
 			</div>
 			</form>
 			<input type="button" value="Run Simulation" ng-click="runSimulation()" class="btn btn-success">
-			<!-- Modal -->
-			<div class="modal fade" id="outputModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-				<div class="modal-dialog modal-lg" role="document">
-					<div class="modal-content">
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					</div>
-				</div>
-			</div>
+
 		</div>
 		<div id="outputPopup" style="display:none" class="popup">
 			<button type="button" id="closeOutputPopup">Close</button>
-			<div id='graphdiv' style='width:95%; height:85%;background:white'></div>
-			<div id="labelsdiv" style="background:white;width:95%;height:20px;"></div>
 		</div>
 		<div id="saveSimPopup" style="display:none" class="popup">
 			<div class="input-group">
@@ -1147,7 +1137,12 @@ formInputs: [
                 text: 'With Floor and Ceiling Values',
                 value: 'withFloorAndCeiling'
             }]
-            $scope.percentOfPortfolioFloorLimitTypes = [{
+            $scope.percentOfPortfolioFloorLimitTypes = [
+            {
+                text: 'No Limit',
+                value: 'none'
+            },
+            {
                 text: 'As a % of Starting Portfolio',
                 value: 'percentageOfPortfolio'
             }, {
@@ -1156,17 +1151,16 @@ formInputs: [
             }, {
                 text: 'Defined $ value',
                 value: 'definedValue'
-            }, {
+            }]
+            $scope.percentOfPortfolioCeilingLimitTypes = [
+            {
                 text: 'No Limit',
                 value: 'none'
-            }]
-            $scope.percentOfPortfolioCeilingLimitTypes = [{
+            },
+            {
                 text: 'As a % of Starting Portfolio',
                 value: 'percentageOfPortfolio'
-            }, {
-                text: 'No Limit',
-                value: 'none'
-            }]
+            } ]
             $scope.retireAgainAmountTypes = [{
                 text: 'Portfolio Value at Retirement',
                 value: 'valueAtRetirement'
