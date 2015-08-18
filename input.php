@@ -13,24 +13,6 @@ error_reporting(0);
 		.dygraph-axis-label-y { padding-right:10px; padding-left:10px;}
 		.output > span { display: none; }
 		.output > span.highlight { display: inline; }
-		.popup {
-			display: none;
-			position: fixed;
-			left: 5%;
-			bottom: 5%;
-			right: 5%;
-			width: 95%;
-			height: 100%;
-			padding: 16px;
-			border: 4px solid black;
-			background-color: white;
-			z-index:1002;
-			overflow: auto;
-		}
-		.popup .small {
-			width: 20%;
-			height: 10%;
-		}
 		#tabNav .nav-pills > li > a {
 		  border-radius: 4px 4px 0 0 ;
 		}
@@ -39,9 +21,7 @@ error_reporting(0);
 		  color : white;
 		  background-color: #428bca;
 		}
-		.tab-graph {
-			height: 800px;
-		}
+
 		</style>
 		<script src='http://code.jquery.com/jquery-1.10.2.min.js' language='Javascript' type='text/javascript'></script>
 		<script type="text/javascript" src="http://dygraphs.com/dygraph-combined.js"></script>
@@ -197,7 +177,7 @@ error_reporting(0);
 												</div>
 											</label>
 										</div>
-										<br><input type="button" value="Run Simulation" ng-click="runSimulation()" class="btn btn-success">
+										<br><a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg" ng-click="runSimulation()">Run Simulation</a>
 									</div>
 								</div>
 							</div>
@@ -868,12 +848,136 @@ error_reporting(0);
 				</div>
 			</div>
 			</form>
-			<input type="button" value="Run Simulation" ng-click="runSimulation()" class="btn btn-success">
+			<a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg" ng-click="runSimulation()">Run Simulation</a>
 
 		</div>
-		<div id="outputPopup" style="display:none" class="popup">
-			<button type="button" id="closeOutputPopup">Close</button>
-		</div>
+
+		<!-- Modal -->
+		  <div class="modal fade" id="outputModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		    <div class="modal-dialog">
+		      <div class="modal-content">
+		        <div class="modal-header">
+		          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		          <h4 class="modal-title">cFIREsim Simulation Cycles</h4>
+		        </div>
+		        <div class="modal-body" id="output">
+					<div id="tabNav" class="container-fullwidth">
+            			<ul class="nav nav-pills" id="tabNames">
+            				<li class="active"><a href="#1a" data-toggle="tab">Sim 1</a></li>
+							<li style="display:none"><a href="#2a" data-toggle="tab">Sim 2</a></li>
+							<li style="display:none"><a href="#3a" data-toggle="tab">Sim 3</a></li>
+							<li style="display:none"><a href="#4a" data-toggle="tab">Sim 4</a></li>
+							<li style="display:none"><a href="#5a" data-toggle="tab">Sim 5</a></li>
+							<li style="display:none"><a href="#6a" data-toggle="tab">Sim 6</a></li>
+							<li style="display:none"><a href="#7a" data-toggle="tab">Sim 7</a></li>
+							<li style="display:none"><a href="#8a" data-toggle="tab">Sim 8</a></li>
+							<li style="display:none"><a href="#9a" data-toggle="tab">Sim 9</a></li>
+							<li style="display:none"><a href="#10a" data-toggle="tab">Sim 10</a></li>
+            			</ul>
+						<!--
+							Tabs are stubbed out here, because if they do not exist at load time, the output graphs cannot be written to.
+						-->
+            			<div class="tab-content clearfix">
+            				<div class="tab-pane active" id="1a">
+								<div style="margin:15px">
+									<p>
+										<h1>
+											Portfolio
+										</h1>
+									</p>
+									<div id='graph1' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels1' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Spending
+										</h1>
+									</p>
+									<div id='graph1b' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels1b' style='background:white;width:800px;height:20px;' class='output'></div>
+								</div>
+            				</div>
+							<div class="tab-pane" id="2a">
+								<div style="margin:15px">
+									<div id='graph2' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels2' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<div id='graph2b' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels2b' style='background:white;width:1100px;height:20px;' class='output'></div>
+								</div>
+							</div>
+							<div class="tab-pane" id="3a">
+								<div style="margin:15px">
+									<div id='graph3' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels3' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<div id='graph3b' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels3b' style='background:white;width:1100px;height:20px;' class='output'></div>
+								</div>
+							</div>
+							<div class="tab-pane" id="4a">
+								<div style="margin:15px">
+									<div id='graph4' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels4' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<div id='graph4b' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels4b' style='background:white;width:1100px;height:20px;' class='output'></div>
+								</div>
+							</div>
+							<div class="tab-pane" id="5a">
+								<div style="margin:15px">
+									<div id='graph5' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels5' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<div id='graph5b' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels5b' style='background:white;width:1100px;height:20px;' class='output'></div>
+								</div>
+							</div>
+							<div class="tab-pane" id="6a">
+								<div style="margin:15px">
+									<div id='graph6' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels6' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<div id='graph6b' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels6b' style='background:white;width:1100px;height:20px;' class='output'></div>
+								</div>
+            				</div>
+							<div class="tab-pane" id="7a">
+								<div style="margin:15px">
+									<div id='graph7' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels7' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<div id='graph7b' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels7b' style='background:white;width:1100px;height:20px;' class='output'></div>
+								</div>
+							</div>
+							<div class="tab-pane" id="8a">
+								<div style="margin:15px">
+									<div id='graph8' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels8' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<div id='graph8b' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels8b' style='background:white;width:1100px;height:20px;' class='output'></div>
+								</div>
+							</div>
+							<div class="tab-pane" id="9a">
+								<div style="margin:15px">
+									<div id='graph9' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels9' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<div id='graph9b' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels9b' style='background:white;width:1100px;height:20px;' class='output'></div>
+								</div>
+							</div>
+							<div class="tab-pane" id="10a">
+								<div style="margin:15px">
+									<div id='graph10' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels10' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<div id='graph10b' style='width:1100px; height:550px;background:white;' class='output'></div>
+									<div id='labels10b' style='background:white;width:1100px;height:20px;' class='output'></div>
+								</div>
+							</div>
+						</div>
+					</div>
+		        </div>
+		        <div class="modal-footer">
+		          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+		        </div>
+		      </div><!-- /.modal-content -->
+		    </div><!-- /.modal-dialog -->
+		  </div><!-- /.modal -->	
+
 		<div id="saveSimPopup" style="display:none" class="popup">
 			<div class="input-group">
 				<span class='input-group-addon'>Saved Simulation Name:</span><input type='text' size='12' class='form-control' id='simNameInput'>
