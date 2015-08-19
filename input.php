@@ -1,5 +1,5 @@
 <?php
-	include 'headers.php';
+	//include 'headers.php';
 error_reporting(0);
 ?>
 <!DOCTYPE html>
@@ -28,18 +28,20 @@ error_reporting(0);
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap-select.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.7/angular.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/r/bs/dt-1.10.8/datatables.min.js"></script>
 
 		<?php
 		echo '<script type="text/javascript" src="js/cFIREsimOpen.js?v='.time().'"></script>';
 		echo '<script type="text/javascript" src="js/formData-stub.js?v='.time().'"></script>';
 		echo '<script type="text/javascript" src="js/marketData.js?v='.time().'"></script>';
 		echo '<script type="text/javascript" src="js/spendingModule.js?v='.time().'"></script>';
-		echo '<script type="text/javascript" src="js/statsModule.js?v='.time().'"></script>';
+		echo '<script type="text/javascript" src="js/statsModule.js"></script>';
 		?>
 
 		<!-- Bootstrap core CSS -->
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 		<link href="css/bootstrap-select.min.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/bs/dt-1.10.8/datatables.min.css"/>
 	</head>
 	<body>
 		<div class="page-header">
@@ -894,6 +896,12 @@ error_reporting(0);
 									</p>
 									<div id='graph1b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels1b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Statistics
+										</h1>
+									</p>
+									<table id='stats1' class="table table-bordered"></table>
 								</div>
             				</div>
 							<div class="tab-pane" id="2a">
