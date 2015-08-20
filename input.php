@@ -21,6 +21,20 @@ error_reporting(0);
 		  color : white;
 		  background-color: #428bca;
 		}
+			
+		.table {
+			background-color: white;
+			color: black;
+		}
+		
+		.table th {
+			background-color: grey;
+		}
+		
+		.rowHeaders tr td:first-child {
+			background-color:grey;
+			font-weight: bold;
+		}
 
 		</style>
 		<script src='http://code.jquery.com/jquery-1.10.2.min.js' language='Javascript' type='text/javascript'></script>
@@ -29,6 +43,7 @@ error_reporting(0);
 		<script type="text/javascript" src="js/bootstrap-select.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.7/angular.min.js"></script>
 		<script type="text/javascript" src="https://cdn.datatables.net/r/bs/dt-1.10.8/datatables.min.js"></script>
+		<script type="text/javascript" src="js/accounting.min.js"></script>
 
 		<?php
 		echo '<script type="text/javascript" src="js/cFIREsimOpen.js?v='.time().'"></script>';
@@ -64,7 +79,7 @@ error_reporting(0);
 						<?php
 						//Start Login Code. Unnecessary for standalone app
 								if(!($user->data['is_registered'])){
-									echo "<button type='button' class='btn btn-default navbar-btn' id='signInBtn'><img src='http://www.cfiresim.com/phpbb/styles/prosilver/theme/images/icon_logout.gif'>Sign in</button>";
+									echo "<li><button type='button' class='btn btn-default navbar-btn' id='signInBtn'><img src='http://www.cfiresim.com/phpbb/styles/prosilver/theme/images/icon_logout.gif'>Sign in</button></li>";
 								}else {
 									echo "<p class='navbar-text'>Logged in as [ <font color='red'><b id='username'>" . $user->data['username'] . " </b></font>]</p>";
 									echo '<li><button type="button" class="btn btn-default navbar-btn" id="signOutBtn"><img src="http://www.cfiresim.com/phpbb/styles/prosilver/theme/images/icon_logout.gif"><a href="' . append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=logout', true, $user->session_id). '">Sign Out</a></button></li>';
@@ -80,7 +95,16 @@ error_reporting(0);
 						?>
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
-						<li><button class="btn btn-default navbar-btn"><a href="phpBB3/index.php">cFIREsim Forums</a></button></li>
+						<li>
+							<p class="navbar-btn">
+								<a href="phpBB3/index.php" class="btn btn-default">cFIREsim Forums</a>
+							</p>
+						</li>
+						<li>
+							<p class="navbar-btn">
+								<a data-toggle="modal" href="#reportIssueModal" class="btn btn-default">Report an Issue</a>
+							</p>
+						</li>
 						<!--<li><form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="display:inline;">
 							<input type="hidden" name="cmd" value="_s-xclick">
 							<input type="hidden" name="hosted_button_id" value="6GFG7N3JXP8HN">
@@ -901,79 +925,263 @@ error_reporting(0);
 											Statistics
 										</h1>
 									</p>
-									<table id='stats1' class="table table-bordered"></table>
+									<table id='stats1a' class="table table-bordered display compact"></table>
+									<table id='stats1b' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats1c' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats1d' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats1e' class="table table-bordered display compact rowHeaders"></table>
 								</div>
             				</div>
 							<div class="tab-pane" id="2a">
 								<div style="margin:15px">
-									<div id='graph2' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels2' style='background:white;width:1100px;height:20px;' class='output'></div>
-									<div id='graph2b' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels2b' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Portfolio
+										</h1>
+									</p>
+									<div id='graph2' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels2' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Spending
+										</h1>
+									</p>
+									<div id='graph2b' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels2b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Statistics
+										</h1>
+									</p>
+									<table id='stats2a' class="table table-bordered display compact"></table>
+									<table id='stats2b' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats2c' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats2d' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats2e' class="table table-bordered display compact rowHeaders"></table>
 								</div>
 							</div>
 							<div class="tab-pane" id="3a">
 								<div style="margin:15px">
-									<div id='graph3' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels3' style='background:white;width:1100px;height:20px;' class='output'></div>
-									<div id='graph3b' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels3b' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Portfolio
+										</h1>
+									</p>
+									<div id='graph3' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels3' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Spending
+										</h1>
+									</p>
+									<div id='graph3b' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels3b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Statistics
+										</h1>
+									</p>
+									<table id='stats3a' class="table table-bordered display compact"></table>
+									<table id='stats3b' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats3c' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats3d' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats3e' class="table table-bordered display compact rowHeaders"></table>
 								</div>
 							</div>
 							<div class="tab-pane" id="4a">
 								<div style="margin:15px">
-									<div id='graph4' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels4' style='background:white;width:1100px;height:20px;' class='output'></div>
-									<div id='graph4b' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels4b' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Portfolio
+										</h1>
+									</p>
+									<div id='graph4' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels4' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Spending
+										</h1>
+									</p>
+									<div id='graph4b' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels4b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Statistics
+										</h1>
+									</p>
+									<table id='stats4a' class="table table-bordered display compact"></table>
+									<table id='stats4b' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats4c' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats4d' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats4e' class="table table-bordered display compact rowHeaders"></table>
 								</div>
 							</div>
 							<div class="tab-pane" id="5a">
 								<div style="margin:15px">
-									<div id='graph5' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels5' style='background:white;width:1100px;height:20px;' class='output'></div>
-									<div id='graph5b' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels5b' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Portfolio
+										</h1>
+									</p>
+									<div id='graph5' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels5' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Spending
+										</h1>
+									</p>
+									<div id='graph5b' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels5b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Statistics
+										</h1>
+									</p>
+									<table id='stats5a' class="table table-bordered display compact"></table>
+									<table id='stats5b' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats5c' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats5d' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats5e' class="table table-bordered display compact rowHeaders"></table>
 								</div>
 							</div>
 							<div class="tab-pane" id="6a">
 								<div style="margin:15px">
-									<div id='graph6' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels6' style='background:white;width:1100px;height:20px;' class='output'></div>
-									<div id='graph6b' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels6b' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Portfolio
+										</h1>
+									</p>
+									<div id='graph6' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels6' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Spending
+										</h1>
+									</p>
+									<div id='graph6b' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels6b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Statistics
+										</h1>
+									</p>
+									<table id='stats6a' class="table table-bordered display compact"></table>
+									<table id='stats6b' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats6c' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats6d' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats6e' class="table table-bordered display compact rowHeaders"></table>
 								</div>
             				</div>
 							<div class="tab-pane" id="7a">
 								<div style="margin:15px">
-									<div id='graph7' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels7' style='background:white;width:1100px;height:20px;' class='output'></div>
-									<div id='graph7b' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels7b' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Portfolio
+										</h1>
+									</p>
+									<div id='graph7' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels7' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Spending
+										</h1>
+									</p>
+									<div id='graph7b' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels7b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Statistics
+										</h1>
+									</p>
+									<table id='stats7a' class="table table-bordered display compact"></table>
+									<table id='stats7b' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats7c' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats7d' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats7e' class="table table-bordered display compact rowHeaders"></table>
 								</div>
 							</div>
 							<div class="tab-pane" id="8a">
 								<div style="margin:15px">
-									<div id='graph8' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels8' style='background:white;width:1100px;height:20px;' class='output'></div>
-									<div id='graph8b' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels8b' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Portfolio
+										</h1>
+									</p>
+									<div id='graph8' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels8' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Spending
+										</h1>
+									</p>
+									<div id='graph8b' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels8b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Statistics
+										</h1>
+									</p>
+									<table id='stats8a' class="table table-bordered display compact"></table>
+									<table id='stats8b' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats8c' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats8d' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats8e' class="table table-bordered display compact rowHeaders"></table>
 								</div>
 							</div>
 							<div class="tab-pane" id="9a">
 								<div style="margin:15px">
-									<div id='graph9' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels9' style='background:white;width:1100px;height:20px;' class='output'></div>
-									<div id='graph9b' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels9b' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Portfolio
+										</h1>
+									</p>
+									<div id='graph9' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels9' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Spending
+										</h1>
+									</p>
+									<div id='graph9b' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels9b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Statistics
+										</h1>
+									</p>
+									<table id='stats9a' class="table table-bordered display compact"></table>
+									<table id='stats9b' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats9c' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats9d' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats9e' class="table table-bordered display compact rowHeaders"></table>
 								</div>
 							</div>
 							<div class="tab-pane" id="10a">
 								<div style="margin:15px">
-									<div id='graph10' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels10' style='background:white;width:1100px;height:20px;' class='output'></div>
-									<div id='graph10b' style='width:1100px; height:550px;background:white;' class='output'></div>
-									<div id='labels10b' style='background:white;width:1100px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Portfolio
+										</h1>
+									</p>
+									<div id='graph10' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels10' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Spending
+										</h1>
+									</p>
+									<div id='graph10b' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels10b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<p>
+										<h1>
+											Statistics
+										</h1>
+									</p>
+									<table id='stats10a' class="table table-bordered display compact"></table>
+									<table id='stats10b' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats10c' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats10d' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats10e' class="table table-bordered display compact rowHeaders"></table>
 								</div>
 							</div>
 						</div>
@@ -986,13 +1194,33 @@ error_reporting(0);
 		    </div><!-- /.modal-dialog -->
 		  </div><!-- /.modal -->	
 
+			<!-- Report Issue Modal -->
+		  	<div class="modal fade" id="reportIssueModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title">Report an Issue</h4>
+						</div>
+						<div class="modal-body">
+							<p>
+								Woooo!
+							</p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+			  </div>
+			</div>
+
 		<div id="saveSimPopup" style="display:none" class="popup">
 			<div class="input-group">
 				<span class='input-group-addon'>Saved Simulation Name:</span><input type='text' size='12' class='form-control' id='simNameInput'>
 			</div>
 			<button type="button" class="btn btn-danger" id="cancelSaveSim">Cancel</button>
-			<button type="button" class="btn btn-success" id="confirmSaveSim">Save Sim</button>
-		</div>
+			<													   utton type="button" class="btn btn-success" id="confirmSaveSim">Save Sim</button>
+		</aiv>
 		<div id="saveSimSuccess" style="display:none" class="popup small">
 			<p>Your simulation was successfully saved</p>
 			<button type="button" class="btn btn-danger" id="closeSaveSuccess">Close</button>

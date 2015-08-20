@@ -3,6 +3,11 @@ $(document).ready(function() {
         Simulation.sim = [];
         Simulation.runSimulation(formData);
     });
+	$('#reportIssueModal').on('shown.bs.modal', function () {
+        $(this).find('.modal-dialog').css({width:'auto',
+                                   height:'auto', 
+                                  'max-height':'100%'});
+	});
     $('#outputModal').on('shown.bs.modal', function () {
         $(this).find('.modal-dialog').css({width:'auto',
                                    height:'auto', 

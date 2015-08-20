@@ -13,6 +13,7 @@ The "sim" parameter for each function is a multi-dimensional array of the simula
 var StatsModule = {
 	"finalStats":  {
 		"successRate": null,
+        "failures": null,
 		"avgPortfolioAtRetirement": null,
 		"average": {
 			"endingPortfolio": null,
@@ -98,18 +99,126 @@ var StatsModule = {
         this.calcWithdrawalAnalysis(sim);
         this.calcDipAnalysis(sim);
         console.log("Final Stats: ", this.finalStats);
+		
+		//Rounds all data for data tables
+		function roundData(rawData){
+			var data = [];
+			for (var i=0;i<rawData.length;i++){
+				for(var j=0; j<rawData[i].length;j++){
+					if(typeof(rawData[i][j])==="number"){
+						rawData[i][j] = Math.round(rawData[i][j]);
+					}
+				}
+			}
+			return rawData;
+		}
+		//First Table - Success Rates
 		var dataSet1a = [
-			[this.finalStats.successRate, this.finalStats.avgPortfolioAtRetirement]
-		]
+			[Math.round(100*this.finalStats.successRate)/100 + "%", this.finalStats.avgPortfolioAtRetirement]
+		];
         $('#stats'+Simulation.tabs+"a").DataTable( {
-        data: dataSet1a,
-        columns: [
-            { title: "Success Rate" },
-            { title: "Avg. Portfolio at Retirement" },
-        ],
-		"ordering": false,
-		"paging": false
-    } );
+			data: dataSet1a,
+			columns: [
+				{ title: "Success Rate" },
+				{ title: "Avg. Portfolio at Retirement" },
+			],
+			"ordering": false,
+			"paging": false,
+			"searching": false,
+			"info": false
+    	} );
+		
+		//Second Table - General Stats
+		var dataSet1b = [
+			["Average:", accounting.formatMoney(this.finalStats.average.endingPortfolios, "$", 0), accounting.formatMoney(this.finalStats.average.yearlyWithdrawals, "$", 0), accounting.formatMoney(this.finalStats.average.totalWithdrawals, "$", 0)],
+			["Median:", accounting.formatMoney(this.finalStats.median.endingPortfolios, "$", 0), accounting.formatMoney(this.finalStats.median.yearlyWithdrawals, "$", 0), accounting.formatMoney(this.finalStats.median.totalWithdrawals, "$", 0)],
+			["St. Dev.:", accounting.formatMoney(this.finalStats.stDev.endingPortfolios, "$", 0), accounting.formatMoney(this.finalStats.stDev.yearlyWithdrawals, "$", 0), accounting.formatMoney(this.finalStats.stDev.totalWithdrawals, "$", 0)],
+			["Highest:", accounting.formatMoney(this.finalStats.highest.endingPortfolios, "$", 0), accounting.formatMoney(this.finalStats.highest.yearlyWithdrawals, "$", 0), accounting.formatMoney(this.finalStats.highest.totalWithdrawals, "$", 0)],
+			["Lowest:", accounting.formatMoney(this.finalStats.lowest.endingPortfolios, "$", 0), accounting.formatMoney(this.finalStats.lowest.yearlyWithdrawals, "$", 0), accounting.formatMoney(this.finalStats.lowest.totalWithdrawals, "$", 0)],
+		];
+        $('#stats'+Simulation.tabs+"b").DataTable( {
+			data: dataSet1b,
+			columns: [
+				{ title: "" },
+				{ title: "Ending Portfolio" },
+				{ title: "Yearly Withdrawals" },
+				{ title: "Total Withdrawals" },
+			],
+			"ordering": false,
+			"paging": false,
+			"searching": false,
+			"info": false
+    	} );
+
+		//Third Table - Withdrawal Analysis
+		var dataSet1c = [
+			["Average:", accounting.formatMoney(this.finalStats.withdrawalAnalysis.average.first5years, "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.average.thirds[0], "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.average.thirds[1], "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.average.thirds[2], "$", 0)],
+			["Median:", accounting.formatMoney(this.finalStats.withdrawalAnalysis.median.first5years, "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.median.thirds[0], "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.median.thirds[1], "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.median.thirds[2], "$", 0),],
+			["St. Dev.:", accounting.formatMoney(this.finalStats.withdrawalAnalysis.stDev.first5years, "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.stDev.thirds[0], "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.stDev.thirds[1], "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.stDev.thirds[2], "$", 0)],
+			["Highest:", accounting.formatMoney(this.finalStats.withdrawalAnalysis.highest.first5years, "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.highest.thirds[0], "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.highest.thirds[1], "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.highest.thirds[2], "$", 0)],
+			["Lowest:", accounting.formatMoney(this.finalStats.withdrawalAnalysis.lowest.first5years, "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.lowest.thirds[0], "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.lowest.thirds[1], "$", 0), accounting.formatMoney(this.finalStats.withdrawalAnalysis.lowest.thirds[2], "$", 0)],
+			["Failures:", this.finalStats.withdrawalAnalysis.failures.first5years, this.finalStats.withdrawalAnalysis.failures.thirds[0], this.finalStats.withdrawalAnalysis.failures.thirds[1], this.finalStats.withdrawalAnalysis.failures.thirds[2]],
+		];
+		dataSet1c = roundData(dataSet1c);
+        $('#stats'+Simulation.tabs+"c").DataTable( {
+			data: dataSet1c,
+			columns: [
+				{ title: "Withdrawal Analysis" },
+				{ title: "First 5 Years" },
+				{ title: "Beginning Third" },
+				{ title: "Middle Third" },
+				{ title: "Final Third" }
+			],
+			"ordering": false,
+			"paging": false,
+			"searching": false,
+			"info": false
+    	} );
+
+        //Fourth Table - Dip Analysis
+        var dataSet1d = [
+            ["Cycles dipped >10% below initial:", this.finalStats.dipAnalysis.below10.portfolioDips, this.finalStats.dipAnalysis.below10.maxPortfolioDips, this.finalStats.dipAnalysis.below10.withdrawalDips, this.finalStats.dipAnalysis.below10.maxWithdrawalDips],
+            [">20% below initial:", this.finalStats.dipAnalysis.below20.portfolioDips, this.finalStats.dipAnalysis.below20.maxPortfolioDips, this.finalStats.dipAnalysis.below20.withdrawalDips, this.finalStats.dipAnalysis.below20.maxWithdrawalDips],
+            [">40% below initial:", this.finalStats.dipAnalysis.below40.portfolioDips, this.finalStats.dipAnalysis.below40.maxPortfolioDips, this.finalStats.dipAnalysis.below40.withdrawalDips, this.finalStats.dipAnalysis.below40.maxWithdrawalDips],
+            [">60% below initial:", this.finalStats.dipAnalysis.below60.portfolioDips, this.finalStats.dipAnalysis.below60.maxPortfolioDips, this.finalStats.dipAnalysis.below60.withdrawalDips, this.finalStats.dipAnalysis.below60.maxWithdrawalDips],
+        ];
+        $('#stats'+Simulation.tabs+"d").DataTable( {
+            data: dataSet1d,
+            columns: [
+                { title: "Dip Analysis" },
+                { title: "Portfolio Dips(cycles)" },
+                { title: "Max Dips(in a cycle)" },
+                { title: "Withdrawal Dips(cycles)" },
+                { title: "Max Dips(in a cycle)" }
+            ],
+            "ordering": false,
+            "paging": false,
+            "searching": false,
+            "info": false
+        } );
+
+        //Fifth Table - Individual Dips
+        var dataSet1e = [
+            ["Lowest Dip:", accounting.formatMoney(this.finalStats.individualDips.portfolioDips[0].portfolio, "$", 0), this.finalStats.individualDips.portfolioDips[0].cycleStart + "/" + this.finalStats.individualDips.portfolioDips[0].dipYear, accounting.formatMoney(this.finalStats.individualDips.withdrawalDips[0].withdrawal, "$", 0), this.finalStats.individualDips.withdrawalDips[0].cycleStart + "/" + this.finalStats.individualDips.withdrawalDips[0].dipYear],
+            ["2nd Lowest Dip:", accounting.formatMoney(this.finalStats.individualDips.portfolioDips[1].portfolio, "$", 0), this.finalStats.individualDips.portfolioDips[1].cycleStart + "/" + this.finalStats.individualDips.portfolioDips[1].dipYear, accounting.formatMoney(this.finalStats.individualDips.withdrawalDips[1].withdrawal, "$", 0), this.finalStats.individualDips.withdrawalDips[0].cycleStart + "/" + this.finalStats.individualDips.withdrawalDips[0].dipYear],
+            ["3rd Lowest Dip:", accounting.formatMoney(this.finalStats.individualDips.portfolioDips[2].portfolio, "$", 0), this.finalStats.individualDips.portfolioDips[2].cycleStart + "/" + this.finalStats.individualDips.portfolioDips[2].dipYear, accounting.formatMoney(this.finalStats.individualDips.withdrawalDips[2].withdrawal, "$", 0), this.finalStats.individualDips.withdrawalDips[0].cycleStart + "/" + this.finalStats.individualDips.withdrawalDips[0].dipYear],
+            ["4th Lowest Dip:", accounting.formatMoney(this.finalStats.individualDips.portfolioDips[3].portfolio, "$", 0), this.finalStats.individualDips.portfolioDips[3].cycleStart + "/" + this.finalStats.individualDips.portfolioDips[3].dipYear, accounting.formatMoney(this.finalStats.individualDips.withdrawalDips[3].withdrawal, "$", 0), this.finalStats.individualDips.withdrawalDips[0].cycleStart + "/" + this.finalStats.individualDips.withdrawalDips[0].dipYear],
+            ["5th Lowest Dip:", accounting.formatMoney(this.finalStats.individualDips.portfolioDips[4].portfolio, "$", 0), this.finalStats.individualDips.portfolioDips[4].cycleStart + "/" + this.finalStats.individualDips.portfolioDips[4].dipYear, accounting.formatMoney(this.finalStats.individualDips.withdrawalDips[4].withdrawal, "$", 0), this.finalStats.individualDips.withdrawalDips[0].cycleStart + "/" + this.finalStats.individualDips.withdrawalDips[0].dipYear],
+        ];
+        $('#stats'+Simulation.tabs+"e").DataTable( {
+            data: dataSet1e,
+            columns: [
+                { title: "Individual Dips" },
+                { title: "Portfolio Dip" },
+                { title: "Cycle Start / Dip Year" },
+                { title: "Withdrawal Dip" },
+                { title: "Cycle Start / Dip Year" }
+            ],
+            "ordering": false,
+            "paging": false,
+            "searching": false,
+            "info": false
+        } );
     },
     //General Statistical Functions
     average: function(data) {
@@ -199,6 +308,27 @@ var StatsModule = {
             "yearlyWithdrawals": this.min(yearlyWithdrawals),
             "totalWithdrawals": this.min(totalWithdrawals)
         };
+
+        //Calculate Success Rate - THIS IS REDUNDANT. Delete/consolidate from cFIREsimOpen.js
+        var totalFailures = 0;
+        for (var i = 0; i < sim.length; i++) {
+            for (var j = 0; j < sim[i].length; j++) {
+                if(sim[i][j].portfolio.infAdjEnd < 0){
+                    totalFailures++;
+                    break;
+                }
+            }
+        }
+        StatsModule.finalStats.successRate = (1-(totalFailures/sim.length))*100;
+        StatsModule.finalStats.failures = totalFailures;
+
+        //Calculate Average Portfolio at Retirement
+        var portfolioAtRetirement = [];
+        for (var i = 0; i < sim.length; i++) {
+            for (var j = 0; j < sim[i].length; j++) {
+
+            }
+        }
     },
     calcWithdrawalAnalysis: function(sim) {
     	//Determine time periods
@@ -394,6 +524,18 @@ var StatsModule = {
                             if(lowestPortfolioDips[k].portfolio > sim[i][j].portfolio.infAdjEnd){
                                 lowestPortfolioDips.splice(k,1);
                                 lowestPortfolioDips.push({"portfolio": sim[i][j].portfolio.infAdjEnd, "cycleStart": (sim[i][j].year-j), "dipYear": sim[i][j].year});
+                                break;
+                            }
+                        }
+                    }
+                    if(lowestWithdrawalDips.length<5){
+                        lowestWithdrawalDips.push({"withdrawal": sim[i][j].infAdjSpending, "cycleStart": (sim[i][j].year-j), "dipYear": sim[i][j].year});
+                    }else{
+                        for(var k=0; k<lowestWithdrawalDips.length; k++){
+                            if(lowestWithdrawalDips[k].withdrawal > sim[i][j].infAdjSpending){
+                                lowestWithdrawalDips.splice(k,1);
+                                lowestWithdrawalDips.push({"withdrawal": sim[i][j].infAdjSpending, "cycleStart": (sim[i][j].year-j), "dipYear": sim[i][j].year});
+                                break;
                             }
                         }
                     }
@@ -403,7 +545,7 @@ var StatsModule = {
             return {"portfolioDips": lowestPortfolioDips, "withdrawalDips": lowestWithdrawalDips };
         }
 
-        function compare(a,b) {
+        function comparePortfolio(a,b) {
           if (a.portfolio < b.portfolio)
             return -1;
           if (a.portfolio > b.portfolio)
@@ -411,7 +553,17 @@ var StatsModule = {
           return 0;
         }
 
+        function compareWithdrawal(a,b) {
+          if (a.withdrawal < b.withdrawal)
+            return -1;
+          if (a.withdrawal > b.withdrawal)
+            return 1;
+          return 0;
+        }
+
         var individualDips = lowestIndividualDips(sim);
+        individualDips.portfolioDips.sort(comparePortfolio);
+        individualDips.withdrawalDips.sort(compareWithdrawal);
         StatsModule.finalStats.individualDips.portfolioDips = individualDips.portfolioDips;
         StatsModule.finalStats.individualDips.withdrawalDips = individualDips.withdrawalDips;
         
