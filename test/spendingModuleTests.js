@@ -193,7 +193,7 @@ describe("percentOfPortfolio", function() {
         it("should lower the spending based on portfolio size", function() {
             var form = {
                 retirementStartYear: new Date().getFullYear(),
-                spending: { percentageOfPortfolioPercentage: 4, percentageOfPortfolioType: "constant" }
+                spending: { percentageOfPortfolioPercentage: 4, percentageOfPortfolioFloorType: "none", percentageOfPortfolioCeilingType: "none" }
             };
             var sim = [
                 [
@@ -207,16 +207,40 @@ describe("percentOfPortfolio", function() {
             expect(actualSpending).toBe(900000 * 0.04);
         });
 
-        describe("and there is a percentage of portfolio floor that is hit", function() {
+        describe("and a defined value floor is hit", function() {
 
             it("should lower the spending to the floor", function() {
                 var form = {
                     retirementStartYear: new Date().getFullYear(),
                     spending: {
                         percentageOfPortfolioPercentage: 4,
-                        percentageOfPortfolioType: "withFloorAndCeiling",
+                        percentageOfPortfolioFloorType: "definedValue",
+                        percentageOfPortfolioFloorValue: 30000,
+                        percentageOfPortfolioCeilingType: "none"
+                    }
+                };
+                var sim = [
+                    [
+                        { portfolio: { start: 1000000 } },
+                        { portfolio: { start: 500000 }, cumulativeInflation: 1.1 }
+                    ]
+                ];
+
+                var actualSpending = SpendingModule['percentOfPortfolio'].calcSpending(form, sim, 0, 1);
+
+                expect(actualSpending).toBe(30000 * 1.1);
+            });
+        });
+
+        describe("and a percentage of portfolio floor is hit", function() {
+
+            it("should lower the spending to the floor", function() {
+                var form = {
+                    retirementStartYear: new Date().getFullYear(),
+                    spending: {
+                        percentageOfPortfolioPercentage: 4,
                         percentageOfPortfolioFloorType: "percentageOfPortfolio",
-                        percentageOfPortfolioFloorPercentage: 3,
+                        percentageOfPortfolioFloorValue: 3,
                         percentageOfPortfolioCeilingType: "none"
                     }
                 };
@@ -233,29 +257,28 @@ describe("percentOfPortfolio", function() {
             });
         });
 
-        describe("and there is a percentage of previous year floor that is hit", function() {
+        describe("and a percentage of previous year floor is hit", function() {
 
             it("should lower the spending to the floor", function() {
                 var form = {
                     retirementStartYear: new Date().getFullYear(),
                     spending: {
                         percentageOfPortfolioPercentage: 4,
-                        percentageOfPortfolioType: "withFloorAndCeiling",
                         percentageOfPortfolioFloorType: "percentageOfPreviousYear",
-                        percentageOfPortfolioFloorPercentage: 95,
+                        percentageOfPortfolioFloorValue: 95,
                         percentageOfPortfolioCeilingType: "none"
                     }
                 };
                 var sim = [
                     [
-                        { portfolio: { start: 1000000 }, spending: 40000 },
-                        { portfolio: { start: 900000 } }
+                        { portfolio: { start: 1000000 }, spending: 40000, cumulativeInflation: 1.05 },
+                        { portfolio: { start: 900000 }, cumulativeInflation: 1.1  }
                     ]
                 ];
 
                 var actualSpending = SpendingModule['percentOfPortfolio'].calcSpending(form, sim, 0, 1);
 
-                expect(actualSpending).toBe(40000 * 0.95);
+                expect(actualSpending).toBe(40000 * 0.95 * (1.1 / 1.05));
             });
         });
 
@@ -266,7 +289,6 @@ describe("percentOfPortfolio", function() {
                     retirementStartYear: new Date().getFullYear(),
                     spending: {
                         percentageOfPortfolioPercentage: 4,
-                        percentageOfPortfolioType: "withFloorAndCeiling",
                         percentageOfPortfolioFloorType: "none",
                         percentageOfPortfolioCeilingType: "none"
                     }
@@ -284,14 +306,13 @@ describe("percentOfPortfolio", function() {
             });
         });
 
-        describe("and there is no percentageOfPortfolioFloorPercentage", function() {
+        describe("and there is no percentageOfPortfolioFloorValue", function() {
 
             it("should have no floor", function() {
                 var form = {
                     retirementStartYear: new Date().getFullYear(),
                     spending: {
                         percentageOfPortfolioPercentage: 4,
-                        percentageOfPortfolioType: "withFloorAndCeiling",
                         percentageOfPortfolioFloorType: "percentageOfPortfolio"
                     }
                 };
@@ -308,14 +329,13 @@ describe("percentOfPortfolio", function() {
             });
         });
 
-        describe("and there is no percentageOfPortfolioFloorPercentage for percentage of previous year", function() {
+        describe("and there is no percentageOfPortfolioFloorValue for percentage of previous year", function() {
 
             it("should have no floor", function() {
                 var form = {
                     retirementStartYear: new Date().getFullYear(),
                     spending: {
                         percentageOfPortfolioPercentage: 4,
-                        percentageOfPortfolioType: "withFloorAndCeiling",
                         percentageOfPortfolioFloorType: "percentageOfPreviousYear"
                     }
                 };
@@ -352,17 +372,41 @@ describe("percentOfPortfolio", function() {
             expect(actualSpending).toBe(1100000 * 0.04);
         });
 
-        describe("and there is a percentage of portfolio ceiling that is hit", function() {
+        describe("and a defined value ceiling is hit", function() {
 
             it("should raise the spending to the ceiling", function() {
                 var form = {
                     retirementStartYear: new Date().getFullYear(),
                     spending: {
                         percentageOfPortfolioPercentage: 4,
-                        percentageOfPortfolioType: "withFloorAndCeiling",
+                        percentageOfPortfolioFloorType: "none",
+                        percentageOfPortfolioCeilingType: "definedValue",
+                        percentageOfPortfolioCeilingValue: 60000
+                    }
+                };
+                var sim = [
+                    [
+                        { portfolio: { start: 1000000 } },
+                        { portfolio: { start: 2000000 }, cumulativeInflation: 1.1 }
+                    ]
+                ];
+
+                var actualSpending = SpendingModule['percentOfPortfolio'].calcSpending(form, sim, 0, 1);
+
+                expect(actualSpending).toBe(60000 * 1.1);
+            });
+        });
+
+        describe("and a percentage of portfolio ceiling is hit", function() {
+
+            it("should raise the spending to the ceiling", function() {
+                var form = {
+                    retirementStartYear: new Date().getFullYear(),
+                    spending: {
+                        percentageOfPortfolioPercentage: 4,
                         percentageOfPortfolioFloorType: "none",
                         percentageOfPortfolioCeilingType: "percentageOfPortfolio",
-                        percentageOfPortfolioCeilingPercentage: 6
+                        percentageOfPortfolioCeilingValue: 6
                     }
                 };
                 var sim = [
@@ -385,7 +429,6 @@ describe("percentOfPortfolio", function() {
                     retirementStartYear: new Date().getFullYear(),
                     spending: {
                         percentageOfPortfolioPercentage: 4,
-                        percentageOfPortfolioType: "withFloorAndCeiling",
                         percentageOfPortfolioFloorType: "none",
                         percentageOfPortfolioCeilingType: "none"
                     }
@@ -403,14 +446,13 @@ describe("percentOfPortfolio", function() {
             });
         });
 
-        describe("and there is no percentageOfPortfolioCeilingPercentage", function() {
+        describe("and there is no percentageOfPortfolioCeilingValue", function() {
 
             it("should have no ceiling", function() {
                 var form = {
                     retirementStartYear: new Date().getFullYear(),
                     spending: {
                         percentageOfPortfolioPercentage: 4,
-                        percentageOfPortfolioType: "withFloorAndCeiling",
                         percentageOfPortfolioCeilingType: "percentageOfPortfolio"
                     }
                 };

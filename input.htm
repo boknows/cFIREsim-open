@@ -295,7 +295,7 @@
                                     <div class="input-group">
                                         <select class="form-control"
                                                 ng-model="data.spending.percentageOfPortfolioFloorType"
-                                                ng-change="clearProperty(true, 'data.spending.percentageOfPortfolioFloorPercentage')"
+                                                ng-change="clearProperty(true, 'data.spending.percentageOfPortfolioFloorValue')"
                                                 ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioFloorLimitTypes">
                                         </select>     
                                     </div>                           
@@ -305,7 +305,7 @@
                                         <span class="input-group-addon" ng-show="data.spending.percentageOfPortfolioFloorType == 'definedValue'">$</span>
                                         <input type="text"
                                                 class="form-control"
-                                                ng-model="data.spending.percentageOfPortfolioFloorPercentage"
+                                                ng-model="data.spending.percentageOfPortfolioFloorValue"
                                                 ng-disabled="data.spending.percentageOfPortfolioFloorType == 'none' || data.spending.percentageOfPortfolioFloorType == 'pensions'">
                                         <span class="input-group-addon" ng-show="data.spending.percentageOfPortfolioFloorType != 'definedValue'">%</span>
                                     </div>
@@ -315,7 +315,7 @@
                                     <div class="input-group">
                                         <select class="form-control"
                                                 ng-model="data.spending.percentageOfPortfolioCeilingType"
-                                                ng-change="clearProperty(true, 'data.spending.percentageOfPortfolioCeilingPercentage')"
+                                                ng-change="clearProperty(true, 'data.spending.percentageOfPortfolioCeilingValue')"
                                                 ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioCeilingLimitTypes">
                                         </select>   
                                     </div>                             
@@ -325,7 +325,7 @@
                                         <span class="input-group-addon" ng-show="data.spending.percentageOfPortfolioCeilingType == 'definedValue'">$</span>
                                         <input  type="text"
                                                 class="form-control"
-                                                ng-model="data.spending.percentageOfPortfolioCeilingPercentage"
+                                                ng-model="data.spending.percentageOfPortfolioCeilingValue"
                                                 ng-disabled="data.spending.percentageOfPortfolioCeilingType == 'none'">
                                         <span class="input-group-addon" ng-show="data.spending.percentageOfPortfolioCeilingType != 'definedValue'">%</span>
                                     </div>
@@ -1023,16 +1023,16 @@
 
             $scope.spendingFloorTypes = [
                 {
+                    text: 'No Floor',
+                    value: 'none'
+                },
+                {
                     text: 'Pensions/SS',
                     value: 'pensions'
                 },
                 {
                     text: 'Defined Value',
                     value: 'definedValue'
-                },
-                {
-                    text: 'No Floor',
-                    value: 'none'
                 }
             ]
 
