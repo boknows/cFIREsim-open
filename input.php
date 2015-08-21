@@ -313,7 +313,7 @@ error_reporting(0);
 										</div>
 										<div class="row">
 											<div class="col-md-6">
-												<label>Fees:
+												<label>Fees/Drag:
 													<div class="input-group">
 														<input type="text" class="form-control" ng-model="data.portfolio.percentFees">
 														<span class="input-group-addon">%</span>
