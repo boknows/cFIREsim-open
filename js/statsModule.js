@@ -11,95 +11,95 @@ The "sim" parameter for each function is a multi-dimensional array of the simula
 */
 
 var StatsModule = {
-	"finalStats":  {
-		"successRate": null,
-        "failures": null,
-		"avgPortfolioAtRetirement": null,
-		"average": {
-			"endingPortfolio": null,
-			"yearlyWithdrawals": null,
-			"totalWithdrawals": null
-		},
-		"median": {
-			"endingPortfolio": null,
-			"yearlyWithdrawals": null,
-			"totalWithdrawals": null
-		},
-		"stDev": {
-			"endingPortfolio": null,
-			"yearlyWithdrawals": null,
-			"totalWithdrawals": null
-		},
-		"highest": {
-			"endingPortfolio": null,
-			"yearlyWithdrawals": null,
-			"totalWithdrawals": null
-		},
-		"lowest": {
-			"endingPortfolio": null,
-			"yearlyWithdrawals": null,
-			"totalWithdrawals": null
-		},
-		"withdrawalAnalysis": {
-			"average": {
-				"first5years": null,
-				"thirds": [],
-			},
-			"median": {
-				"first5years": null,
-				"thirds": [],
-			},
-			"stDev": {
-				"first5years": null,
-				"thirds": [],
-			},
-			"highest": {
-				"first5years": null,
-				"thirds": [],
-			},
-			"lowest": {
-				"first5years": null,
-				"thirds": [],
-			},
-			"failures": {
-				"first5years": null,
-				"thirds": [],
-			}
-		},
-		"dipAnalysis": {
-			"below10": {
-				"portfolioDips": null,
-				"maxPortfolioDips": null,
-				"withdrawalDips": null,
-				"maxWithdrawalDips": null
-			},
-			"below20": {
-				"portfolioDips": null,
-				"maxPortfolioDips": null,
-				"withdrawalDips": null,
-				"maxWithdrawalDips": null
-			},
-			"below40": {
-				"portfolioDips": null,
-				"maxPortfolioDips": null,
-				"withdrawalDips": null,
-				"maxWithdrawalDips": null
-			},
-			"below60": {
-				"portfolioDips": null,
-				"maxPortfolioDips": null,
-				"withdrawalDips": null,
-				"maxWithdrawalDips": null
-			}
-		},
-		"individualDips": []
-	},
     init: function(sim) {
+		this.finalStats =  {
+			"successRate": null,
+				"failures": null,
+					"avgPortfolioAtRetirement": null,
+						"average": {
+							"endingPortfolio": null,
+								"yearlyWithdrawals": null,
+									"totalWithdrawals": null
+						},
+							"median": {
+								"endingPortfolio": null,
+									"yearlyWithdrawals": null,
+										"totalWithdrawals": null
+							},
+								"stDev": {
+									"endingPortfolio": null,
+										"yearlyWithdrawals": null,
+											"totalWithdrawals": null
+								},
+									"highest": {
+										"endingPortfolio": null,
+											"yearlyWithdrawals": null,
+												"totalWithdrawals": null
+									},
+										"lowest": {
+											"endingPortfolio": null,
+												"yearlyWithdrawals": null,
+													"totalWithdrawals": null
+										},
+											"withdrawalAnalysis": {
+												"average": {
+													"first5years": null,
+														"thirds": [],
+												},
+													"median": {
+														"first5years": null,
+															"thirds": [],
+													},
+														"stDev": {
+															"first5years": null,
+																"thirds": [],
+														},
+															"highest": {
+																"first5years": null,
+																	"thirds": [],
+															},
+																"lowest": {
+																	"first5years": null,
+																		"thirds": [],
+																},
+																	"failures": {
+																		"first5years": null,
+																			"thirds": [],
+																	}
+																	},
+																		"dipAnalysis": {
+																			"below10": {
+																				"portfolioDips": null,
+																					"maxPortfolioDips": null,
+																						"withdrawalDips": null,
+																							"maxWithdrawalDips": null
+																			},
+																				"below20": {
+																					"portfolioDips": null,
+																						"maxPortfolioDips": null,
+																							"withdrawalDips": null,
+																								"maxWithdrawalDips": null
+																				},
+																					"below40": {
+																						"portfolioDips": null,
+																							"maxPortfolioDips": null,
+																								"withdrawalDips": null,
+																									"maxWithdrawalDips": null
+																					},
+																						"below60": {
+																							"portfolioDips": null,
+																								"maxPortfolioDips": null,
+																									"withdrawalDips": null,
+																										"maxWithdrawalDips": null
+																						}
+																		},
+																			"individualDips": []
+		};
         this.calcGeneralStats(sim);
         this.calcWithdrawalAnalysis(sim);
         this.calcDipAnalysis(sim);
         console.log("Final Stats: ", this.finalStats);
-		
+
 		//Rounds all data for data tables
 		function roundData(rawData){
 			var data = [];
@@ -125,7 +125,8 @@ var StatsModule = {
 			"ordering": false,
 			"paging": false,
 			"searching": false,
-			"info": false
+			"info": false,
+			"autoWidth": false
     	} );
 		
 		//Second Table - General Stats
@@ -359,6 +360,7 @@ var StatsModule = {
        			{"start": (Math.ceil(cycleLength/3)*2), "stop": (cycleLength-1)},
        		];
        	}
+        console.log("Thirds:", period);
 
         //call all time period functions
         first5years(sim, period);
@@ -388,7 +390,8 @@ var StatsModule = {
         	for(var third = 0; third < period.thirds.length; third++){
         		var withdrawals = [];
 	            var failures = 0;
-	            for (var i = 0; i < sim.length; i++) {
+	            //for (var i = 0; i < sim.length; i++) {
+                for (var i = 0; i < 10; i++) {
 	                for (var j = period.thirds[third].start; j < period.thirds[third].stop; j++) {
 	                    withdrawals.push(sim[i][j].infAdjSpending);
 	                    if (sim[i][j].portfolio.infAdjEnd < 0) {
@@ -402,6 +405,8 @@ var StatsModule = {
 	            StatsModule.finalStats.withdrawalAnalysis.highest.thirds.push(StatsModule.max(withdrawals));
 	            StatsModule.finalStats.withdrawalAnalysis.lowest.thirds.push(StatsModule.min(withdrawals));
 	            StatsModule.finalStats.withdrawalAnalysis.failures.thirds.push(failures);
+				
+				console.log("Debug analyzeThirds", withdrawals, StatsModule.finalStats.withdrawalAnalysis);
         	}
         }
     },

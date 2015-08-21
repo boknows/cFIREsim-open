@@ -1,13 +1,15 @@
+
 $(document).ready(function() {
-    $("#runSim").click(function() {
-        Simulation.sim = [];
-        Simulation.runSimulation(formData);
-    });
+    //Launch Welcome Modal
+    $('#welcomeModal').modal('show');
+    
+	//Full-screen modals
 	$('#reportIssueModal').on('shown.bs.modal', function () {
         $(this).find('.modal-dialog').css({width:'auto',
                                    height:'auto', 
                                   'max-height':'100%'});
 	});
+	
     $('#outputModal').on('shown.bs.modal', function () {
         $(this).find('.modal-dialog').css({width:'auto',
                                    height:'auto', 
@@ -19,6 +21,7 @@ $(document).ready(function() {
 		}
 	});
 
+	//Resizing dygraphs graphs when output tab is clicked. This allows graphs to be seen when switching tabs.
 	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		//Dygraphs window resize. Workaround for blank graphs at load time. This is for resizing when changing tabs. 
 		for(var i=0;i<Simulation.g.length;i++){
@@ -70,7 +73,7 @@ $(document).ready(function() {
 var Simulation = {
     sim: [],
     tabs: 0,
-	g: [],
+	g: [], //dygraph object
     getQueries: function(username, callback) {
         $.ajax({
             url: "getData.php",
@@ -608,8 +611,8 @@ var Simulation = {
         }
         //this trick will generate a temp <a /> tag
         var link = document.createElement("a");
-        var linkText = document.createTextNode("download CSV");
-        link.title = "download CSV";
+        var linkText = document.createTextNode("Download Year-by-year Spreadsheet");
+        link.title = "Download Year-by-year Spreadsheet";
         // Add an id to the link to be able to remove it
         link.id = "csvDownloadLink";
         link.appendChild(linkText);
@@ -621,7 +624,8 @@ var Simulation = {
 
         //this part will append the anchor tag and remove it after automatic click
         document.body.appendChild(link);
-        $(link).appendTo("#output");
+        $(link).appendTo("#download"+Simulation.tabs);
+		$(link).addClass("btn btn-success btn-lg");
         //link.click();
         //document.body.removeChild(link);
     }

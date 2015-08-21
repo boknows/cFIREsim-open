@@ -26,11 +26,20 @@ error_reporting(0);
 			background-color: white;
 			color: black;
 		}
-		
+			
+		.table-nonfluid {
+			width: auto !important;
+			font-size: 80%;
+		}
+			
+		.table-nonfluid th {
+			width: auto !important;
+		}
+
 		.table th {
 			background-color: grey;
 		}
-		
+
 		.rowHeaders tr td:first-child {
 			background-color:grey;
 			font-weight: bold;
@@ -59,6 +68,37 @@ error_reporting(0);
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/bs/dt-1.10.8/datatables.min.css"/>
 	</head>
 	<body>
+		<!-- Welcome Modal -->
+		<div class="modal fade" id="welcomeModal" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h4 class="modal-title">Welcome to the cFIREsim Open Project</h4>
+					</div>
+					<div class="modal-body">
+						<p>
+							The cFIREsim Open Project is a completely rebuilt version of cFIREsim with efficiency and transparaceny in mind. Currently not <b>all</b> of the cFIREsim legacy capabilities exist here, but you can access the <a href="oldsite/input.php">old site</a> until they do.
+						</p>
+						<p>
+							All of the code for cFIREsim Open is located in the <a href="https://github.com/boknows/cFIREsim-open">GitHub Repo</a>. Feel free to contribute new ideas, or <a href="https://github.com/boknows/cFIREsim-open/issues">report any issues you might find.</a>
+						</p>
+						<p>
+							All of the current issues and enhancement requests are listsed on <a href="https://github.com/boknows/cFIREsim-open/issues">the GitHub Issues Page</a>. The list of backlogged issues and the list of issues I'm currently working on can be found <a href="https://trello.com/b/traCS117/cfiresim-open">on my Trello board.</a>
+						</p>
+						<p>
+							I hope that you enjoy the new format, and I look forward to bringing new things to cFIREsim.
+						</p>
+						<p>
+							-Bo
+						</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+		  </div>
+		</div>
 		<div class="page-header">
 			<h1 class="text-center">The Crowdsourced FIRE Simulator (cFIREsim) - Open Source</h1>
 		</div>
@@ -148,6 +188,10 @@ error_reporting(0);
 								Basics  
 							</div>
 							<div class="panel-body">
+								<div class="alert alert-danger" role="alert" id="yearsError" style="display:none">
+									<span class="sr-only">Error:</span>
+									Retirement Start must be >= Current Year. Retirement Start must be before Retirement End.
+								</div>
 								<label>Retirement Year:<input type="text" class="form-control" ng-model="data.retirementStartYear"></label>
 								<label>Retirement End Year:<input type="text" class="form-control" ng-model="data.retirementEndYear"></label>
 							</div>
@@ -203,7 +247,7 @@ error_reporting(0);
 												</div>
 											</label>
 										</div>
-										<br><a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg" ng-click="runSimulation()">Run Simulation</a>
+										<br><a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg runSim" ng-click="runSimulation()">Run Simulation</a>
 									</div>
 								</div>
 							</div>
@@ -217,6 +261,10 @@ error_reporting(0);
 								Portfolio
 							</div>
 							<div class="panel-body">
+								<div class="alert alert-danger" role="alert" id="portfolioError" style="display:none">
+									<span class="sr-only">Error:</span>
+									Portfolio must be a positive integer.
+								</div>
 								<label>Portfolio Value:<input type="number" class="form-control" ng-model="data.portfolio.initial"></label>
 								<div class="panel panel-default">
 									<div class="panel-heading">
@@ -224,6 +272,10 @@ error_reporting(0);
 									</div>
 									<div class="panel-body">
 										<div class="row">
+											<div class="alert alert-danger" role="alert" id="allocationError" style="display:none">
+												<span class="sr-only">Error:</span>
+												Allocations must add up to 100%
+											</div>
 											<div class="col-md-6">
 												<label>Equities:
 													<div class="input-group">
@@ -611,6 +663,10 @@ error_reporting(0);
 									Pensions
 								</div>
 								<div class="panel-body">
+									<div class="alert alert-danger" role="alert" id="pensionsError" style="display:none">
+										<span class="sr-only">Error:</span>
+										Pension amount must be a positive integer. Pension Start Year must be >= the current year.
+									</div>
 									<table class="table">
 										<thead>
 											<tr>
@@ -874,7 +930,7 @@ error_reporting(0);
 				</div>
 			</div>
 			</form>
-			<a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg" ng-click="runSimulation()">Run Simulation</a>
+			<a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg runSim" ng-click="runSimulation()">Run Simulation</a>
 
 		</div>
 
@@ -920,16 +976,28 @@ error_reporting(0);
 									</p>
 									<div id='graph1b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels1b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='download1'></div>
 									<p>
 										<h1>
 											Statistics
 										</h1>
 									</p>
-									<table id='stats1a' class="table table-bordered display compact"></table>
-									<table id='stats1b' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats1c' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats1d' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats1e' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats1a' class="table table-bordered table-nonfluid display compact"></table>
+									<div class="row">
+    									<div class="col-md-6">
+											<table id='stats1b' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats1c' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats1d' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats1e' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+									</div>
+									
 								</div>
             				</div>
 							<div class="tab-pane" id="2a">
@@ -953,11 +1021,21 @@ error_reporting(0);
 											Statistics
 										</h1>
 									</p>
-									<table id='stats2a' class="table table-bordered display compact"></table>
-									<table id='stats2b' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats2c' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats2d' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats2e' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats2a' class="table table-bordered table-nonfluid display compact"></table>
+									<div class="row">
+    									<div class="col-md-6">
+											<table id='stats2b' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats2c' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats2d' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats2e' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="tab-pane" id="3a">
@@ -981,11 +1059,21 @@ error_reporting(0);
 											Statistics
 										</h1>
 									</p>
-									<table id='stats3a' class="table table-bordered display compact"></table>
-									<table id='stats3b' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats3c' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats3d' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats3e' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats3a' class="table table-bordered table-nonfluid display compact"></table>
+									<div class="row">
+    									<div class="col-md-6">
+											<table id='stats3b' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats3c' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats3d' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats3e' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="tab-pane" id="4a">
@@ -1009,11 +1097,21 @@ error_reporting(0);
 											Statistics
 										</h1>
 									</p>
-									<table id='stats4a' class="table table-bordered display compact"></table>
-									<table id='stats4b' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats4c' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats4d' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats4e' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats4a' class="table table-bordered table-nonfluid display compact"></table>
+									<div class="row">
+    									<div class="col-md-6">
+											<table id='stats4b' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats4c' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats4d' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats4e' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="tab-pane" id="5a">
@@ -1037,11 +1135,21 @@ error_reporting(0);
 											Statistics
 										</h1>
 									</p>
-									<table id='stats5a' class="table table-bordered display compact"></table>
-									<table id='stats5b' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats5c' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats5d' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats5e' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats5a' class="table table-bordered table-nonfluid display compact"></table>
+									<div class="row">
+    									<div class="col-md-6">
+											<table id='stats5b' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats5c' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats5d' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats5e' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="tab-pane" id="6a">
@@ -1065,11 +1173,21 @@ error_reporting(0);
 											Statistics
 										</h1>
 									</p>
-									<table id='stats6a' class="table table-bordered display compact"></table>
-									<table id='stats6b' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats6c' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats6d' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats6e' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats6a' class="table table-bordered table-nonfluid display compact"></table>
+									<div class="row">
+    									<div class="col-md-6">
+											<table id='stats6b' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats6c' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats6d' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats6e' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+									</div>
 								</div>
             				</div>
 							<div class="tab-pane" id="7a">
@@ -1093,11 +1211,21 @@ error_reporting(0);
 											Statistics
 										</h1>
 									</p>
-									<table id='stats7a' class="table table-bordered display compact"></table>
-									<table id='stats7b' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats7c' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats7d' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats7e' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats7a' class="table table-bordered table-nonfluid display compact"></table>
+									<div class="row">
+    									<div class="col-md-6">
+											<table id='stats7b' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats7c' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats7d' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats7e' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="tab-pane" id="8a">
@@ -1121,11 +1249,21 @@ error_reporting(0);
 											Statistics
 										</h1>
 									</p>
-									<table id='stats8a' class="table table-bordered display compact"></table>
-									<table id='stats8b' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats8c' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats8d' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats8e' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats8a' class="table table-bordered table-nonfluid display compact"></table>
+									<div class="row">
+    									<div class="col-md-6">
+											<table id='stats8b' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats8c' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats8d' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats8e' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="tab-pane" id="9a">
@@ -1149,11 +1287,21 @@ error_reporting(0);
 											Statistics
 										</h1>
 									</p>
-									<table id='stats9a' class="table table-bordered display compact"></table>
-									<table id='stats9b' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats9c' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats9d' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats9e' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats9a' class="table table-bordered table-nonfluid display compact"></table>
+									<div class="row">
+    									<div class="col-md-6">
+											<table id='stats9b' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats9c' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats9d' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats9e' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="tab-pane" id="10a">
@@ -1177,11 +1325,21 @@ error_reporting(0);
 											Statistics
 										</h1>
 									</p>
-									<table id='stats10a' class="table table-bordered display compact"></table>
-									<table id='stats10b' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats10c' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats10d' class="table table-bordered display compact rowHeaders"></table>
-									<table id='stats10e' class="table table-bordered display compact rowHeaders"></table>
+									<table id='stats10a' class="table table-bordered table-nonfluid display compact"></table>
+									<div class="row">
+    									<div class="col-md-6">
+											<table id='stats10b' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats10c' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats10d' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+										<div class="col-md-6">
+											<table id='stats10e' class="table table-bordered table-nonfluid display compact rowHeaders"></table>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -1214,19 +1372,23 @@ error_reporting(0);
 			  </div>
 			</div>
 
+
+
 		<div id="saveSimPopup" style="display:none" class="popup">
 			<div class="input-group">
 				<span class='input-group-addon'>Saved Simulation Name:</span><input type='text' size='12' class='form-control' id='simNameInput'>
 			</div>
 			<button type="button" class="btn btn-danger" id="cancelSaveSim">Cancel</button>
-			<													   utton type="button" class="btn btn-success" id="confirmSaveSim">Save Sim</button>
-		</aiv>
+			<button type="button" class="btn btn-success" id="confirmSaveSim">Save Sim</button>
+		</div>
 		<div id="saveSimSuccess" style="display:none" class="popup small">
 			<p>Your simulation was successfully saved</p>
 			<button type="button" class="btn btn-danger" id="closeSaveSuccess">Close</button>
 		</div>
+
 		<script type="text/javascript" src="js/marketData.js"></script>
 		<script type="text/javascript" src="js/cFIREsimOpen.js"></script>
+
 	</body>
 </html>
 <script type="text/javascript">
@@ -1658,6 +1820,9 @@ formInputs: [
         }
     ]); 
 
-	//Validation Rules
 
+
+</script>
+<script type="text/javascript">
+    <?php echo 'var session = "'.json_encode($_SESSION['msg']).'";';
 </script>
