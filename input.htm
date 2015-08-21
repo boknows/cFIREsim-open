@@ -290,32 +290,24 @@
                                     <span class="input-group-addon">%</span>
                                 </div>
                             </label>
-                            <label>Percentage Type:
-                                <div class="input-group">
-                                    <select class="form-control"
-                                            ng-model="data.spending.percentageOfPortfolioType"
-                                            ng-change="clearFields('#percentageOfPortfolioLimits')"
-                                            ng-options="percentageType.value as percentageType.text for percentageType in percentageOfPortfolioTypes">
-                                    </select>  
-                                </div>                              
-                            </label>
-                            <div id="percentageOfPortfolioLimits" ng-show="data.spending.percentageOfPortfolioType == 'withFloorAndCeiling'">
+                            <div id="percentageOfPortfolioLimits">
                                 <label>Floor Spending:
                                     <div class="input-group">
                                         <select class="form-control"
                                                 ng-model="data.spending.percentageOfPortfolioFloorType"
-                                                ng-change="clearProperty(data.spending.percentageOfPortfolioFloorType == 'none', 'data.spending.percentageOfPortfolioFloorPercentage')"
+                                                ng-change="clearProperty(true, 'data.spending.percentageOfPortfolioFloorValue')"
                                                 ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioFloorLimitTypes">
                                         </select>     
                                     </div>                           
                                 </label>
                                 <label>Never Less Than:
                                     <div class="input-group">
+                                        <span class="input-group-addon" ng-show="data.spending.percentageOfPortfolioFloorType == 'definedValue'">$</span>
                                         <input type="text"
                                                 class="form-control"
-                                                ng-model="data.spending.percentageOfPortfolioFloorPercentage"
-                                                ng-disabled="data.spending.percentageOfPortfolioFloorType == 'none'">
-                                        <span class="input-group-addon">%</span>
+                                                ng-model="data.spending.percentageOfPortfolioFloorValue"
+                                                ng-disabled="data.spending.percentageOfPortfolioFloorType == 'none' || data.spending.percentageOfPortfolioFloorType == 'pensions'">
+                                        <span class="input-group-addon" ng-show="data.spending.percentageOfPortfolioFloorType != 'definedValue'">%</span>
                                     </div>
                                 </label>
                                 <br>                              
@@ -323,18 +315,19 @@
                                     <div class="input-group">
                                         <select class="form-control"
                                                 ng-model="data.spending.percentageOfPortfolioCeilingType"
-                                                ng-change="clearProperty(data.spending.percentageOfPortfolioCeilingType == 'none', 'data.spending.percentageOfPortfolioCeilingPercentage')"
+                                                ng-change="clearProperty(true, 'data.spending.percentageOfPortfolioCeilingValue')"
                                                 ng-options="limitType.value as limitType.text for limitType in percentOfPortfolioCeilingLimitTypes">
                                         </select>   
                                     </div>                             
                                 </label>
                                 <label>Never More Than:
                                     <div class="input-group">
+                                        <span class="input-group-addon" ng-show="data.spending.percentageOfPortfolioCeilingType == 'definedValue'">$</span>
                                         <input  type="text"
                                                 class="form-control"
-                                                ng-model="data.spending.percentageOfPortfolioCeilingPercentage"
+                                                ng-model="data.spending.percentageOfPortfolioCeilingValue"
                                                 ng-disabled="data.spending.percentageOfPortfolioCeilingType == 'none'">
-                                        <span class="input-group-addon">%</span>
+                                        <span class="input-group-addon" ng-show="data.spending.percentageOfPortfolioCeilingType != 'definedValue'">%</span>
                                     </div>
                                 </label>
                             </div>
@@ -823,9 +816,8 @@
                     floor: 'pensions',
                     ceiling: 'none',
                     percentageOfPortfolioType: 'constant',
-                    percentageOfPortfolioFloorType: 'percentageOfPortfolio',
-                    percentageOfPortfolioCeilingType: 'percentageOfPreviousYear',
-                    percentageOfPortfolioFloorPercentage: 7,
+                    percentageOfPortfolioFloorType: 'pensions',
+                    percentageOfPortfolioCeilingType: 'none',
                     percentageOfPortfolioPercentage: 4,
                     retireAgainAmountType: 'valueAtRetirement',
                     hebelerAgeOfRetirement: 60, 
@@ -1031,16 +1023,16 @@
 
             $scope.spendingFloorTypes = [
                 {
+                    text: 'No Floor',
+                    value: 'none'
+                },
+                {
                     text: 'Pensions/SS',
                     value: 'pensions'
                 },
                 {
                     text: 'Defined Value',
                     value: 'definedValue'
-                },
-                {
-                    text: 'No Floor',
-                    value: 'none'
                 }
             ]
 
@@ -1055,18 +1047,19 @@
                 }
             ]
 
-            $scope.percentageOfPortfolioTypes = [
+            $scope.percentOfPortfolioFloorLimitTypes = [
                 {
-                    text: 'Constant %',
-                    value: 'constant'
+                    text: 'No Floor',
+                    value: 'none'
                 },
                 {
-                    text: 'With Floor and Ceiling Values',
-                    value: 'withFloorAndCeiling'
-                }
-            ]
-
-            $scope.percentOfPortfolioFloorLimitTypes = [
+                    text: 'Pensions/SS',
+                    value: 'pensions'
+                },
+                {
+                    text: 'Defined Value',
+                    value: 'definedValue'
+                },
                 {
                     text: 'As a % of Starting Portfolio',
                     value: 'percentageOfPortfolio'
@@ -1074,21 +1067,21 @@
                 {
                     text: '% of Previous Year',
                     value: 'percentageOfPreviousYear'
-                },
-                {
-                    text: 'No Limit',
-                    value: 'none'
                 }
             ]
 
             $scope.percentOfPortfolioCeilingLimitTypes = [
                 {
-                    text: 'As a % of Starting Portfolio',
-                    value: 'percentageOfPortfolio'
+                    text: 'No Ceiling',
+                    value: 'none'
                 },
                 {
-                    text: 'No Limit',
-                    value: 'none'
+                    text: 'Defined Value',
+                    value: 'definedValue'
+                },
+                {
+                    text: 'As a % of Starting Portfolio',
+                    value: 'percentageOfPortfolio'
                 }
             ]
 
