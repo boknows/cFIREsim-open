@@ -225,6 +225,7 @@ var Simulation = {
                     "val": null
                 },
                 "cumulativeInflation": this.cumulativeInflation(startCPI, data.cpi),
+                "socialSecurityAndPensionAdjustments": null,
                 "sumOfAdjustments": null,
             });
         }
@@ -346,23 +347,25 @@ var Simulation = {
     },
     calcSumOfAdjustments: function(form, i, j) { //Calculate the sum of all portfolio adjustments for a given year (pensions, extra income, extra spending, etc)
         var currentYear = new Date().getFullYear();
+        var socialSecurityAndPensionAdjustments = 0;
         var sumOfAdjustments = 0;
         //Evaluate ExtraIncome given cycle i, year j
         //Social Security - always adjusted by CPI
         if ((j >= (form.extraIncome.socialSecurity.startYear - currentYear)) && (j <= (form.extraIncome.socialSecurity.endYear - currentYear))) {
-            sumOfAdjustments += (form.extraIncome.socialSecurity.val * this.sim[i][j].cumulativeInflation);
+            socialSecurityAndPensionAdjustments += (form.extraIncome.socialSecurity.val * this.sim[i][j].cumulativeInflation);
         }
         if ((j >= (form.extraIncome.socialSecuritySpouse.startYear - currentYear)) && (j <= (form.extraIncome.socialSecuritySpouse.endYear - currentYear))) {
-            sumOfAdjustments += (form.extraIncome.socialSecuritySpouse.val * this.sim[i][j].cumulativeInflation);
+            socialSecurityAndPensionAdjustments += (form.extraIncome.socialSecuritySpouse.val * this.sim[i][j].cumulativeInflation);
         }
 
         //Pensions
         for (var k = 0; k < form.extraIncome.pensions.length; k++) {
             if ((j >= (form.extraIncome.pensions[k].startYear - currentYear))) {
-                sumOfAdjustments += this.calcAdjustmentVal(form.extraIncome.pensions[k], i, j);
+                socialSecurityAndPensionAdjustments += this.calcAdjustmentVal(form.extraIncome.pensions[k], i, j);
             }
         }
 
+        sumOfAdjustments += socialSecurityAndPensionAdjustments;
         //Extra Savings
         for (var k = 0; k < form.extraIncome.extraSavings.length; k++) {
             if (form.extraIncome.extraSavings[k].recurring == true) {
@@ -390,6 +393,7 @@ var Simulation = {
         }
 
         //Add sumOfAdjustments to sim container and return value.
+        this.sim[i][j].socialSecurityAndPensionAdjustments = socialSecurityAndPensionAdjustments;
         this.sim[i][j].sumOfAdjustments = sumOfAdjustments;
         return sumOfAdjustments;
     },

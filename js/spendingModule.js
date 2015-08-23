@@ -65,6 +65,8 @@ var SpendingModule = {
                 floor = (j == 0) ? 0 : (sim[i][j - 1].spending * (form.spending.percentageOfPortfolioFloorValue / 100)  * sim[i][j].cumulativeInflation / sim[i][j-1].cumulativeInflation);
             }else if(form.spending.percentageOfPortfolioFloorType == "definedValue" && "percentageOfPortfolioFloorValue" in form.spending && form.spending.percentageOfPortfolioFloorValue != "") {
                 floor = form.spending.percentageOfPortfolioFloorValue * sim[i][j].cumulativeInflation;
+            }else if(form.spending.percentageOfPortfolioFloorType == "pensions" && sim[i][j].socialSecurityAndPensionAdjustments != null) {
+                floor = sim[i][j].socialSecurityAndPensionAdjustments;
             }
 
             //Calculate Ceiling
