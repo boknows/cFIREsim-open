@@ -165,6 +165,7 @@ var Simulation = {
         for (var i = 0; i < this.sim.length; i++) {
             for (var j = 0; j < this.sim[i].length; j++) {
                 this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
+                this.calcSumOfAdjustments(form, i, j);
                 this.calcSpending(form, i, j); //Nominal spending for this specific cycle
                 this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
                 this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
@@ -261,7 +262,7 @@ var Simulation = {
     },
     calcMarketGains: function(form, i, j) {
         var portfolio = this.sim[i][j].portfolio.start;
-        var sumOfAdjustments = this.calcSumOfAdjustments(form, i, j); //Sum of all portfolio adjustments for this given year. SS/Pensions/Extra Income/Extra Spending.
+        var sumOfAdjustments = this.sim[i][j].sumOfAdjustments; //Sum of all portfolio adjustments for this given year. SS/Pensions/Extra Income/Extra Spending.
         portfolio = portfolio - this.sim[i][j].spending + sumOfAdjustments; //Take out spending and portfolio adjustments before calculating asset allocation. This simulates taking your spending out at the beginning of a year.
 
         //Calculate value of each asset class based on allocation percentages
