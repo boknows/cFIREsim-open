@@ -11,9 +11,9 @@ error_reporting(0);
 		<meta name="description" content="A Crowdsourced Financial Independence and Early Retirement Simulator and Calculator. Uses historic stock data to model your retirement and give you a success rate based on all of the possible periods of time in the stock market (good and bad)."><title>Crowdsourced Financial Independence and Early Retirement Simulator/Calculator</title>
 		<style>
 		.dygraph-axis-label-y { padding-right:10px; padding-left:10px;}
-		.labels > span { display: none; }
-  		.labels > span.highlight { display: inline; }
-  		.labels { color: black; }
+		.output > span { display: none; }
+  		.output > span.highlight { display: inline; }
+  		.output { color: black; }
 		#tabNav .nav-pills > li > a {
 		  border-radius: 4px 4px 0 0 ;
 		}
@@ -964,10 +964,10 @@ error_reporting(0);
             			<div class="tab-content clearfix">
             				<div class="tab-pane active" id="1a">
 								<div style="margin:15px">
-									<div id='graph1' style='width:800px; height:400px;background:white;' class='labels'></div>
-									<div id='labels1' style='background:white;width:800px;height:20px;' class='labels'></div>
-									<div id='graph1b' style='width:800px; height:400px;background:white;' class='labels'></div>
-									<div id='labels1b' style='background:white;width:800px;height:20px;' class='labels'></div>
+									<div id='graph1' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels1' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='graph1b' style='width:800px; height:400px;background:white;' class='output'></div>
+									<div id='labels1b' style='background:white;width:800px;height:20px;' class='output'></div>
 									<div id='download1'></div>
 									<p>
 										<h1>

@@ -482,7 +482,7 @@ var Simulation = {
                     'textAlign': 'right'
                 },
                 labelsDivWidth: 500,
-                labelsDiv: 'labels1',
+                labelsDiv: 'labels' + Simulation.tabs,
                 digitsAfterDecimal: 0,
                 axes: {
                     y: {
