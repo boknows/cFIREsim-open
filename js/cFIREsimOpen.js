@@ -410,46 +410,31 @@ var Simulation = {
         var chartData = [];
         var spendingData = [];
         var interval = results.length;
-        var cycLength = results[0].length - 1;
-        var simLength = results.length + cycLength;
+        var cycLength = results[0].length;
+        var simLength = results.length + cycLength - 1;
 
         //Logic to create array for Dygraphs display. Each series must have an entry for every year in the dataset. If there is no entry for that year in the "results" array, a null value is given so that dygraphs doesn't plot there. This provides the unique look of cFIREsims graph
         for (var i = 0; i < simLength; i++) {
-            chartData[i] = [];
-            for (var j = 0; j < simLength; j++) {
+            chartData.push([]);
+            spendingData.push([]);
+            for (var j = 0; j < interval; j++) {
                 chartData[i].push(null);
-            }
-        }
-        var interval = results[0].length;
-        for (var a = 0; a < simLength; a++) {
-            for (var i = 0; i < results.length; i++) {
-                for (var b = 0; b < interval; b++) {
-                    if (results[i][b].year == (a + results[0][0].year)) {
-                        chartData[a][i] = results[i][b].portfolio.infAdjEnd;
-                    }
-                }
-            }
-        }
-        for (var i = 0; i < simLength; i++) { // Add year to the front of each series array. This is a Dygraphs format standard
-            chartData[i].unshift((i + results[0][0].year));
-        }
-
-        //Create Spending Data array in dygraphs format
-        for (var i = 0; i < simLength; i++) {
-            spendingData[i] = [];
-            for (var j = 0; j < simLength; j++) {
                 spendingData[i].push(null);
             }
         }
-        var interval = results[0].length;
-        for (var a = 0; a < simLength; a++) {
-            for (var i = 0; i < results.length; i++) {
-                for (var b = 0; b < interval; b++) {
-                    if (results[i][b].year == (a + results[0][0].year)) {
-                        spendingData[a][i] = results[i][b].infAdjSpending;
+        for(var i=0; i < simLength; i++){
+            for(var j=0; j < results.length; j++){
+                for(var k =0; k < cycLength; k++){
+                    if (results[j][k].year == (i + results[0][0].year)) {
+                        chartData[i][j] = parseInt(results[j][k].portfolio.infAdjEnd);
+                        spendingData[i][j] = results[j][k].infAdjSpending;
                     }
                 }
             }
+        }
+
+        for (var i = 0; i < simLength; i++) { // Add year to the front of each series array. This is a Dygraphs format standard
+            chartData[i].unshift((i + results[0][0].year));
         }
         for (var i = 0; i < simLength; i++) { // Add year to the front of each series array. This is a Dygraphs format standard
             spendingData[i].unshift((i + results[0][0].year));
@@ -457,19 +442,34 @@ var Simulation = {
 
         //Chart Formatting - Dygraphs
         var labels = ['x'];
-        for (var i = 0; i < simLength; i++) {
+        for (var i = 0; i < results.length; i++) {
             var labelyear = i + results[0][0].year;
             var label = '';
             label = 'Cycle Start Year: ' + labelyear;
             labels[i + 1] = label;
         }
-		
-		//Portfolio Graph
+
+        //Chart Series Colors Formatter
+        function rainbowColors(length, maxLength)
+        {
+            var i = (length * 255 / maxLength);
+            var r = Math.round(Math.sin(0.024 * i + 0) * 127 + 128);
+            var g = Math.round(Math.sin(0.024 * i + 2) * 127 + 128);
+            var b = Math.round(Math.sin(0.024 * i + 4) * 127 + 128);
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+        var colors = [];
+        for (var i=0; i<results.length; i++){
+            colors.push(rainbowColors(i,results.length));
+        }
+
+        //Portfolio Graph
         Simulation.g.push(new Dygraph(
             // containing div
             document.getElementById("graph" + Simulation.tabs),
             chartData, {
                 labels: labels.slice(),
+                legend: 'always',
                 title: 'cFIREsim Simulation Cycles',
                 ylabel: 'Portfolio ($)',
                 xlabel: 'Year',
@@ -477,7 +477,7 @@ var Simulation = {
                     'textAlign': 'right'
                 },
                 labelsDivWidth: 500,
-                labelsDiv: 'labels' + this.tabs,
+                labelsDiv: 'labels1',
                 digitsAfterDecimal: 0,
                 axes: {
                     y: {
@@ -485,7 +485,7 @@ var Simulation = {
                         labelsKMB: false,
                         maxNumberWidth: 11,
                         valueFormatter: function numberWithCommas(x) {
-                            return 'Portfolio: $' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            return 'Spending: $' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         },
                         axisLabelFormatter: function numberWithCommas(x) {
                             return '$' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -493,10 +493,11 @@ var Simulation = {
                     },
                     x: {
                         valueFormatter: function numberWithCommas(x) {
-                            return 'Selected Year: ' + x;
+                            return 'Year: ' + x;
                         },
                     },
                 },
+                colors: colors,
                 showLabelsOnHighlight: true,
                 highlightCircleSize: 3,
                 strokeWidth: 1.5,
@@ -510,55 +511,59 @@ var Simulation = {
             }
         ));
 
-		//Spending Graph
-		Simulation.g.push(new Dygraph(
-			// containing div
-			document.getElementById("graph" + Simulation.tabs + "b"),
-			spendingData, {
-				labels: labels.slice(),
-				title: 'Spending Level',
-				ylabel: 'Spending ($)',
-				xlabel: 'Year',
-				labelsDivStyles: {
-					'textAlign': 'right'
-				},
-				labelsDiv: 'labels' + Simulation.tabs + "b",
-				labelsDivWidth: 500,
-				digitsAfterDecimal: 0,
-				axes: {
-					y: {
-						axisLabelWidth: 100,
-						labelsKMB: false,
-						maxNumberWidth: 11,
-						valueFormatter: function numberWithCommas(x) {
-							return 'Spending: $' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-						},
-						axisLabelFormatter: function numberWithCommas(x) {
-							return '$' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-						}
-					},
-					x: {
-						valueFormatter: function numberWithCommas(x) {
-							return 'Year: ' + x;
-						},
-					},
-				},
-				showLabelsOnHighlight: true,
-				highlightCircleSize: 3,
-				strokeWidth: 1.5,
-				strokeBorderWidth: 0,
-				highlightSeriesBackgroundAlpha: 1.0,
-				highlightSeriesOpts: {
-					strokeWidth: 4,
-					strokeBorderWidth: 2,
-					highlightCircleSize: 5,
-				},
-			}
-		));
-            
+
+
+        //Spending Graph
+
+        Simulation.g.push(new Dygraph(
+            // containing div
+            document.getElementById("graph" + Simulation.tabs + "b"),
+            spendingData, {
+                labels: labels.slice(),
+                legend: 'always',
+                title: 'Spending Level',
+                ylabel: 'Spending ($)',
+                xlabel: 'Year',
+                labelsDivStyles: {
+                    'textAlign': 'right'
+                },
+                labelsDiv: 'labels' + Simulation.tabs + "b",
+                labelsDivWidth: 500,
+                digitsAfterDecimal: 0,
+                axes: {
+                    y: {
+                        axisLabelWidth: 100,
+                        labelsKMB: false,
+                        maxNumberWidth: 11,
+                        valueFormatter: function numberWithCommas(x) {
+                            return 'Spending: $' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        },
+                        axisLabelFormatter: function numberWithCommas(x) {
+                            return '$' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        }
+                    },
+                    x: {
+                        valueFormatter: function numberWithCommas(x) {
+                            return 'Year: ' + x;
+                        },
+                    },
+                },
+                colors: colors,
+                showLabelsOnHighlight: true,
+                highlightCircleSize: 3,
+                strokeWidth: 1.5,
+                strokeBorderWidth: 0,
+                highlightSeriesBackgroundAlpha: 1.0,
+                highlightSeriesOpts: {
+                    strokeWidth: 4,
+                    strokeBorderWidth: 2,
+                    highlightCircleSize: 5,
+                },
+            }
+        ));
 
         $('#tabNav a[href="#' + Simulation.tabs + 'a"]').tab('show');
-		$('a[href="#'+ Simulation.tabs+'a"]').parent('li').show();
+        $('a[href="#'+ Simulation.tabs+'a"]').parent('li').show();
     },
     convertToCSV: function(results) { //converts a random cycle of simulation into a CSV file, for users to easily view
         var csv = "";

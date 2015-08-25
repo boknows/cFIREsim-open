@@ -360,7 +360,6 @@ var StatsModule = {
        			{"start": (Math.ceil(cycleLength/3)*2), "stop": (cycleLength-1)},
        		];
        	}
-        console.log("Thirds:", period);
 
         //call all time period functions
         first5years(sim, period);
@@ -406,8 +405,7 @@ var StatsModule = {
 	            StatsModule.finalStats.withdrawalAnalysis.lowest.thirds.push(StatsModule.min(withdrawals));
 	            StatsModule.finalStats.withdrawalAnalysis.failures.thirds.push(failures);
 				
-				console.log("Debug analyzeThirds", withdrawals, StatsModule.finalStats.withdrawalAnalysis);
-        	}
+            }
         }
     },
 	calcDipAnalysis: function (sim) {

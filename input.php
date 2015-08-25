@@ -11,8 +11,9 @@ error_reporting(0);
 		<meta name="description" content="A Crowdsourced Financial Independence and Early Retirement Simulator and Calculator. Uses historic stock data to model your retirement and give you a success rate based on all of the possible periods of time in the stock market (good and bad)."><title>Crowdsourced Financial Independence and Early Retirement Simulator/Calculator</title>
 		<style>
 		.dygraph-axis-label-y { padding-right:10px; padding-left:10px;}
-		.output > span { display: none; }
-		.output > span.highlight { display: inline; }
+		.labels > span { display: none; }
+  		.labels > span.highlight { display: inline; }
+  		.labels { color: black; }
 		#tabNav .nav-pills > li > a {
 		  border-radius: 4px 4px 0 0 ;
 		}
@@ -41,7 +42,7 @@ error_reporting(0);
 		}
 
 		.rowHeaders tr td:first-child {
-			background-color:grey;
+			background-color: grey;
 			font-weight: bold;
 		}
 
@@ -54,13 +55,12 @@ error_reporting(0);
 		<script type="text/javascript" src="https://cdn.datatables.net/r/bs/dt-1.10.8/datatables.min.js"></script>
 		<script type="text/javascript" src="js/accounting.min.js"></script>
 
-		<?php
-		echo '<script type="text/javascript" src="js/cFIREsimOpen.js?v='.time().'"></script>';
-		echo '<script type="text/javascript" src="js/formData-stub.js?v='.time().'"></script>';
-		echo '<script type="text/javascript" src="js/marketData.js?v='.time().'"></script>';
-		echo '<script type="text/javascript" src="js/spendingModule.js?v='.time().'"></script>';
-		echo '<script type="text/javascript" src="js/statsModule.js"></script>';
-		?>
+		<script type="text/javascript" src="js/cFIREsimOpen.js"></script>
+		<script type="text/javascript" src="js/formData-stub.js"></script>
+		<script type="text/javascript" src="js/marketData.js"></script>
+		<script type="text/javascript" src="js/spendingModule.js"></script>
+		<script type="text/javascript" src="js/statsModule.js"></script>
+		<script type="text/javascript" src="js/validation.js"></script>
 
 		<!-- Bootstrap core CSS -->
 		<link href="css/bootstrap.min.css" rel="stylesheet">
@@ -964,20 +964,10 @@ error_reporting(0);
             			<div class="tab-content clearfix">
             				<div class="tab-pane active" id="1a">
 								<div style="margin:15px">
-									<p>
-										<h1>
-											Portfolio
-										</h1>
-									</p>
-									<div id='graph1' style='width:800px; height:400px;background:white;' class='output'></div>
-									<div id='labels1' style='background:white;width:800px;height:20px;' class='output'></div>
-									<p>
-										<h1>
-											Spending
-										</h1>
-									</p>
-									<div id='graph1b' style='width:800px; height:400px;background:white;' class='output'></div>
-									<div id='labels1b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='graph1' style='width:800px; height:400px;background:white;' class='labels'></div>
+									<div id='labels1' style='background:white;width:800px;height:20px;' class='labels'></div>
+									<div id='graph1b' style='width:800px; height:400px;background:white;' class='labels'></div>
+									<div id='labels1b' style='background:white;width:800px;height:20px;' class='labels'></div>
 									<div id='download1'></div>
 									<p>
 										<h1>
@@ -1004,20 +994,11 @@ error_reporting(0);
             				</div>
 							<div class="tab-pane" id="2a">
 								<div style="margin:15px">
-									<p>
-										<h1>
-											Portfolio
-										</h1>
-									</p>
 									<div id='graph2' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels2' style='background:white;width:800px;height:20px;' class='output'></div>
-									<p>
-										<h1>
-											Spending
-										</h1>
-									</p>
 									<div id='graph2b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels2b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='download2'></div>
 									<p>
 										<h1>
 											Statistics
@@ -1042,20 +1023,11 @@ error_reporting(0);
 							</div>
 							<div class="tab-pane" id="3a">
 								<div style="margin:15px">
-									<p>
-										<h1>
-											Portfolio
-										</h1>
-									</p>
 									<div id='graph3' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels3' style='background:white;width:800px;height:20px;' class='output'></div>
-									<p>
-										<h1>
-											Spending
-										</h1>
-									</p>
 									<div id='graph3b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels3b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='download3'></div>
 									<p>
 										<h1>
 											Statistics
@@ -1080,20 +1052,11 @@ error_reporting(0);
 							</div>
 							<div class="tab-pane" id="4a">
 								<div style="margin:15px">
-									<p>
-										<h1>
-											Portfolio
-										</h1>
-									</p>
 									<div id='graph4' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels4' style='background:white;width:800px;height:20px;' class='output'></div>
-									<p>
-										<h1>
-											Spending
-										</h1>
-									</p>
 									<div id='graph4b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels4b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='download4'></div>
 									<p>
 										<h1>
 											Statistics
@@ -1118,20 +1081,11 @@ error_reporting(0);
 							</div>
 							<div class="tab-pane" id="5a">
 								<div style="margin:15px">
-									<p>
-										<h1>
-											Portfolio
-										</h1>
-									</p>
 									<div id='graph5' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels5' style='background:white;width:800px;height:20px;' class='output'></div>
-									<p>
-										<h1>
-											Spending
-										</h1>
-									</p>
 									<div id='graph5b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels5b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='download5'></div>
 									<p>
 										<h1>
 											Statistics
@@ -1156,20 +1110,11 @@ error_reporting(0);
 							</div>
 							<div class="tab-pane" id="6a">
 								<div style="margin:15px">
-									<p>
-										<h1>
-											Portfolio
-										</h1>
-									</p>
 									<div id='graph6' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels6' style='background:white;width:800px;height:20px;' class='output'></div>
-									<p>
-										<h1>
-											Spending
-										</h1>
-									</p>
 									<div id='graph6b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels6b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='download6'></div>
 									<p>
 										<h1>
 											Statistics
@@ -1194,20 +1139,11 @@ error_reporting(0);
             				</div>
 							<div class="tab-pane" id="7a">
 								<div style="margin:15px">
-									<p>
-										<h1>
-											Portfolio
-										</h1>
-									</p>
 									<div id='graph7' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels7' style='background:white;width:800px;height:20px;' class='output'></div>
-									<p>
-										<h1>
-											Spending
-										</h1>
-									</p>
 									<div id='graph7b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels7b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='download7'></div>
 									<p>
 										<h1>
 											Statistics
@@ -1232,20 +1168,11 @@ error_reporting(0);
 							</div>
 							<div class="tab-pane" id="8a">
 								<div style="margin:15px">
-									<p>
-										<h1>
-											Portfolio
-										</h1>
-									</p>
 									<div id='graph8' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels8' style='background:white;width:800px;height:20px;' class='output'></div>
-									<p>
-										<h1>
-											Spending
-										</h1>
-									</p>
 									<div id='graph8b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels8b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='download8'></div>
 									<p>
 										<h1>
 											Statistics
@@ -1270,20 +1197,11 @@ error_reporting(0);
 							</div>
 							<div class="tab-pane" id="9a">
 								<div style="margin:15px">
-									<p>
-										<h1>
-											Portfolio
-										</h1>
-									</p>
 									<div id='graph9' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels9' style='background:white;width:800px;height:20px;' class='output'></div>
-									<p>
-										<h1>
-											Spending
-										</h1>
-									</p>
 									<div id='graph9b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels9b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='download9'></div>
 									<p>
 										<h1>
 											Statistics
@@ -1308,20 +1226,11 @@ error_reporting(0);
 							</div>
 							<div class="tab-pane" id="10a">
 								<div style="margin:15px">
-									<p>
-										<h1>
-											Portfolio
-										</h1>
-									</p>
 									<div id='graph10' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels10' style='background:white;width:800px;height:20px;' class='output'></div>
-									<p>
-										<h1>
-											Spending
-										</h1>
-									</p>
 									<div id='graph10b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels10b' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div id='download1'></div>
 									<p>
 										<h1>
 											Statistics
