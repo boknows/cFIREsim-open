@@ -1,4 +1,3 @@
-
 $(document).ready(function() {
     //Launch Welcome Modal
     $('#welcomeModal').modal('show');
@@ -145,22 +144,28 @@ var Simulation = {
         if (form.data.method == "historicalAll" || form.data.method == "constant") {
             numCycles = Object.keys(Market).length - cycleLength + 1;
         } else if (form.data.method == "historicalSpecific") {
-            numCycles = form.data.end - form.data.start + cycleLength;
+            numCycles = (form.data.end - form.data.start) - cycleLength + 2;
             cycleStart = parseInt(form.data.start);
         }
-        if (form.investigate.type == "single") {
+        if (form.data.method == "singleCycle") {
             numCycles = 1;
-            cycleStart = parseInt(form.investigate.single);
+            cycleStart = parseInt(form.data.singleStart);
         }
-        if (form.investigate.type == "single") {
+        if (form.data.method == "singleCycle") {
+			console.log("Cycle Start:", cycleStart);
             var cyc = this.cycle(cycleStart, cycleStart + cycleLength);
             this.sim.push(cyc);
-        } else {
+        } else if(form.data.method != "historicalSpecific"){
             for (cycleStart; cycleStart < 1871 + numCycles; cycleStart++) {
                 var cyc = this.cycle(cycleStart, cycleStart + cycleLength);
                 this.sim.push(cyc);
             }
-        }
+        }else if(form.data.method == "historicalSpecific"){
+			for(var i=cycleStart; i < (cycleStart+numCycles); i++){
+				var cyc = this.cycle(i, i+cycleLength);
+				this.sim.push(cyc);
+			}
+		}
 
         for (var i = 0; i < this.sim.length; i++) {
             for (var j = 0; j < this.sim[i].length; j++) {
@@ -171,7 +176,6 @@ var Simulation = {
                 this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
             }
         }
-        console.log("Results:", this.sim);
 
         //Run post-simulation functions
         this.convertToCSV(this.sim);
@@ -179,14 +183,12 @@ var Simulation = {
         this.displayGraph(this.sim, form);
 
         //Initialize statistics calculations
-        StatsModule.init(this.sim);
-
+        StatsModule.init(this.sim, form);
     },
     cycle: function(startOfRange, endOfRange) {
         //The starting CPI value of this cycle, for comparison throughout the cycle.
         var startCPI = Market[startOfRange.toString()].cpi;
         var cyc = [];
-
         for (var year = startOfRange; year < endOfRange; year++) {
             data = Market[year.toString()];
             cyc.push({
@@ -258,13 +260,13 @@ var Simulation = {
         }
 
         this.sim[i][j].spending = spending; //assign value to main sim container
-        this.sim[i][j].infAdjSpending = this.roundTwoDecimals(spending / this.sim[i][j].cumulativeInflation);
+        this.sim[i][j].infAdjSpending = Math.round(spending / this.sim[i][j].cumulativeInflation);
     },
     calcMarketGains: function(form, i, j) {
         var portfolio = this.sim[i][j].portfolio.start;
         var sumOfAdjustments = this.sim[i][j].sumOfAdjustments; //Sum of all portfolio adjustments for this given year. SS/Pensions/Extra Income/Extra Spending.
         portfolio = portfolio - this.sim[i][j].spending + sumOfAdjustments; //Take out spending and portfolio adjustments before calculating asset allocation. This simulates taking your spending out at the beginning of a year.
-
+		this.sim[i][j].portfolio.start = portfolio;
         //Calculate value of each asset class based on allocation percentages
         var equities = (form.portfolio.percentEquities / 100 * portfolio);
         var bonds = (form.portfolio.percentBonds / 100 * portfolio);
@@ -325,7 +327,7 @@ var Simulation = {
 
             //Sum all assets to determine portfolio end value.
             this.sim[i][j].portfolio.end = this.roundTwoDecimals(this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end);
-            this.sim[i][j].portfolio.infAdjEnd = this.roundTwoDecimals(this.sim[i][j].portfolio.end / this.sim[i][j].cumulativeInflation);
+            this.sim[i][j].portfolio.infAdjEnd = parseInt(this.sim[i][j].portfolio.end / this.sim[i][j].cumulativeInflation);
 
         } else { //Add logic for non-rebalancing portfolios
 
@@ -344,7 +346,6 @@ var Simulation = {
                 totalFailures++;
             }
         }
-        console.log("Failed " + totalFailures + " out of " + results.length + " cycles.");
     },
     calcSumOfAdjustments: function(form, i, j) { //Calculate the sum of all portfolio adjustments for a given year (pensions, extra income, extra spending, etc)
         var currentYear = new Date().getFullYear();
@@ -454,7 +455,7 @@ var Simulation = {
             labels[i + 1] = label;
         }
 
-        //Chart Series Colors Formatter
+		//Chart Series Colors Formatter
         function rainbowColors(length, maxLength)
         {
             var i = (length * 255 / maxLength);
@@ -511,7 +512,7 @@ var Simulation = {
                 highlightSeriesOpts: {
                     strokeWidth: 4,
                     strokeBorderWidth: 2,
-                    highlightCircleSize: 5,
+                    highlightCircleSize: 7,
                 },
             }
         ));
@@ -519,7 +520,6 @@ var Simulation = {
 
 
         //Spending Graph
-
         Simulation.g.push(new Dygraph(
             // containing div
             document.getElementById("graph" + Simulation.tabs + "b"),

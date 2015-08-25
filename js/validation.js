@@ -99,7 +99,6 @@ $(document).ready(function() {
 	});
 	
 	//Pensions Validation
-	var obj = $("input[ng-model='pension.startYear']");
 	function cmpPensionYears(){
 		var startYears = $("input[ng-model='pension.startYear']");
 		var currentYear = new Date().getFullYear();
@@ -140,4 +139,35 @@ $(document).ready(function() {
 		}
 	});
 
+	//Extra Spending Validation
+	function cmpExtraSpendingYears(){
+		var startYears = $("input[ng-model='extraSpending.startYear']");
+		var endYears = $("input[ng-model='extraSpending.endYear']");
+		var currentYear = new Date().getFullYear();
+		var trigger = true;
+		for(var i=0; i<startYears.length; i++){
+			if((parseInt(startYears[i].value) < currentYear) || (isNaN(parseInt(startYears[i].value))) || (parseInt(startYears[i].value) >= parseInt(endYears[i].value))) {
+				trigger = false;
+			}
+		}
+		return trigger;
+	}
+	$("input[ng-model='extraSpending.startYear']").keyup(function() {
+		if(cmpExtraSpendingYears()){
+			$("#extraSpendingError").hide();
+			$(".runSim").removeClass("disabled");
+		}else{
+			$("#extraSpendingError").show();
+			$(".runSim").addClass("disabled");
+		}
+	});
+	$("input[ng-model='extraSpending.endYear']").keyup(function() {
+		if(cmpExtraSpendingYears()){
+			$("#extraSpendingError").hide();
+			$(".runSim").removeClass("disabled");
+		}else{
+			$("#extraSpendingError").show();
+			$(".runSim").addClass("disabled");
+		}
+	});
 });

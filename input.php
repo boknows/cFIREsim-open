@@ -37,7 +37,7 @@ error_reporting(0);
 			width: auto !important;
 		}
 
-		.table th {
+		.table-nonfluid th {
 			background-color: grey;
 		}
 
@@ -202,6 +202,10 @@ error_reporting(0);
 							<div class="panel-heading">
 								Data Options
 							</div>
+							<div class="alert alert-danger" role="alert" id="datarror" style="display:none">
+									<span class="sr-only">Error:</span>
+									Data End Year must be equal to or less than current year. (Data End Year - Data Start Year) must be greater than (Retirement End Year - Current Year).
+							</div>
 							<div class="panel-body">
 								<label>Data To Use:
 									<select class="form-control"
@@ -223,6 +227,13 @@ error_reporting(0);
 										</div>
 									</label>
 								</div>
+								<div id="singleCycleOptions" class="dataOptions" style="display:none">
+									<label>Starting Data Year:
+										<div class="input-group">
+											<input type="text" class="form-control" ng-model="data.data.singleStart">
+										</div>
+									</label>
+								</div>
 								<div id="constantGrowthOptions" class="dataOptions" style="display:none">
 									<label>Market Growth:
 										<div class="input-group">
@@ -240,13 +251,6 @@ error_reporting(0);
 												ng-options="investigateOptions.value as investigateOptions.text for investigateOptions in investigateOptionTypes">
 											</select>
 										</label>
-										<div id="singleCycleOptions" class="dataOptions" style="display:none">
-											<label>Starting Data Year:
-												<div class="input-group">
-													<input type="text" class="form-control" ng-model="data.investigate.single">
-												</div>
-											</label>
-										</div>
 										<br><a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg runSim" ng-click="runSimulation()">Run Simulation</a>
 									</div>
 								</div>
@@ -840,6 +844,10 @@ error_reporting(0);
 								<div class="panel-heading">
 									Other Spending
 								</div>
+								<div class="alert alert-danger" role="alert" id="extraSpendingError" style="display:none">
+									<span class="sr-only">Error:</span>
+									Start Year must be greater than current year. Start Year must be less than End Year.
+								</div>
 								<div class="panel-body">
 									<table class="table">
 										<thead>
@@ -1313,11 +1321,11 @@ angular.module('cFIREsim', [])
                     method: "historicalAll",
                     start: 1900,
                     end: 1970,
-                    growth: 8
+                    growth: 8,
+					singleStart: 1966
                 },
                 investigate: {
                     type: "none",
-                    single: 1966
                 },
                 portfolio: {
                     initial: 1000000,
@@ -1445,16 +1453,16 @@ angular.module('cFIREsim', [])
                 formInputs: [
                     'constantGrowthOptions'
                 ]
-            }]
+            }, {
+				text: 'Single Simulation Cycle',
+				value: 'singleCycle',
+				formInputs: [
+                    'singleCycleOptions'
+                ]
+			}]
             $scope.investigateOptionTypes = [{
                 text: 'None ',
                 value: 'none',
-            }, {
-                text: 'Single Simulation Cycle ',
-                value: 'single',
-                formInputs: [
-                    'singleCycleOptions'
-                ]
             }]
             $scope.spendingPlanTypes = [{
                     text: 'Inflation Adjusted',
@@ -1610,10 +1618,17 @@ formInputs: [
                 if ($scope.data.data.method == "historicalSpecific") {
                     $('#historicalSpecificOptions').show();
                     $('#constantGrowthOptions').hide();
+					$('#singleCycleOptions').hide();
                 } else if ($scope.data.data.method == "constant") {
                     $('#constantGrowthOptions').show();
                     $('#historicalSpecificOptions').hide();
+					$('#singleCycleOptions').hide();
                 } else if ($scope.data.data.method == "historicalAll") {
+                    $('#constantGrowthOptions').hide();
+                    $('#historicalSpecificOptions').hide();
+					$('#singleCycleOptions').hide();
+                } else if ($scope.data.data.method == "singleCycle") {
+					$('#singleCycleOptions').show();
                     $('#constantGrowthOptions').hide();
                     $('#historicalSpecificOptions').hide();
                 }

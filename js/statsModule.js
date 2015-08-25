@@ -11,7 +11,7 @@ The "sim" parameter for each function is a multi-dimensional array of the simula
 */
 
 var StatsModule = {
-    init: function(sim) {
+    init: function(sim, form) {
 		this.finalStats =  {
 			"successRate": null,
 				"failures": null,
@@ -95,8 +95,8 @@ var StatsModule = {
 																		},
 																			"individualDips": []
 		};
-        this.calcGeneralStats(sim);
-        this.calcWithdrawalAnalysis(sim);
+        this.calcGeneralStats(sim, form);
+        this.calcWithdrawalAnalysis(sim, form);
         this.calcDipAnalysis(sim);
         console.log("Final Stats: ", this.finalStats);
 
@@ -114,7 +114,7 @@ var StatsModule = {
 		}
 		//First Table - Success Rates
 		var dataSet1a = [
-			[Math.round(100*this.finalStats.successRate)/100 + "%", this.finalStats.avgPortfolioAtRetirement]
+			[Math.round(100*this.finalStats.successRate)/100 + "%", accounting.formatMoney(this.finalStats.avgPortfolioAtRetirement, "$", 0)]
 		];
         $('#stats'+Simulation.tabs+"a").DataTable( {
 			data: dataSet1a,
@@ -259,55 +259,58 @@ var StatsModule = {
     min: function(values) {
         return Math.min.apply(null, values);
     },
-    calcGeneralStats: function(sim) {
+    calcGeneralStats: function(sim, form) {
         //Initialize arrays for storing values from sim container
         var endingPortfolios = [],
             yearlyWithdrawals = [],
             totalWithdrawals = [],
             totalWithdrawalsSummed = [],
             totalWithdrawalAvgs = 0;
+		var currentYear = new Date().getFullYear();
+    	var retireYrIndex = (form.retirementStartYear - currentYear);
+		var cycles = form.retirementEndYear - form.retirementStartYear + 1;
 
         //Add appropriate values to arrays from the main sim container, for each year of each cycle
         for (var i = 0; i < sim.length; i++) {
-            totalWithdrawalsSummed[i] = [];
+            var tempSummedWithdrawals = [];
             for (var j = 0; j < sim[i].length; j++) {
-                endingPortfolios.push(sim[i][j].portfolio.infAdjEnd);
-                yearlyWithdrawals.push(sim[i][j].infAdjSpending);
-                totalWithdrawalsSummed[i].push(sim[i][j].infAdjSpending);
-                totalWithdrawals.push(sim[i][j].infAdjSpending);
+				if(j >= retireYrIndex){
+					endingPortfolios.push(sim[i][j].portfolio.infAdjEnd);
+					yearlyWithdrawals.push(sim[i][j].infAdjSpending);
+					tempSummedWithdrawals.push(sim[i][j].infAdjSpending);
+					totalWithdrawals.push(sim[i][j].infAdjSpending);
+				}
             }
+            totalWithdrawalsSummed.push(tempSummedWithdrawals.reduce(function(a,b,index,array){return a+b}));
         }
-
         //Sum up the total withdrawals from a given cycle, to determine the average total withdrawals for all cycles
-        for (var i = 0; i < totalWithdrawalsSummed.length; i++) {
-            totalWithdrawalAvgs = totalWithdrawalAvgs + this.average(totalWithdrawalsSummed[i]);
-        }
+        totalWithdrawalAvgs = this.average(yearlyWithdrawals);
 
         //Send values to finalStats object
         this.finalStats.average = {
             "endingPortfolios": this.average(endingPortfolios),
             "yearlyWithdrawals": this.average(yearlyWithdrawals),
-            "totalWithdrawals": (totalWithdrawalAvgs / totalWithdrawalsSummed.length)
+            "totalWithdrawals": this.average(totalWithdrawalsSummed)
         };
         this.finalStats.median = {
             "endingPortfolios": this.median(endingPortfolios),
             "yearlyWithdrawals": this.median(yearlyWithdrawals),
-            "totalWithdrawals": this.median(totalWithdrawals)
+            "totalWithdrawals": this.median(totalWithdrawalsSummed)
         };
         this.finalStats.stDev = {
             "endingPortfolios": this.standardDeviation(endingPortfolios),
             "yearlyWithdrawals": this.standardDeviation(yearlyWithdrawals),
-            "totalWithdrawals": this.standardDeviation(totalWithdrawals)
+            "totalWithdrawals": this.standardDeviation(totalWithdrawalsSummed)
         };
         this.finalStats.highest = {
             "endingPortfolios": this.max(endingPortfolios),
             "yearlyWithdrawals": this.max(yearlyWithdrawals),
-            "totalWithdrawals": this.max(totalWithdrawals)
+            "totalWithdrawals": this.max(totalWithdrawalsSummed)
         };
         this.finalStats.lowest = {
             "endingPortfolios": this.min(endingPortfolios),
             "yearlyWithdrawals": this.min(yearlyWithdrawals),
-            "totalWithdrawals": this.min(totalWithdrawals)
+            "totalWithdrawals": this.min(totalWithdrawalsSummed)
         };
 
         //Calculate Success Rate - THIS IS REDUNDANT. Delete/consolidate from cFIREsimOpen.js
@@ -325,19 +328,25 @@ var StatsModule = {
 
         //Calculate Average Portfolio at Retirement
         var portfolioAtRetirement = [];
+		var dt = new Date();
+		var retireYear = form.retirementStartYear - (dt.getYear()+1900);
         for (var i = 0; i < sim.length; i++) {
             for (var j = 0; j < sim[i].length; j++) {
-
+				if(retireYear == j){
+					portfolioAtRetirement.push(sim[i][j].portfolio.infAdjStart);
+				}
             }
         }
+		StatsModule.finalStats.avgPortfolioAtRetirement = this.average(portfolioAtRetirement);
     },
-    calcWithdrawalAnalysis: function(sim) {
+    calcWithdrawalAnalysis: function(sim, form) {
     	//Determine time periods
-    	var cycleLength = sim[0].length;
+		var currentYear = new Date().getFullYear();
+    	var cycleLength = form.retirementEndYear - form.retirementStartYear;
     	var period = {
     		"first5": {
-    			"start": 0,
-    			"stop": 4
+    			"start": (form.retirementStartYear - currentYear),
+    			"stop": (form.retirementStartYear - currentYear + 4)
     		},
        	};
 
