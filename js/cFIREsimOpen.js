@@ -165,6 +165,7 @@ var Simulation = {
         for (var i = 0; i < this.sim.length; i++) {
             for (var j = 0; j < this.sim[i].length; j++) {
                 this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
+                this.calcSumOfAdjustments(form, i, j);
                 this.calcSpending(form, i, j); //Nominal spending for this specific cycle
                 this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
                 this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
@@ -225,6 +226,7 @@ var Simulation = {
                     "val": null
                 },
                 "cumulativeInflation": this.cumulativeInflation(startCPI, data.cpi),
+                "socialSecurityAndPensionAdjustments": null,
                 "sumOfAdjustments": null,
             });
         }
@@ -260,7 +262,7 @@ var Simulation = {
     },
     calcMarketGains: function(form, i, j) {
         var portfolio = this.sim[i][j].portfolio.start;
-        var sumOfAdjustments = this.calcSumOfAdjustments(form, i, j); //Sum of all portfolio adjustments for this given year. SS/Pensions/Extra Income/Extra Spending.
+        var sumOfAdjustments = this.sim[i][j].sumOfAdjustments; //Sum of all portfolio adjustments for this given year. SS/Pensions/Extra Income/Extra Spending.
         portfolio = portfolio - this.sim[i][j].spending + sumOfAdjustments; //Take out spending and portfolio adjustments before calculating asset allocation. This simulates taking your spending out at the beginning of a year.
 
         //Calculate value of each asset class based on allocation percentages
@@ -346,23 +348,25 @@ var Simulation = {
     },
     calcSumOfAdjustments: function(form, i, j) { //Calculate the sum of all portfolio adjustments for a given year (pensions, extra income, extra spending, etc)
         var currentYear = new Date().getFullYear();
+        var socialSecurityAndPensionAdjustments = 0;
         var sumOfAdjustments = 0;
         //Evaluate ExtraIncome given cycle i, year j
         //Social Security - always adjusted by CPI
         if ((j >= (form.extraIncome.socialSecurity.startYear - currentYear)) && (j <= (form.extraIncome.socialSecurity.endYear - currentYear))) {
-            sumOfAdjustments += (form.extraIncome.socialSecurity.val * this.sim[i][j].cumulativeInflation);
+            socialSecurityAndPensionAdjustments += (form.extraIncome.socialSecurity.val * this.sim[i][j].cumulativeInflation);
         }
         if ((j >= (form.extraIncome.socialSecuritySpouse.startYear - currentYear)) && (j <= (form.extraIncome.socialSecuritySpouse.endYear - currentYear))) {
-            sumOfAdjustments += (form.extraIncome.socialSecuritySpouse.val * this.sim[i][j].cumulativeInflation);
+            socialSecurityAndPensionAdjustments += (form.extraIncome.socialSecuritySpouse.val * this.sim[i][j].cumulativeInflation);
         }
 
         //Pensions
         for (var k = 0; k < form.extraIncome.pensions.length; k++) {
             if ((j >= (form.extraIncome.pensions[k].startYear - currentYear))) {
-                sumOfAdjustments += this.calcAdjustmentVal(form.extraIncome.pensions[k], i, j);
+                socialSecurityAndPensionAdjustments += this.calcAdjustmentVal(form.extraIncome.pensions[k], i, j);
             }
         }
 
+        sumOfAdjustments += socialSecurityAndPensionAdjustments;
         //Extra Savings
         for (var k = 0; k < form.extraIncome.extraSavings.length; k++) {
             if (form.extraIncome.extraSavings[k].recurring == true) {
@@ -390,6 +394,7 @@ var Simulation = {
         }
 
         //Add sumOfAdjustments to sim container and return value.
+        this.sim[i][j].socialSecurityAndPensionAdjustments = socialSecurityAndPensionAdjustments;
         this.sim[i][j].sumOfAdjustments = sumOfAdjustments;
         return sumOfAdjustments;
     },

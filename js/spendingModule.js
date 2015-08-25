@@ -20,7 +20,9 @@ var SpendingModule = {
     },
     "notInflationAdjusted": {
         calcSpending: function(form, sim, i, j) {
-            return (form.spending.initial);
+            var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
+            var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
+            return Math.min(ceiling, Math.max(floor, form.spending.initial));
         }
     },
     "hebelerAutopilot": {
@@ -31,7 +33,12 @@ var SpendingModule = {
             var rmdWeight = parseInt(form.spending.hebelerWeightedRMD) / 100;
             var cpiWeight = parseInt(form.spending.hebelerWeightedCPI) / 100;
             var rmdPortfolio = (sim[i][j].portfolio.start / rmdFactor);
-            return (((form.spending.initial * sim[i][j].cumulativeInflation * cpiWeight) + (rmdPortfolio * rmdWeight)));
+
+            var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
+            var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
+
+            var baseSpending = (((form.spending.initial * sim[i][j].cumulativeInflation * cpiWeight) + (rmdPortfolio * rmdWeight)));
+            return Math.min(ceiling, Math.max(floor, baseSpending));
         },
     },
     "variableSpending": {
@@ -40,8 +47,8 @@ var SpendingModule = {
             var isInitialYearInCycle = j == (form.retirementStartYear - currentYear);
             var isAfterInitialYearInCycle = j > (form.retirementStartYear - currentYear);
 
-            var floor = (form.spending.floor == 'definedValue') && ("floorValue" in form.spending) ? form.spending.floorValue * sim[i][j].cumulativeInflation : Number.NEGATIVE_INFINITY;
-            var ceiling = (form.spending.ceiling == 'definedValue') && ("ceilingValue" in form.spending) ? form.spending.ceilingValue * sim[i][j].cumulativeInflation : Number.POSITIVE_INFINITY;
+            var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
+            var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
 
             if (isInitialYearInCycle) {
                 return form.spending.initial;
@@ -65,6 +72,8 @@ var SpendingModule = {
                 floor = (j == 0) ? 0 : (sim[i][j - 1].spending * (form.spending.percentageOfPortfolioFloorValue / 100)  * sim[i][j].cumulativeInflation / sim[i][j-1].cumulativeInflation);
             }else if(form.spending.percentageOfPortfolioFloorType == "definedValue" && "percentageOfPortfolioFloorValue" in form.spending && form.spending.percentageOfPortfolioFloorValue != "") {
                 floor = form.spending.percentageOfPortfolioFloorValue * sim[i][j].cumulativeInflation;
+            }else if(form.spending.percentageOfPortfolioFloorType == "pensions" && sim[i][j].socialSecurityAndPensionAdjustments != null) {
+                floor = sim[i][j].socialSecurityAndPensionAdjustments;
             }
 
             //Calculate Ceiling
@@ -99,9 +108,9 @@ var SpendingModule = {
             var currentWithdrawalRate = sim[i][j-1].spending / sim[i][j].portfolio.start;
             var exceedsRate = initialWithdrawalRate * (1 + exceeds);
             var fallRate = initialWithdrawalRate * (1 - fall);
-
-            var floor = form.spending.floor == "definedValue" ? form.spending.floorValue * sim[i][j].cumulativeInflation : 0;
-            var ceiling = form.spending.ceiling == "definedValue" ? form.spending.ceilingValue * sim[i][j].cumulativeInflation : Number.POSITIVE_INFINITY;
+            
+            var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
+            var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
 
             var currentYearInflation = ((sim[i][j].cumulativeInflation - sim[i][j-1].cumulativeInflation) / sim[i][j-1].cumulativeInflation + 1);
             var simulationDuration = form.retirementEndYear - form.retirementStartYear + 1;
@@ -116,5 +125,16 @@ var SpendingModule = {
             }
             return sim[i][j-1].spending * currentYearInflation;
         }
+    },
+    calcBasicSpendingFloor: function(form, sim, i, j) {
+        if(form.spending.floor == 'definedValue' && "floorValue" in form.spending) {
+            return form.spending.floorValue * sim[i][j].cumulativeInflation;
+        } else if (form.spending.floor == "pensions" && sim[i][j].socialSecurityAndPensionAdjustments != null){
+            return sim[i][j].socialSecurityAndPensionAdjustments;
+        }
+        return 0;
+    },
+    calcBasicSpendingCeiling: function(form, sim, i, j) {
+        return form.spending.ceiling == "definedValue" && form.spending.ceilingValue != null ? form.spending.ceilingValue * sim[i][j].cumulativeInflation : Number.POSITIVE_INFINITY;
     }
 };
