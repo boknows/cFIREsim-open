@@ -20,7 +20,8 @@ if($_POST['param']=="getSavedSim"){
 	$stmt = $db->prepare('SELECT * FROM queriesJSON WHERE qid = :qid');
 	$stmt->execute(array(':qid' => $_POST['qid']));
 	foreach ($stmt as $row) {
-		$data = $row['json'];
+		$data['data'] = $row['json'];
+		$data['simName'] = $row['simName'];
 	}
 	echo JSON_encode($data);
 }

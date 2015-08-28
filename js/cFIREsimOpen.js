@@ -30,38 +30,23 @@ $(document).ready(function() {
 
     //Populate Saved Sims dropdown if user is logged in
     if ($("#username").html() != undefined) {
-        Simulation.getQueries($("#username").html(), function(data) {
-            var html = "";
-            for (var i = 0; i < data.qid.length; i++) {
-                html += "<li><a href='#' id='" + data.qid[i] + "' class='savedSim'>" + data.simName[i] + "</a></li>"
-            }
-            $("#savedSimsDropdown").html(html);
-            $('.dropdown-menu a').click(function() {
-                var id = $(this).attr('id');
-                Simulation.getSavedSim(id);
-            });
-            
-        });
-        //Open the Save Sim input field containing simName input and submit/cancel buttons
-        $('#saveSimBtn').click(function(e) {
-            $('#saveSimPopup').show();
-        });
+        Simulation.getQueries();
+		
+		//Open the Save Sim input field containing simName input and submit/cancel buttons
+		$('#saveSimBtn').click(function(e) {
+			$('#saveSimPopup').modal('show');
+		});
+		
+		//When Saved Sim is submitted, save to DB
+		$('#confirmSaveSim').click(function(e) {
+			e.stopImmediatePropagation();
+			Simulation.saveSim($("#username").html());
+		});  
 
-        //When Saved Sim is submitted, save to DB
-        $('#confirmSaveSim').click(function(e) {
-            e.stopImmediatePropagation();
-            Simulation.saveSim($("#username").html());
-        });
-
-        //Close Save Sim input div if cancelled
-        $('#cancelSaveSim').click(function(e) {
-            $('#saveSimPopup').hide();
-        });    
-
-        //Close Save Sim success popup
-        $('#closeSaveSuccess').click(function(e) {
-            $('#saveSimSuccess').hide();
-        });
+		//Close Save Sim success popup
+		$('#closeSaveSuccess').click(function(e) {
+			$('#saveSimSuccess').hide();
+		});
     }
 
     $("#signInBtn").click(function() {
@@ -73,7 +58,8 @@ var Simulation = {
     sim: [],
     tabs: 0,
 	g: [], //dygraph object
-    getQueries: function(username, callback) {
+    getQueries: function() {
+		var username = $("#username").html();
         $.ajax({
             url: "getData.php",
             type: "POST",
@@ -82,7 +68,17 @@ var Simulation = {
                 param: "getNames",
                 username: username,
             },
-        }).success(callback);
+        }).success(function(data){
+			var html = "";
+            for (var i = 0; i < data.qid.length; i++) {
+                html += "<li><a href='#' id='" + data.qid[i] + "' class='savedSim'>" + data.simName[i] + "</a></li>"
+            }
+            $("#savedSimsDropdown").html(html);
+            $('.dropdown-menu a').click(function() {
+                var id = $(this).attr('id');
+                Simulation.getSavedSim(id);
+            });	
+		});
     },
     getSavedSim: function(qid) {
         $.ajax({
@@ -94,7 +90,10 @@ var Simulation = {
                 qid: qid,
             }
         }).success(function(data) {
-            Simulation.loadSavedSim(data);   
+            Simulation.loadSavedSim(data.data);  
+			var html = "<p>Successfully loaded '" + data.simName + "'</p>";
+			$("#loadedSimHeaderText").html(html);
+			$("#loadedSimHeader").show();
         });
     },
     loadSavedSim: function(data){
@@ -124,9 +123,10 @@ var Simulation = {
                     simName: $('#simNameInput').val(),
                 },
             }).success(function(){
-                $('#saveSimPopup').hide();
+                $('#saveSimPopup').modal('hide');
                 console.log("Save Success!");
                 $('#saveSimSuccess').fadeIn( 300, "linear" );
+				Simulation.getQueries();
             });
         });
     },

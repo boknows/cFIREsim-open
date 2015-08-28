@@ -398,8 +398,7 @@ var StatsModule = {
         	for(var third = 0; third < period.thirds.length; third++){
         		var withdrawals = [];
 	            var failures = 0;
-	            //for (var i = 0; i < sim.length; i++) {
-                for (var i = 0; i < 10; i++) {
+	            for (var i = 0; i < sim.length; i++) {
 	                for (var j = period.thirds[third].start; j < period.thirds[third].stop; j++) {
 	                    withdrawals.push(sim[i][j].infAdjSpending);
 	                    if (sim[i][j].portfolio.infAdjEnd < 0) {

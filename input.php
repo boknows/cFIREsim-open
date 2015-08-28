@@ -1,5 +1,5 @@
 <?php
-	//include 'headers.php';
+	include 'headers.php';
 error_reporting(0);
 ?>
 <!DOCTYPE html>
@@ -142,6 +142,11 @@ error_reporting(0);
 						</li>
 						<li>
 							<p class="navbar-btn">
+								<a data-toggle="modal" href="#donateModal" class="btn btn-default">Donate/Support</a>
+							</p>
+						</li>
+						<li>
+							<p class="navbar-btn">
 								<a data-toggle="modal" href="#reportIssueModal" class="btn btn-default">Report an Issue</a>
 							</p>
 						</li>
@@ -182,6 +187,15 @@ error_reporting(0);
 			<div id="input" ng-controller="simulationInputController">
 				<form name="form">
 				<div class="row">
+					<div class="col-md-12" style="display:none" id="loadedSimHeader">
+						<div class="panel panel-success">
+							<div class="panel-heading" id="loadedSimHeaderText">
+								Successfully loaded  
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
 					<div class="col-md-6">
 						<div class="panel panel-primary">
 							<div class="panel-heading">
@@ -202,9 +216,13 @@ error_reporting(0);
 							<div class="panel-heading">
 								Data Options
 							</div>
-							<div class="alert alert-danger" role="alert" id="datarror" style="display:none">
-									<span class="sr-only">Error:</span>
-									Data End Year must be equal to or less than current year. (Data End Year - Data Start Year) must be greater than (Retirement End Year - Current Year).
+							<div class="alert alert-danger" role="alert" id="dataError" style="display:none">
+								<span class="sr-only">Error:</span>
+								Start Year must be >= 1871. Start Year must be less than End Year. End Year must be less than current year. Total span of years must be > simulation period. 
+							</div>
+							<div class="alert alert-danger" role="alert" id="dataRateError" style="display:none">
+								<span class="sr-only">Error:</span>
+								Market Growth must be a positive integer. 
 							</div>
 							<div class="panel-body">
 								<label>Data To Use:
@@ -425,6 +443,10 @@ error_reporting(0);
 						<div class="panel-heading">
 							Spending Plan
 						</div>
+						<div class="alert alert-danger" role="alert" id="initialSpendingError" style="display:none">
+							<span class="sr-only">Error:</span>
+							Initial Spending amount must be a positive integer.
+						</div>
 						<div class="panel-body">
 							<label>Spending Plan:
 								<select class="form-control"
@@ -630,6 +652,14 @@ error_reporting(0);
 									Social Security
 								</div>
 								<div class="panel-body">
+									<div class="alert alert-danger" role="alert" id="ssError" style="display:none">
+										<span class="sr-only">Error:</span>
+										Start Year must be >= current year. Start Year must be less than End Year.
+									</div>
+									<div class="alert alert-danger" role="alert" id="ssValueError" style="display:none">
+										<span class="sr-only">Error:</span>
+										Amount must be a positive integer.
+									</div>
 									<div class="row">
 										<div class="col-md-4">
 											<label>Annual:
@@ -671,7 +701,15 @@ error_reporting(0);
 								<div class="panel-body">
 									<div class="alert alert-danger" role="alert" id="pensionsError" style="display:none">
 										<span class="sr-only">Error:</span>
-										Pension amount must be a positive integer. Pension Start Year must be >= the current year.
+										Pension Start Year must be >= the current year and must be an integer. 
+									</div>
+									<div class="alert alert-danger" role="alert" id="pensionsValueError" style="display:none">
+										<span class="sr-only">Error:</span>
+										Amount must be a positive integer.
+									</div>
+									<div class="alert alert-danger" role="alert" id="pensionsRateError" style="display:none">
+										<span class="sr-only">Error:</span>
+										Pension inflation rate must be a positive integer. 
 									</div>
 									<table class="table">
 										<thead>
@@ -722,14 +760,13 @@ error_reporting(0);
 														ng-options="option.value as option.text for option in inflationTypes"
 														ng-change="changeInflationType($index, data.extraIncome.pensions)"
 														ng-disabled="!pension.inflationAdjusted">
-														<option value=""></option>
 													</select>
 												</td>
 												<td>
 													<input type="text"
 													class="form-control"
 													ng-model="pension.inflationRate"
-													ng-disabled="pension.inflationType != 'constant'">
+													ng-disabled="pension.inflationType != 'constant' || !pension.inflationAdjusted">
 												</td>
 												<td>
 													<input type="button" ng-click="removeObject($index, data.extraIncome.pensions)" value="Delete"/>
@@ -743,6 +780,18 @@ error_reporting(0);
 							<div class="panel panel-default">
 								<div class="panel-heading">
 									Other Income
+								</div>
+								<div class="alert alert-danger" role="alert" id="extraIncomeRateError" style="display:none">
+									<span class="sr-only">Error:</span>
+									Extra Income inflation rate must be a positive integer. 
+								</div>
+								<div class="alert alert-danger" role="alert" id="extraIncomeValueError" style="display:none">
+									<span class="sr-only">Error:</span>
+									Amount must be a positive integer. 
+								</div>
+								<div class="alert alert-danger" role="alert" id="extraIncomeError" style="display:none">
+									<span class="sr-only">Error:</span>
+									Start Year must be >= current year. Start Year must be less than End Year.
 								</div>
 								<div class="panel-body">
 									<table class="table">
@@ -813,14 +862,13 @@ error_reporting(0);
 														ng-options="option.value as option.text for option in inflationTypes"
 														ng-change="changeInflationType($index, data.extraIncome.extraSavings)"
 														ng-disabled="!extraSaving.inflationAdjusted">
-														<option value=""></option>
 													</select>
 												</td>
 												<td>
 													<input type="text"
 													class="form-control"
 													ng-model="extraSaving.inflationRate"
-													ng-disabled="extraSaving.inflationType != 'constant'">
+													ng-disabled="extraSaving.inflationType != 'constant' || !extraSaving.inflationAdjusted">
 												</td>
 												<td>
 													<input type="button" ng-click="removeObject($index, data.extraIncome.extraSavings)" value="Delete"/>
@@ -846,7 +894,15 @@ error_reporting(0);
 								</div>
 								<div class="alert alert-danger" role="alert" id="extraSpendingError" style="display:none">
 									<span class="sr-only">Error:</span>
-									Start Year must be greater than current year. Start Year must be less than End Year.
+									Start Year must be >= current year. Start Year must be less than End Year.
+								</div>
+								<div class="alert alert-danger" role="alert" id="extraSpendingValueError" style="display:none">
+									<span class="sr-only">Error:</span>
+									Amount must be a positive integer.
+								</div>
+								<div class="alert alert-danger" role="alert" id="extraSpendingRateError" style="display:none">
+									<span class="sr-only">Error:</span>
+									Inflation Rate for Spending must be a positive integer. 
 								</div>
 								<div class="panel-body">
 									<table class="table">
@@ -917,14 +973,13 @@ error_reporting(0);
 														ng-options="option.value as option.text for option in inflationTypes"
 														ng-change="changeInflationType($index, data.extraSpending)"
 														ng-disabled="!extraSpending.inflationAdjusted">
-														<option value=""></option>
 													</select>
 												</td>
 												<td>
 													<input type="text"
 													class="form-control"
 													ng-model="extraSpending.inflationRate"
-													ng-disabled="extraSpending.inflationType != 'constant'">
+													ng-disabled="extraSpending.inflationType != 'constant' || !extraSpending.inflationAdjusted">
 												</td>
 												<td>
 													<input type="button" ng-click="removeObject($index, data.extraSpending)" value="Delete"/>
@@ -1281,8 +1336,50 @@ error_reporting(0);
 						</div>
 						<div class="modal-body">
 							<p>
-								Woooo!
+								There are 2 ways to report an issue or request a new feature.
 							</p>
+							<ul>
+								<li>
+									You can log in to the <a href="https://github.com/boknows/cFIREsim-open/issues">GitHub Issues page</a> and report your issue or request a new feature.
+								</li>
+								<li>
+									You can <a href="phpBB3/index.php">Log in to the forums</a> and post in the cFIREsim Bugs or cFIREsim Feature Requests forum.
+								</li>
+							</ul>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+			  </div>
+			</div>
+
+			<!-- Donate/Support Modal -->
+		  	<div class="modal fade" id="donateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title">Donate/Support cFIREsim</h4>
+						</div>
+						<div class="modal-body">
+							<p>
+								There are a few ways to donate or support cFIREsim
+							</p>
+							<ul>
+								<li>
+									You can log in to the <a href="https://github.com/boknows/cFIREsim-open/issues">GitHub Issues page</a> and contribute to the cFIREsim Open project by coding a feature/bugfix.
+								</li>
+								<li>
+									You can donate via Paypal to support the web hosting fees of this site. 
+									<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="display:inline;">
+										<input type="hidden" name="cmd" value="_s-xclick">
+										<input type="hidden" name="hosted_button_id" value="6GFG7N3JXP8HN">
+										<input type="image" src="../docs/paypal-donate.jpg" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" style='padding-top: 15px;'>
+										<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+									</form>
+								</li>
+							</ul>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
@@ -1292,14 +1389,27 @@ error_reporting(0);
 			</div>
 
 
+		<!-- Save Sim Modal -->
+		<div class="modal fade" id="saveSimPopup" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h4 class="modal-title">Save Simulation Inputs</h4>
+					</div>
+					<div class="modal-body">
+						<div class="input-group">
+							<span class='input-group-addon'>Saved Simulation Name:</span><input type='text' size='12' class='form-control' id='simNameInput'>
+						</div>
+						<button type="button" class="btn btn-success" id="confirmSaveSim">Save Sim</button>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+		  </div>
+		</div> <!-- End Save Sim Modal -->
 
-		<div id="saveSimPopup" style="display:none" class="popup">
-			<div class="input-group">
-				<span class='input-group-addon'>Saved Simulation Name:</span><input type='text' size='12' class='form-control' id='simNameInput'>
-			</div>
-			<button type="button" class="btn btn-danger" id="cancelSaveSim">Cancel</button>
-			<button type="button" class="btn btn-success" id="confirmSaveSim">Save Sim</button>
-		</div>
 		<div id="saveSimSuccess" style="display:none" class="popup small">
 			<p>Your simulation was successfully saved</p>
 			<button type="button" class="btn btn-danger" id="closeSaveSuccess">Close</button>
@@ -1698,6 +1808,7 @@ formInputs: [
                     inflationType: 'CPI',
                     inflationRate: ''
                 });
+				$scope.refreshSpendingForm();
             }
             $scope.removeObject = function(index, array) {
                 array.splice(index, 1);
@@ -1706,14 +1817,14 @@ formInputs: [
             $scope.changeInflationAdjusted = function(index, array) {
                 var object = array[index];
                 if (!object.inflationAdjusted) {
-                    object.inflationType = '';
+                    //object.inflationType = '';
                 }
                 $scope.changeInflationType(index, array);
             }
             $scope.changeInflationType = function(index, array) {
                 var object = array[index];
                 if (object.inflationType != 'constant') {
-                    object.inflationRate = '';
+                    //object.inflationRate = '';
                 }
             }
             $scope.clearEndYear = function(index, array) {
