@@ -78,7 +78,7 @@ error_reporting(0);
 					</div>
 					<div class="modal-body">
 						<p>
-							The cFIREsim Open Project is a completely rebuilt version of cFIREsim with efficiency and transparaceny in mind. Currently not <b>all</b> of the cFIREsim legacy capabilities exist here, but you can access the <a href="oldsite/input.php">old site</a> until they do.
+							The cFIREsim Open Project is a completely rebuilt version of cFIREsim with efficiency and transparaceny in mind. Currently not <b>all</b> of the cFIREsim legacy capabilities exist here, but you can access the <a href="http://gator3089.hostgator.com/~boknows/input.php">old site</a> until they do.
 						</p>
 						<p>
 							All of the code for cFIREsim Open is located in the <a href="https://github.com/boknows/cFIREsim-open">GitHub Repo</a>. Feel free to contribute new ideas, or <a href="https://github.com/boknows/cFIREsim-open/issues">report any issues you might find.</a>
@@ -91,6 +91,9 @@ error_reporting(0);
 						</p>
 						<p>
 							-Bo
+						</p>
+						<p class="alert alert-danger">
+							Login issues? Long story short: try re-registering on the new site. If you're still having issues, <a href="mailto:cfiresim@gmail.com">email me</a>.
 						</p>
 					</div>
 					<div class="modal-footer">
@@ -119,10 +122,10 @@ error_reporting(0);
 						<?php
 						//Start Login Code. Unnecessary for standalone app
 								if(!($user->data['is_registered'])){
-									echo "<li><button type='button' class='btn btn-default navbar-btn' id='signInBtn'><img src='http://www.cfiresim.com/phpbb/styles/prosilver/theme/images/icon_logout.gif'>Sign in</button></li>";
+									echo "<li><button type='button' class='btn btn-default navbar-btn' id='signInBtn'><img src='http://www.cfiresim.com/phpBB3/styles/prosilver/theme/images/icon_logout.gif'>Sign in</button></li>";
 								}else {
 									echo "<p class='navbar-text'>Logged in as [ <font color='red'><b id='username'>" . $user->data['username'] . " </b></font>]</p>";
-									echo '<li><button type="button" class="btn btn-default navbar-btn" id="signOutBtn"><img src="http://www.cfiresim.com/phpbb/styles/prosilver/theme/images/icon_logout.gif"><a href="' . append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=logout', true, $user->session_id). '">Sign Out</a></button></li>';
+									echo '<li><button type="button" class="btn btn-default navbar-btn" id="signOutBtn"><img src="http://www.cfiresim.com/phpBB3/styles/prosilver/theme/images/icon_logout.gif"><a href="' . append_sid("http://www.cfiresim.com/phpBB3/ucp.php", 'mode=logout', true, $user->session_id). '">Sign Out</a></button></li>';
 									echo '<li><button type="button" class="btn btn-default navbar-btn" id="saveSimBtn">Save Simulation Inputs</button></li>';
 									echo '<li class="dropdown">
 										<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Load Saved Sim <span class="caret"></span></a>
@@ -150,13 +153,6 @@ error_reporting(0);
 								<a data-toggle="modal" href="#reportIssueModal" class="btn btn-default">Report an Issue</a>
 							</p>
 						</li>
-						<!--<li><form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="display:inline;">
-							<input type="hidden" name="cmd" value="_s-xclick">
-							<input type="hidden" name="hosted_button_id" value="6GFG7N3JXP8HN">
-							<input type="image" src="../docs/paypal-donate.jpg" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" style='padding-top: 15px;'>
-							<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-						</form>
-					</li> -->
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Blogs/Forums <span class="caret"></span></a>
 						<ul class="dropdown-menu">
@@ -210,6 +206,16 @@ error_reporting(0);
 								<label>Retirement End Year:<input type="text" class="form-control" ng-model="data.retirementEndYear"></label>
 							</div>
 						</div>
+						<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+						<!-- cFIREsim Open -->
+						<ins class="adsbygoogle"
+						     style="display:block"
+						     data-ad-client="ca-pub-5980092593965662"
+						     data-ad-slot="3095196591"
+						     data-ad-format="auto"></ins>
+						<script>
+						(adsbygoogle = window.adsbygoogle || []).push({});
+						</script>
 					</div>
 					<div class="col-md-6">
 						<div class="panel panel-primary">
@@ -1372,11 +1378,11 @@ error_reporting(0);
 								</li>
 								<li>
 									You can donate via Paypal to support the web hosting fees of this site. 
-									<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="display:inline;">
-										<input type="hidden" name="cmd" value="_s-xclick">
-										<input type="hidden" name="hosted_button_id" value="6GFG7N3JXP8HN">
-										<input type="image" src="../docs/paypal-donate.jpg" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" style='padding-top: 15px;'>
-										<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+									<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+									<input type="hidden" name="cmd" value="_s-xclick">
+									<input type="hidden" name="hosted_button_id" value="6GFG7N3JXP8HN">
+									<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+									<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
 									</form>
 								</li>
 							</ul>
@@ -1872,5 +1878,14 @@ formInputs: [
 
 </script>
 <script type="text/javascript">
-    <?php echo 'var session = "'.json_encode($_SESSION['msg']).'";';
+  <?php echo 'var session = "'.json_encode($_SESSION['msg']).'";'; ?>
+
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-42984907-1', 'auto');
+  ga('send', 'pageview');
+
 </script>

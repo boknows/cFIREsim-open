@@ -2,13 +2,7 @@ $(document).ready(function() {
     //Launch Welcome Modal
     $('#welcomeModal').modal('show');
     
-	//Full-screen modals
-	$('#reportIssueModal').on('shown.bs.modal', function () {
-        $(this).find('.modal-dialog').css({width:'auto',
-                                   height:'auto', 
-                                  'max-height':'100%'});
-	});
-	
+	//Full-screen modals	
     $('#outputModal').on('shown.bs.modal', function () {
         $(this).find('.modal-dialog').css({width:'auto',
                                    height:'auto', 
@@ -491,7 +485,7 @@ var Simulation = {
                         labelsKMB: false,
                         maxNumberWidth: 11,
                         valueFormatter: function numberWithCommas(x) {
-                            return 'Spending: $' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            return 'Portfolio: $' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         },
                         axisLabelFormatter: function numberWithCommas(x) {
                             return '$' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
