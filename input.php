@@ -161,6 +161,7 @@ error_reporting(0);
 							<li><a href="http://earlyretirementextreme.com/">Early Retirement Extreme</a></li>
 							<li><a href="http://early-retirement.org">Early-Retirement.org</a></li>
 							<li><a href="http://www.gocurrycracker.com/">Go Curry Cracker!</a></li>
+							<li><a href="http://www.1500Days.com/">1500 Days</a></li>
 							<li><a href="http://the-military-guide.com/">Military Retirement</a></li>
 							<li><a href="http://www.mrmoneymustache.com">Mr. Money Mustache</a></li>
 							<li><a href="http://wpfau.blogspot.com/">Wade Pfau's Retirement Research</a></li>
@@ -462,7 +463,7 @@ error_reporting(0);
 								</select>
 							</label>
 							<div id="yearlySpendingOptions" class="spendingOptions">
-								<label>Yearly Spending:
+								<label>Initial Yearly Spending:
 									<div class="input-group">
 										<span class="input-group-addon">$</span>
 										<input type="text" class="form-control" ng-model="data.spending.initial">
@@ -1035,6 +1036,16 @@ error_reporting(0);
 								<div style="margin:15px">
 									<div id='graph1' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels1' style='background:white;width:800px;height:20px;' class='output'></div>
+									<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+									<!-- cFIREsim-open-output ad-->
+									<ins class="adsbygoogle"
+									     style="display:block"
+									     data-ad-client="ca-pub-5980092593965662"
+									     data-ad-slot="3557698192"
+									     data-ad-format="auto"></ins>
+									<script>
+									(adsbygoogle = window.adsbygoogle || []).push({});
+									</script>
 									<div id='graph1b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels1b' style='background:white;width:800px;height:20px;' class='output'></div>
 									<div id='download1'></div>

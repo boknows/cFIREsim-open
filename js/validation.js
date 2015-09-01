@@ -83,7 +83,7 @@ $(document).ready(function() {
 	//Initial Portfolio Validation
 	function cmpPortfolio(){
 		var portfolio = parseInt($("input[ng-model='data.portfolio.initial']").val());
-		if((portfolio > 0) && !(isNaN(portfolio))){
+		if((portfolio >= 0) && !(isNaN(portfolio))){
 			return true;
 		}else{
 			return false;
@@ -103,7 +103,7 @@ $(document).ready(function() {
 	//Spending Validation
 	function cmpInitialSpending(){
 		var spending = parseInt($("input[ng-model='data.spending.initial']").val());
-		if((spending > 0) && !(isNaN(spending))){
+		if((spending >= 0) && !(isNaN(spending))){
 			return true;
 		}else{
 			return false;

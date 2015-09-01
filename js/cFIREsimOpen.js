@@ -369,7 +369,7 @@ var Simulation = {
                     sumOfAdjustments += this.calcAdjustmentVal(form.extraIncome.extraSavings[k], i, j);
                 }
             } else if (form.extraIncome.extraSavings[k].recurring == false) {
-                if (j == form.extraIncome.extraSavings[k].startYear) {
+                if (j == (form.extraIncome.extraSavings[k].startYear - currentYear)) {
                     sumOfAdjustments += this.calcAdjustmentVal(form.extraIncome.extraSavings[k], i, j);
                 }
             }
@@ -382,7 +382,7 @@ var Simulation = {
                     sumOfAdjustments -= this.calcAdjustmentVal(form.extraSpending[k], i, j);
                 }
             } else if (form.extraSpending[k].recurring == false) {
-                if (j == form.extraSpending[k].startYear) {
+                if (j == (form.extraSpending[k].startYear - currentYear)) {
                     sumOfAdjustments -= this.calcAdjustmentVal(form.extraSpending[k], i, j);
                 }
             }
