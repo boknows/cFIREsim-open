@@ -184,10 +184,19 @@ error_reporting(0);
 			<div id="input" ng-controller="simulationInputController">
 				<form name="form">
 				<div class="row">
+					<div class="col-md-10">
+				<div class="row">
 					<div class="col-md-12" style="display:none" id="loadedSimHeader">
 						<div class="panel panel-success">
 							<div class="panel-heading" id="loadedSimHeaderText">
 								Successfully loaded  
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12" style="display:none" id="loadedSimFail">
+						<div class="panel panel-danger">
+							<div class="panel-heading" id="loadedSimFailText">
+								Failed to load  
 							</div>
 						</div>
 					</div>
@@ -207,16 +216,6 @@ error_reporting(0);
 								<label>Retirement End Year:<input type="text" class="form-control" ng-model="data.retirementEndYear"></label>
 							</div>
 						</div>
-						<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-						<!-- cFIREsim Open -->
-						<ins class="adsbygoogle"
-						     style="display:block"
-						     data-ad-client="ca-pub-5980092593965662"
-						     data-ad-slot="3095196591"
-						     data-ad-format="auto"></ins>
-						<script>
-						(adsbygoogle = window.adsbygoogle || []).push({});
-						</script>
 					</div>
 					<div class="col-md-6">
 						<div class="panel panel-primary">
@@ -276,9 +275,17 @@ error_reporting(0);
 												ng-options="investigateOptions.value as investigateOptions.text for investigateOptions in investigateOptionTypes">
 											</select>
 										</label>
-										<br><a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg runSim" ng-click="runSimulation()">Run Simulation</a>
 									</div>
 								</div>
+								<div id="maxInitialSpendingOptions" class="dataOptions" style="display:none">
+									<label>Minimum Success Rate:
+										<div class="input-group">
+											<input type="text" class="form-control" ng-model="data.investigate.successRate">
+											<span class="input-group-addon">%</span>
+										</div>
+									</label>
+								</div>
+								<br><a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg runSim" ng-click="runSimulation()">Run Simulation</a>
 							</div>
 						</div>
 					</div>
@@ -1003,9 +1010,19 @@ error_reporting(0);
 			</div>
 			</form>
 			<a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg runSim" ng-click="runSimulation()">Run Simulation</a>
-
 		</div>
-
+		<div class="col-md-2">
+		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+		<!-- cFIREsim Big -->
+		<ins class="adsbygoogle"
+		     style="display:inline-block;width:300px;height:600px"
+		     data-ad-client="ca-pub-5980092593965662"
+		     data-ad-slot="3595070993"></ins>
+		<script>
+		(adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
+		</div>
+		</div>
 		<!-- Modal -->
 		  <div class="modal fade" id="outputModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		    <div class="modal-dialog">
@@ -1036,16 +1053,6 @@ error_reporting(0);
 								<div style="margin:15px">
 									<div id='graph1' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels1' style='background:white;width:800px;height:20px;' class='output'></div>
-									<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-									<!-- cFIREsim-open-output ad-->
-									<ins class="adsbygoogle"
-									     style="display:block"
-									     data-ad-client="ca-pub-5980092593965662"
-									     data-ad-slot="3557698192"
-									     data-ad-format="auto"></ins>
-									<script>
-									(adsbygoogle = window.adsbygoogle || []).push({});
-									</script>
 									<div id='graph1b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels1b' style='background:white;width:800px;height:20px;' class='output'></div>
 									<div id='download1'></div>
@@ -1590,6 +1597,13 @@ angular.module('cFIREsim', [])
             $scope.investigateOptionTypes = [{
                 text: 'None ',
                 value: 'none',
+            },
+            {
+            	text: 'Max Initial Spending',
+            	value: 'maxInitialSpending',
+            	formInputs: [
+            		'maxInitialSpendingOptions'
+            	]
             }]
             $scope.spendingPlanTypes = [{
                     text: 'Inflation Adjusted',
@@ -1761,10 +1775,10 @@ formInputs: [
                 }
             }
             $scope.refreshInvestigateForm = function() {
-                if ($scope.data.investigate.type == "single") {
-                    $('#singleCycleOptions').show();
+                if ($scope.data.investigate.type == "maxInitialSpending") {
+                    $('#maxInitialSpendingOptions').show();
                 } else {
-                    $('#singleCycleOptions').hide();
+                    $('#maxInitialSpendingOptions').hide();
                 }
 
             }
@@ -1857,7 +1871,7 @@ formInputs: [
                     for (var i = 0; i < pathArray.length; i++) {
                         if (i == (pathArray.length - 1)) {
                             property[pathArray[i]] = '';
-                        } else {
+                        } else {su
                             property = property[pathArray[i]];
                         }
                     }
@@ -1890,7 +1904,6 @@ formInputs: [
 </script>
 <script type="text/javascript">
   <?php echo 'var session = "'.json_encode($_SESSION['msg']).'";'; ?>
-
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -1899,4 +1912,9 @@ formInputs: [
   ga('create', 'UA-42984907-1', 'auto');
   ga('send', 'pageview');
 
+	var loadedByID = Simulation.getUrlVars(["id"]);
+	if (Number.isInteger(loadedByID)){
+		Simulation.getSavedSim(loadedByID);
+	}
+  
 </script>

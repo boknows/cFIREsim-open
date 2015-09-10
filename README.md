@@ -1,6 +1,6 @@
 cFIREsim-open
 =============
-Current Live version: http://www.cfiresim.com
+Current Demo Available: http://www.cfiresim.com/open/input.htm
 
 Purpose:  This project is intended to bring absolute transparency to the cFIREsim project, to refresh the code and move it away from PHP and into Javascript, and to provide the opportunity for others in the FIRE community to participate in the rebuilding effort.
 

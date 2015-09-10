@@ -84,10 +84,16 @@ var Simulation = {
                 qid: qid,
             }
         }).success(function(data) {
-            Simulation.loadSavedSim(data.data);  
-			var html = "<p>Successfully loaded '" + data.simName + "'</p>";
-			$("#loadedSimHeaderText").html(html);
-			$("#loadedSimHeader").show();
+        	if(data == null){
+        		var html = "<p>Could not load ID:" + Simulation.getUrlVars(['id']) + ". There is no data for that ID.</p>";
+				$("#loadedSimFailText").html(html);
+				$("#loadedSimFail").show();
+        	}else{
+	            Simulation.loadSavedSim(data.data);  
+				var html = "<p>Successfully loaded '" + data.simName + "'</p>";
+				$("#loadedSimHeaderText").html(html);
+				$("#loadedSimHeader").show();
+        	}
         });
     },
     loadSavedSim: function(data){
@@ -98,7 +104,6 @@ var Simulation = {
             //Refresh form to show proper data options after loading
             scope.refreshDataForm();
             scope.refreshSpendingForm();
-            scope.clearFields('#percentageOfPortfolioLimits');
             scope.refreshInvestigateForm();
         });
     },
@@ -161,23 +166,55 @@ var Simulation = {
 			}
 		}
 
-        for (var i = 0; i < this.sim.length; i++) {
-            for (var j = 0; j < this.sim[i].length; j++) {
-                this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
-                this.calcSumOfAdjustments(form, i, j);
-                this.calcSpending(form, i, j); //Nominal spending for this specific cycle
-                this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
-                this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
-            }
-        }
+		if(form.investigate.type == 'none'){
+	        for (var i = 0; i < this.sim.length; i++) {
+	            for (var j = 0; j < this.sim[i].length; j++) {
+	                this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
+	                this.calcSumOfAdjustments(form, i, j);
+	                this.calcSpending(form, i, j); //Nominal spending for this specific cycle
+	                this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
+	                this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
+	            }
+	        }
+	        
+            //Run post-simulation functions
+	        this.convertToCSV(this.sim);
+	        this.calcFailures(this.sim);
+	        this.displayGraph(this.sim, form);
+	
+	        //Initialize statistics calculations
+	        StatsModule.init(this.sim, form);
+        
+		}else if(form.investigate.type == 'maxInitialSpending'){
+			var min = 0, max = 1000000;
+			while (Math.round(min) <= Math.round(max)){
+				var mid = ((max-min)/2)+min;
+				form.spending.initial = mid;
+				for (var i = 0; i < this.sim.length; i++) {
+		            for (var j = 0; j < this.sim[i].length; j++) {
+		                this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
+		                this.calcSumOfAdjustments(form, i, j);
+		                this.calcSpending(form, i, j); //Nominal spending for this specific cycle
+		                this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
+		                this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
+		            }
+		        }
+		        var failures = this.calcFailures(this.sim);
+		        var success = (failures.totalCycles - failures.totalFailures) / failures.totalCycles;
+		        if (success<(form.investigate.successRate/100)){
+					max = mid;
+				}else{
+					min = mid;
+				}
+				if((max-min)>.5){
+					continue;
+				}else{
+					console.log("Done:", Math.Floor(mid));
+					break;
+				}
+			}
+		}
 
-        //Run post-simulation functions
-        this.convertToCSV(this.sim);
-        this.calcFailures(this.sim);
-        this.displayGraph(this.sim, form);
-
-        //Initialize statistics calculations
-        StatsModule.init(this.sim, form);
     },
     cycle: function(startOfRange, endOfRange) {
         //The starting CPI value of this cycle, for comparison throughout the cycle.
@@ -340,6 +377,11 @@ var Simulation = {
                 totalFailures++;
             }
         }
+        var ret = {
+        	'totalFailures': totalFailures,
+        	'totalCycles': results.length
+        };
+        return ret; 
     },
     calcSumOfAdjustments: function(form, i, j) { //Calculate the sum of all portfolio adjustments for a given year (pensions, extra income, extra spending, etc)
         var currentYear = new Date().getFullYear();
@@ -357,6 +399,7 @@ var Simulation = {
         //Pensions
         for (var k = 0; k < form.extraIncome.pensions.length; k++) {
             if ((j >= (form.extraIncome.pensions[k].startYear - currentYear))) {
+            	console.log(this.calcAdjustmentVal(form.extraIncome.pensions[k], i, j));
                 socialSecurityAndPensionAdjustments += this.calcAdjustmentVal(form.extraIncome.pensions[k], i, j);
             }
         }
@@ -403,7 +446,7 @@ var Simulation = {
                 return (adj.val * Math.pow(percentage, (j + 1)));
             }
         } else if (adj.inflationAdjusted == false) {
-            return adj.val;
+            return parseInt(adj.val);
         }
     },
     displayGraph: function(results, form) {
@@ -632,6 +675,15 @@ var Simulation = {
 		$(link).addClass("btn btn-success btn-lg");
         //link.click();
         //document.body.removeChild(link);
-    }
+    },
+    getUrlVars: function() {  //Function to retrieve GET parameters in URL. Used in loading saved sim via URL.
+		var vars = {};
+		var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+			vars[key] = parseInt(value);
+		});
+		return vars.id;
+	}
 };
+
+
 
