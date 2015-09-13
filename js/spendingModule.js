@@ -138,6 +138,6 @@ var SpendingModule = {
         return form.spending.ceiling == "definedValue" && form.spending.ceilingValue != null ? form.spending.ceilingValue * sim[i][j].cumulativeInflation : Number.POSITIVE_INFINITY;
     },
     calcPayment: function(rate, nper, pv, fv) {
-        return (rate * (pv - fv)) / (1 - Math.pow(1 + rate, nper))
+        return -(rate * (pv * Math.pow(1 + rate, nper) + fv)) / (Math.pow(1 + rate, nper) - 1);
     }
 };
