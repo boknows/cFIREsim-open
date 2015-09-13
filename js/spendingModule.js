@@ -136,5 +136,8 @@ var SpendingModule = {
     },
     calcBasicSpendingCeiling: function(form, sim, i, j) {
         return form.spending.ceiling == "definedValue" && form.spending.ceilingValue != null ? form.spending.ceilingValue * sim[i][j].cumulativeInflation : Number.POSITIVE_INFINITY;
+    },
+    calcPayment: function(rate, nper, pv, fv) {
+        return (rate * (pv - fv)) / (1 - Math.pow(1 + rate, nper))
     }
 };

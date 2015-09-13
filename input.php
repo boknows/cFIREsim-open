@@ -1871,7 +1871,7 @@ formInputs: [
                     for (var i = 0; i < pathArray.length; i++) {
                         if (i == (pathArray.length - 1)) {
                             property[pathArray[i]] = '';
-                        } else {su
+                        } else {
                             property = property[pathArray[i]];
                         }
                     }
