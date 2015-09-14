@@ -43,9 +43,8 @@ var SpendingModule = {
     },
     "variableSpending": {
         calcSpending: function(form, sim, i, j) {
-            var currentYear = new Date().getFullYear();
-            var isInitialYearInCycle = j == (form.retirementStartYear - currentYear);
-            var isAfterInitialYearInCycle = j > (form.retirementStartYear - currentYear);
+            var isInitialYearInCycle = j == 0;
+            var isAfterInitialYearInCycle = j > 0;
 
             var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
             var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
@@ -98,7 +97,6 @@ var SpendingModule = {
                 return form.spending.initial;
             }
 
-            var currentYear = new Date().getFullYear();
             var initialWithdrawalRate = form.spending.initial / sim[i][0].portfolio.start;
             var exceeds = (form.spending.guytonKlingerExceeds / 100);
             var cut = form.spending.guytonKlingerCut / 100;
@@ -124,6 +122,18 @@ var SpendingModule = {
                 return Math.min(sim[i][j-1].spending * (1 + raise) * currentYearInflation, ceiling);
             }
             return sim[i][j-1].spending * currentYearInflation;
+        }
+    },
+    "vpw": {
+        calcSpending: function(form, sim, i, j) {
+            var simulationDuration = form.retirementEndYear - form.retirementStartYear + 1;
+            var yearsLeftInSimulation = simulationDuration - j;
+            
+            var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
+            var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
+
+            var uncappedSpending = -SpendingModule.calcPayment(form.spending.vpwRateOfReturn / 100, yearsLeftInSimulation, sim[i][j].portfolio.start, Number(form.spending.vpwFutureValue));
+            return Math.min(Math.max(uncappedSpending, floor), ceiling) * sim[i][j].cumulativeInflation;
         }
     },
     calcBasicSpendingFloor: function(form, sim, i, j) {

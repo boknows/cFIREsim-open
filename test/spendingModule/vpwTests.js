@@ -22,7 +22,8 @@ describe("calcPayment", function() {
         { rate: 0.02, nper: 30, pv: 100000, fv: 0, pmt: -4465 },
         { rate: 0.03, nper: 30, pv: 100000, fv: 0, pmt: -5102 },
         { rate: 0.04, nper: 30, pv: 100000, fv: 0, pmt: -5783 },
-        { rate: 0.05, nper: 30, pv: 100000, fv: 0, pmt: -6505 }
+        { rate: 0.05, nper: 30, pv: 100000, fv: 0, pmt: -6505 },
+        { rate: 0.043, nper: 30, pv: 1000000, fv: -1000000, pmt: -43000 }
     ];
 
     scenarios.forEach(function(scenario) {
