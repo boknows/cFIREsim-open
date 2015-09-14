@@ -133,7 +133,7 @@ var SpendingModule = {
             var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
 
             var uncappedSpending = -SpendingModule.calcPayment(form.spending.vpwRateOfReturn / 100, yearsLeftInSimulation, sim[i][j].portfolio.start, Number(form.spending.vpwFutureValue));
-            return Math.min(Math.max(uncappedSpending, floor), ceiling) * sim[i][j].cumulativeInflation;
+            return Math.round(Math.min(Math.max(uncappedSpending, floor), ceiling));
         }
     },
     calcBasicSpendingFloor: function(form, sim, i, j) {
@@ -148,6 +148,6 @@ var SpendingModule = {
         return form.spending.ceiling == "definedValue" && form.spending.ceilingValue != null ? form.spending.ceilingValue * sim[i][j].cumulativeInflation : Number.POSITIVE_INFINITY;
     },
     calcPayment: function(rate, nper, pv, fv) {
-        return -(rate * (pv * Math.pow(1 + rate, nper) + fv)) / (Math.pow(1 + rate, nper) - 1);
+        return -(rate * (pv * Math.pow(1 + rate, nper) + fv)) / ((Math.pow(1 + rate, nper) - 1) * (1 + rate));
     }
 };
