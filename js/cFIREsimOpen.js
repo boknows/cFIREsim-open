@@ -65,7 +65,7 @@ var Simulation = {
         }).success(function(data){
 			var html = "";
             for (var i = 0; i < data.qid.length; i++) {
-                html += "<li><a href='#' id='" + data.qid[i] + "' class='savedSim'>" + data.simName[i] + "</a></li>"
+                html += "<li><a href='#' id='" + data.qid[i] + "' class='savedSim'>ID:" + data.qid[i] + " - " + data.simName[i] + "</a></li>"
             }
             $("#savedSimsDropdown").html(html);
             $('.dropdown-menu a').click(function() {
@@ -90,7 +90,7 @@ var Simulation = {
 				$("#loadedSimFail").show();
         	}else{
 	            Simulation.loadSavedSim(data.data);  
-				var html = "<p>Successfully loaded '" + data.simName + "'</p>";
+				var html = "<p>Successfully loaded ID#" + data.qid + " - '" + data.simName + "'</p>";
 				$("#loadedSimHeaderText").html(html);
 				$("#loadedSimHeader").show();
         	}
@@ -185,34 +185,8 @@ var Simulation = {
 	        //Initialize statistics calculations
 	        StatsModule.init(this.sim, form);
         
-		}else if(form.investigate.type == 'maxInitialSpending'){
-			var min = 0, max = 1000000;
-			while (Math.round(min) <= Math.round(max)){
-				var mid = ((max-min)/2)+min;
-				form.spending.initial = mid;
-				for (var i = 0; i < this.sim.length; i++) {
-		            for (var j = 0; j < this.sim[i].length; j++) {
-		                this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
-		                this.calcSumOfAdjustments(form, i, j);
-		                this.calcSpending(form, i, j); //Nominal spending for this specific cycle
-		                this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
-		                this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
-		            }
-		        }
-		        var failures = this.calcFailures(this.sim);
-		        var success = (failures.totalCycles - failures.totalFailures) / failures.totalCycles;
-		        if (success<(form.investigate.successRate/100)){
-					max = mid;
-				}else{
-					min = mid;
-				}
-				if((max-min)>.5){
-					continue;
-				}else{
-					console.log("Done:", Math.Floor(mid));
-					break;
-				}
-			}
+		}else{
+			this.calcInvestigation(this.sim, form);
 		}
 
     },
@@ -399,7 +373,6 @@ var Simulation = {
         //Pensions
         for (var k = 0; k < form.extraIncome.pensions.length; k++) {
             if ((j >= (form.extraIncome.pensions[k].startYear - currentYear))) {
-            	console.log(this.calcAdjustmentVal(form.extraIncome.pensions[k], i, j));
                 socialSecurityAndPensionAdjustments += this.calcAdjustmentVal(form.extraIncome.pensions[k], i, j);
             }
         }
@@ -448,6 +421,47 @@ var Simulation = {
         } else if (adj.inflationAdjusted == false) {
             return parseInt(adj.val);
         }
+    },
+    calcInvestigation: function(sim, form){
+    	if(form.investigate.type == 'maxInitialSpending'){
+			var min = 0, max = 1000000;
+			while (Math.round(min) <= Math.round(max)){
+				var mid = ((max-min)/2)+min;
+				form.spending.initial = mid;
+				for (var i = 0; i < this.sim.length; i++) {
+		            for (var j = 0; j < this.sim[i].length; j++) {
+		                this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
+		                this.calcSumOfAdjustments(form, i, j);
+		                this.calcSpending(form, i, j); //Nominal spending for this specific cycle
+		                this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
+		                this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
+		            }
+		        }
+		        var failures = this.calcFailures(this.sim);
+		        var success = (failures.totalCycles - failures.totalFailures) / failures.totalCycles;
+		        if (success<(form.investigate.successRate/100)){
+					max = mid;
+				}else{
+					min = mid;
+				}
+				if((max-min)>.5){
+					continue;
+				}else{
+					var html = "<b>Investigate Maximum Initial Spending</b>: Considering all other inputs, the maximum intiial spending would be <b style='color:#AAFF69'>" + accounting.formatMoney(Math.floor(mid), "$", 0) + "</b>.";
+					//Run post-simulation functions
+			        this.convertToCSV(this.sim);
+			        this.calcFailures(this.sim);
+			        this.displayGraph(this.sim, form);
+			
+			        //Initialize statistics calculations
+			        StatsModule.init(this.sim, form);
+			        
+			        //Display Investigation Results
+			        $("#graph" + Simulation.tabs).parent().prepend(html);
+					break;
+				}
+			}
+		}	
     },
     displayGraph: function(results, form) {
         var chartData = [];

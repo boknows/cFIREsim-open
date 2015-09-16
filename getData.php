@@ -22,6 +22,7 @@ if($_POST['param']=="getSavedSim"){
 	foreach ($stmt as $row) {
 		$data['data'] = $row['json'];
 		$data['simName'] = $row['simName'];
+		$data['qid'] = $row['qid'];
 	}
 	echo JSON_encode($data);
 }
