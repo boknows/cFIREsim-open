@@ -589,6 +589,22 @@ error_reporting(0);
 									</div>
 								</label>
 							</div>
+							<div id="vpwOptions" class="spendingOptions">
+								<label>Rate of Return:
+									<div class="input-group">
+										<input  type="text"
+										class="form-control"
+										ng-model="data.spending.vpwRateOfReturn">
+										<span class="input-group-addon">%</span>
+									</div>
+								</label>
+								<label>Future Value:
+									<div class="input-group">
+										<span class="input-group-addon">$</span>
+										<input  type="text" class="form-control" ng-model="data.spending.vpwFutureValue">
+									</div>
+								</label>
+							</div>
 							<div id="retireAgainAndAgainOptions" class="spendingOptions">
 								<label>RAA Target Portfolio Amount:
 									<div class="input-group">
@@ -1489,7 +1505,9 @@ angular.module('cFIREsim', [])
                     guytonKlingerExceeds: 20,
                     guytonKlingerFall: 20,
                     guytonKlingerRaise: 10,
-                    guytonKlingerCut: 10
+                    guytonKlingerCut: 10,
+                    vpwRateOfReturn: 4.3,
+                    vpwFutureValue: 0
                 },
                 extraIncome: {
                     socialSecurity: {
@@ -1646,6 +1664,13 @@ angular.module('cFIREsim', [])
                     formInputs: [
                         'yearlySpendingOptions',
                         'guytonKlingerOptions',
+                        'spendingLimitOptions'
+                    ]
+                }, {
+                    text: 'VPW',
+                    value: 'vpw',
+                    formInputs: [
+                        'vpwOptions',
                         'spendingLimitOptions'
                     ]
                 }
@@ -1871,7 +1896,7 @@ formInputs: [
                     for (var i = 0; i < pathArray.length; i++) {
                         if (i == (pathArray.length - 1)) {
                             property[pathArray[i]] = '';
-                        } else {su
+                        } else {
                             property = property[pathArray[i]];
                         }
                     }
