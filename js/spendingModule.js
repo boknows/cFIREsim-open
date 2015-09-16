@@ -43,9 +43,8 @@ var SpendingModule = {
     },
     "variableSpending": {
         calcSpending: function(form, sim, i, j) {
-            var currentYear = new Date().getFullYear();
-            var isInitialYearInCycle = j == (form.retirementStartYear - currentYear);
-            var isAfterInitialYearInCycle = j > (form.retirementStartYear - currentYear);
+            var isInitialYearInCycle = j == 0;
+            var isAfterInitialYearInCycle = j > 0;
 
             var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
             var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
@@ -98,7 +97,6 @@ var SpendingModule = {
                 return form.spending.initial;
             }
 
-            var currentYear = new Date().getFullYear();
             var initialWithdrawalRate = form.spending.initial / sim[i][0].portfolio.start;
             var exceeds = (form.spending.guytonKlingerExceeds / 100);
             var cut = form.spending.guytonKlingerCut / 100;
@@ -126,6 +124,18 @@ var SpendingModule = {
             return sim[i][j-1].spending * currentYearInflation;
         }
     },
+    "vpw": {
+        calcSpending: function(form, sim, i, j) {
+            var simulationDuration = form.retirementEndYear - form.retirementStartYear + 1;
+            var yearsLeftInSimulation = simulationDuration - j;
+            
+            var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
+            var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
+
+            var uncappedSpending = -SpendingModule.calcPayment(form.spending.vpwRateOfReturn / 100, yearsLeftInSimulation, sim[i][j].portfolio.start, Number(form.spending.vpwFutureValue));
+            return Math.round(Math.min(Math.max(uncappedSpending, floor), ceiling));
+        }
+    },
     calcBasicSpendingFloor: function(form, sim, i, j) {
         if(form.spending.floor == 'definedValue' && "floorValue" in form.spending) {
             return form.spending.floorValue * sim[i][j].cumulativeInflation;
@@ -136,5 +146,8 @@ var SpendingModule = {
     },
     calcBasicSpendingCeiling: function(form, sim, i, j) {
         return form.spending.ceiling == "definedValue" && form.spending.ceilingValue != null ? form.spending.ceilingValue * sim[i][j].cumulativeInflation : Number.POSITIVE_INFINITY;
+    },
+    calcPayment: function(rate, nper, pv, fv) {
+        return -(rate * (pv * Math.pow(1 + rate, nper) + fv)) / ((Math.pow(1 + rate, nper) - 1) * (1 + rate));
     }
 };
