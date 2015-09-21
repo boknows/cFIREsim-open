@@ -1,6 +1,7 @@
 <?php
-	include 'headers.php';
-error_reporting(0);
+	//include 'headers.php';
+	error_reporting(0);
+
 ?>
 <!DOCTYPE html>
 <html lang="en" ng-app="cFIREsim">
@@ -77,6 +78,9 @@ error_reporting(0);
 						<h4 class="modal-title">Welcome to the cFIREsim Open Project</h4>
 					</div>
 					<div class="modal-body">
+						<p class="alert alert-success">
+							 9-16-2015 - Added VPW Spending Method and Investigate Maximum Spending option. 
+						</p>
 						<p>
 							The cFIREsim Open Project is a completely rebuilt version of cFIREsim with efficiency and transparaceny in mind. Currently not <b>all</b> of the cFIREsim legacy capabilities exist here, but you can access the <a href="http://gator3089.hostgator.com/~boknows/input.php">old site</a> until they do.
 						</p>
@@ -93,7 +97,7 @@ error_reporting(0);
 							-Bo
 						</p>
 						<p class="alert alert-danger">
-							Login issues? Long story short: try re-registering on the new site. If you're still having issues, <a href="mailto:cfiresim@gmail.com">email me</a>.
+							 Any issues? <a href="mailto:cfiresim@gmail.com">Email me</a>.
 						</p>
 					</div>
 					<div class="modal-footer">
@@ -125,7 +129,7 @@ error_reporting(0);
 									echo "<li><button type='button' class='btn btn-default navbar-btn' id='signInBtn'><img src='http://www.cfiresim.com/phpBB3/styles/prosilver/theme/images/icon_logout.gif'>Sign in</button></li>";
 								}else {
 									echo "<p class='navbar-text'>Logged in as [ <font color='red'><b id='username'>" . $user->data['username'] . " </b></font>]</p>";
-									echo '<li><button type="button" class="btn btn-default navbar-btn" id="signOutBtn"><img src="http://www.cfiresim.com/phpBB3/styles/prosilver/theme/images/icon_logout.gif"><a href="' . append_sid("http://www.cfiresim.com/phpBB3/ucp.php", 'mode=logout', true, $user->session_id). '">Sign Out</a></button></li>';
+									echo '<li><p class="navbar-btn btn btn-default"><img src="http://www.cfiresim.com/phpBB3/styles/prosilver/theme/images/icon_logout.gif"><a href="http://www.cfiresim.com/phpBB3/ucp.php?mode=logout&sid=' . $user->session_id . '">Sign Out</a></p></li>';
 									echo '<li><button type="button" class="btn btn-default navbar-btn" id="saveSimBtn">Save Simulation Inputs</button></li>';
 									echo '<li class="dropdown">
 										<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Load Saved Sim <span class="caret"></span></a>
@@ -184,8 +188,6 @@ error_reporting(0);
 			<div id="input" ng-controller="simulationInputController">
 				<form name="form">
 				<div class="row">
-					<div class="col-md-10">
-				<div class="row">
 					<div class="col-md-12" style="display:none" id="loadedSimHeader">
 						<div class="panel panel-success">
 							<div class="panel-heading" id="loadedSimHeaderText">
@@ -214,8 +216,20 @@ error_reporting(0);
 								</div>
 								<label>Retirement Year:<input type="text" class="form-control" ng-model="data.retirementStartYear"></label>
 								<label>Retirement End Year:<input type="text" class="form-control" ng-model="data.retirementEndYear"></label>
+
+								<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+								<!-- cFIREsim Open -->
+								<ins class="adsbygoogle"
+								     style="display:block"
+								     data-ad-client="ca-pub-5980092593965662"
+								     data-ad-slot="3095196591"
+								     data-ad-format="auto"></ins>
+								<script>
+								(adsbygoogle = window.adsbygoogle || []).push({});
+								</script>
 							</div>
 						</div>
+
 					</div>
 					<div class="col-md-6">
 						<div class="panel panel-primary">
@@ -286,6 +300,7 @@ error_reporting(0);
 									</label>
 								</div>
 								<br><a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg runSim" ng-click="runSimulation()">Run Simulation</a>
+
 							</div>
 						</div>
 					</div>
@@ -1027,18 +1042,6 @@ error_reporting(0);
 			</form>
 			<a data-toggle="modal" href="#outputModal" class="btn btn-success btn-lg runSim" ng-click="runSimulation()">Run Simulation</a>
 		</div>
-		<div class="col-md-2">
-		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-		<!-- cFIREsim Big -->
-		<ins class="adsbygoogle"
-		     style="display:inline-block;width:300px;height:600px"
-		     data-ad-client="ca-pub-5980092593965662"
-		     data-ad-slot="3595070993"></ins>
-		<script>
-		(adsbygoogle = window.adsbygoogle || []).push({});
-		</script>
-		</div>
-		</div>
 		<!-- Modal -->
 		  <div class="modal fade" id="outputModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		    <div class="modal-dialog">
@@ -1069,6 +1072,17 @@ error_reporting(0);
 								<div style="margin:15px">
 									<div id='graph1' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels1' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div>
+										<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+										<!-- cFIREsim-open Leaderboard -->
+										<ins class="adsbygoogle"
+										     style="display:inline-block;width:728px;height:90px"
+										     data-ad-client="ca-pub-5980092593965662"
+										     data-ad-slot="2988961795"></ins>
+										<script>
+										(adsbygoogle = window.adsbygoogle || []).push({});
+										</script>
+									</div>
 									<div id='graph1b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels1b' style='background:white;width:800px;height:20px;' class='output'></div>
 									<div id='download1'></div>
@@ -1476,6 +1490,7 @@ angular.module('cFIREsim', [])
                 },
                 investigate: {
                     type: "none",
+                    successRate: 95
                 },
                 portfolio: {
                     initial: 1000000,
