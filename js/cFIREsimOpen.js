@@ -242,7 +242,7 @@ var Simulation = {
 
     },
     roundTwoDecimals: function(num) {
-        return Math.ceil(num * 100.0) / 100;
+        return +parseFloat(num).toFixed(2);
     },
     cumulativeInflation: function(startCPI, endCPI) {
         return 1 + ((endCPI - startCPI) / startCPI);
