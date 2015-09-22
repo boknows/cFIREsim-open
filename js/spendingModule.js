@@ -132,7 +132,7 @@ var SpendingModule = {
             var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
             var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
 
-            var uncappedSpending = -SpendingModule.calcPayment(form.spending.vpwRateOfReturn / 100, yearsLeftInSimulation, sim[i][j].portfolio.start, Number(form.spending.vpwFutureValue));
+            var uncappedSpending = -SpendingModule.calcPayment(form.spending.vpwRateOfReturn / 100, yearsLeftInSimulation, sim[i][j].portfolio.start, Number(form.spending.vpwFutureValue * sim[i][j].cumulativeInflation));
             var cappedSpending = Math.min(Math.max(uncappedSpending, floor), ceiling);
 
             return Math.min(Math.max(uncappedSpending, floor), ceiling);
