@@ -132,15 +132,17 @@ var SpendingModule = {
             var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
             var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
 
-            var uncappedSpending = -SpendingModule.calcPayment(form.spending.vpwRateOfReturn / 100, yearsLeftInSimulation, sim[i][j].portfolio.start, Number(form.spending.vpwFutureValue));
-            return Math.round(Math.min(Math.max(uncappedSpending, floor), ceiling));
+            var uncappedSpending = -SpendingModule.calcPayment(form.spending.vpwRateOfReturn / 100, yearsLeftInSimulation, sim[i][j].portfolio.start, Number(form.spending.vpwFutureValue * sim[i][j].cumulativeInflation));
+            var cappedSpending = Math.min(Math.max(uncappedSpending, floor), ceiling);
+
+            return Math.min(Math.max(uncappedSpending, floor), ceiling);
         }
     },
     calcBasicSpendingFloor: function(form, sim, i, j) {
         if(form.spending.floor == 'definedValue' && "floorValue" in form.spending) {
-            return form.spending.floorValue * sim[i][j].cumulativeInflation;
+            return Math.min(form.spending.floorValue * sim[i][j].cumulativeInflation, sim[i][j].portfolio.start);
         } else if (form.spending.floor == "pensions" && sim[i][j].socialSecurityAndPensionAdjustments != null){
-            return sim[i][j].socialSecurityAndPensionAdjustments;
+            return Math.min(sim[i][j].socialSecurityAndPensionAdjustments, sim[i][j].portfolio.start);
         }
         return 0;
     },
