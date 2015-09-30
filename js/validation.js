@@ -49,6 +49,85 @@ $(document).ready(function() {
 			$(".runSim").addClass("disabled");
 		}
 	});
+	
+	//Target Assets allocation add up to 100%
+	function cmpTargetAllocation(){
+		var equities = parseInt($("input[ng-model='data.portfolio.targetPercentEquities']").val());
+		var bonds = parseInt($("input[ng-model='data.portfolio.targetPercentBonds']").val());
+		var gold = parseInt($("input[ng-model='data.portfolio.targetPercentGold']").val());
+		var cash = parseInt($("input[ng-model='data.portfolio.targetPercentCash']").val());
+		if(equities + bonds + gold + cash == 100){
+			return true;
+		}else{
+			return false;
+		}
+	}
+		$("input[ng-model='data.portfolio.targetPercentEquities']").keyup(function() {
+		if(cmpTargetAllocation()){
+			$("#targetAllocationError").hide();
+			$(".runSim").removeClass("disabled");
+		}else{
+			$("#targetAllocationError").show();
+			$(".runSim").addClass("disabled");
+		}
+	});
+	$("input[ng-model='data.portfolio.targetPercentBonds']").keyup(function() {
+		if(cmpTargetAllocation()){
+			$("#targetAllocationError").hide();
+			$(".runSim").removeClass("disabled");
+		}else{
+			$("#targetAllocationError").show();
+			$(".runSim").addClass("disabled");
+		}
+	});
+	$("input[ng-model='data.portfolio.targetPercentGold']").keyup(function() {
+		if(cmpTargetAllocation()){
+			$("#targetAllocationError").hide();
+			$(".runSim").removeClass("disabled");
+		}else{
+			$("#targetAllocationError").show();
+			$(".runSim").addClass("disabled");
+		}
+	});
+	$("input[ng-model='data.portfolio.targetPercentCash']").keyup(function() {
+		if(cmpTargetAllocation()){
+			$("#targetAllocationError").hide();
+			$(".runSim").removeClass("disabled");
+		}else{
+			$("#targetAllocationError").show();
+			$(".runSim").addClass("disabled");
+		}
+	});
+	
+	//Target Asset Years
+	function cmpTargetYears(){
+		var startYear = parseInt($("input[ng-model='data.portfolio.changeAllocationStartYear']").val());
+		var endYear = parseInt($("input[ng-model='data.portfolio.changeAllocationEndYear']").val());
+		var currentYear = new Date().getFullYear();
+		if((startYear < endYear) && (startYear >= currentYear)){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	$("input[ng-model='data.portfolio.changeAllocationStartYear']").keyup(function() {
+		if(cmpTargetYears()){
+			$("#targetAllocationYearsError").hide();
+			$(".runSim").removeClass("disabled");
+		}else{
+			$("#targetAllocationYearsError").show();
+			$(".runSim").addClass("disabled");
+		}
+	});
+	$("input[ng-model='data.portfolio.changeAllocationEndYear']").keyup(function() {
+		if(cmpTargetYears()){
+			$("#targetAllocationYearsError").hide();
+			$(".runSim").removeClass("disabled");
+		}else{
+			$("#targetAllocationYearsError").show();
+			$(".runSim").addClass("disabled");
+		}
+	});
 
 	//Retirement Years Validation
 	function cmpYears(){

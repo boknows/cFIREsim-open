@@ -1,5 +1,5 @@
 <?php
-	//include 'headers.php';
+	include 'headers.php';
 	error_reporting(0);
 
 ?>
@@ -48,9 +48,14 @@
 		}
 
 		</style>
-		<script src='http://code.jquery.com/jquery-1.10.2.min.js' language='Javascript' type='text/javascript'></script>
+		<script src='https://code.jquery.com/jquery-1.11.3.min.js' language='Javascript' type='text/javascript'></script>
 		<script type="text/javascript" src="http://dygraphs.com/dygraph-combined.js"></script>
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		
+		<!-- Dependencies for cFIREsim tour -->
+		<script type="text/javascript" src="https://raw.githubusercontent.com/usablica/intro.js/master/intro.js"></script>
+		<!-- End Tour dependencies -->
+		
 		<script type="text/javascript" src="js/bootstrap-select.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.7/angular.min.js"></script>
 		<script type="text/javascript" src="https://cdn.datatables.net/r/bs/dt-1.10.8/datatables.min.js"></script>
@@ -65,6 +70,7 @@
 
 		<!-- Bootstrap core CSS -->
 		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://raw.githubusercontent.com/usablica/intro.js/master/introjs.css" rel="stylesheet"> <!-- Dependency for cFIREsim tour -->
 		<link href="css/bootstrap-select.min.css" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/bs/dt-1.10.8/datatables.min.css"/>
 	</head>
@@ -157,6 +163,11 @@
 								<a data-toggle="modal" href="#reportIssueModal" class="btn btn-default">Report an Issue</a>
 							</p>
 						</li>
+						<li>
+							<p class="navbar-btn">
+								<a data-toggle="modal" href="#" class="btn btn-default" id="tourBtn">Tour</a>
+							</p>
+						</li>
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Blogs/Forums <span class="caret"></span></a>
 						<ul class="dropdown-menu">
@@ -214,7 +225,7 @@
 									<span class="sr-only">Error:</span>
 									Retirement Start must be >= Current Year. Retirement Start must be before Retirement End.
 								</div>
-								<label>Retirement Year:<input type="text" class="form-control" ng-model="data.retirementStartYear"></label>
+								<label>Retirement Year:<input type="text" class="form-control toot" ng-model="data.retirementStartYear" id="startYear"></label>
 								<label>Retirement End Year:<input type="text" class="form-control" ng-model="data.retirementEndYear"></label>
 
 								<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -382,39 +393,43 @@
 										</div>
 									</div>
 								</div>
-								<div class="row" style="display:none">
+								<div class="row">
 									<div class="col-md-6">
 										<div class="form-group">
-											<label>Rebalance Annually:</label>
-											<div>
-												<label class="radio-inline">
-													<input type="radio" name="rebalanceProtfolioRadio" value="true" ng-model="data.portfolio.rebalanceAnnually" ng-value="true" ng-change="enableRebalancing(true)">Yes
-												</label>
-												<label class="radio-inline">
-													<input type="radio" name="rebalanceProtfolioRadio" value="false" ng-model="data.portfolio.rebalanceAnnually" ng-value="false" ng-change="enableRebalancing(false)">No
-												</label>
-											</div>
+											<label>Rebalance Annually:
+												<select class="form-control"
+													ng-model="data.portfolio.rebalanceAnnually"
+													ng-change="refreshRebalanceAnnuallyOptions()"
+													ng-options="rebalanceAnnuallyOptions.value as rebalanceAnnuallyOptions.text for rebalanceAnnuallyOptions in rebalanceAnnuallyOptionsTypes">
+												</select>
+											</label>
 										</div>
 									</div>
 									<div class="col-md-6">
 										<div class="form-group">
-											<label>Keep Allocation Constant:</label>
-											<div>
-												<label class="radio-inline">
-													<input type="radio" name="constantAllocationRadio" value="true" ng-model="data.portfolio.constantAllocation" ng-value="true" ng-change="enableChangeAllocation(true)">Yes
-												</label>
-												<label class="radio-inline">
-													<input type="radio" name="constantAllocationRadio" value="false" ng-model="data.portfolio.constantAllocation" ng-value="false" ng-change="enableChangeAllocation(false)">No
-												</label>
-											</div>
+											<label>Keep Allocation Constant:
+												<select class="form-control"
+													ng-model="data.portfolio.constantAllocation"
+													ng-change="refreshConstantAllocationOptions()"
+													ng-options="constantAllocationOptions.value as constantAllocationOptions.text for constantAllocationOptions in constantAllocationOptionsTypes">
+												</select>
+											</label>
 										</div>
 									</div>
 								</div>
-								<div class="panel panel-default" style="display:none">
+								<div class="panel panel-default" id="targetAssets" style="display:none">
 									<div class="panel-heading">
 										Target Assets
 									</div>
 									<div class="panel-body">
+										<div class="alert alert-danger" role="alert" id="targetAllocationError" style="display:none">
+											<span class="sr-only">Error:</span>
+											Allocations must add up to 100% 
+										</div>
+										<div class="alert alert-danger" role="alert" id="targetAllocationYearsError" style="display:none">
+											<span class="sr-only">Error:</span>
+											Start Year must be greater than current year. End Year must be after Start Year.
+										</div>
 										<div class="row">
 											<div class="col-md-6">
 												<label>Start Year:
@@ -448,7 +463,7 @@
 										<div class="col-md-6">
 											<label>Gold:
 												<div class="input-group">
-													<input type="text" class="form-control" ng-model="data.portfolio.targetPercentEquities">
+													<input type="text" class="form-control" ng-model="data.portfolio.targetPercentGold">
 													<span class="input-group-addon">%</span>
 												</div>
 											</label>
@@ -456,7 +471,7 @@
 										<div class="col-md-6">
 											<label>Cash:
 												<div class="input-group">
-													<input type="text" class="form-control" ng-model="data.portfolio.targetPercentBonds">
+													<input type="text" class="form-control" ng-model="data.portfolio.targetPercentCash">
 													<span class="input-group-addon">%</span>
 												</div>
 											</label>
@@ -1501,7 +1516,13 @@ angular.module('cFIREsim', [])
                     percentFees: 0.18,
                     growthOfCash: 0.25,
                     rebalanceAnnually: true,
-                    constantAllocation: true
+                    constantAllocation: true,
+                    changeAllocationStartYear: 2025,
+                    changeAllocationEndYear: 2030,
+                    targetPercentEquities: 100,
+                    targetPercentBonds: 0, 
+                    targetPercentGold: 0,
+                    targetPercentCash: 0
                 },
                 spending: {
                     initial: 40000,
@@ -1637,6 +1658,22 @@ angular.module('cFIREsim', [])
             	formInputs: [
             		'maxInitialSpendingOptions'
             	]
+            }]
+            $scope.rebalanceAnnuallyOptionsTypes = [{
+            	text: 'Yes',
+            	value: true
+            },
+            {
+            	text: 'No',
+            	value: false
+            }]
+            $scope.constantAllocationOptionsTypes = [{
+            	text: 'Yes',
+            	value: true
+            },
+            {
+            	text: 'No',
+            	value: false
             }]
             $scope.spendingPlanTypes = [{
                     text: 'Inflation Adjusted',
@@ -1856,16 +1893,25 @@ formInputs: [
                 //Load from JSON
             }
             // TODO: Could these 2 be turned into declarative Angular statements?
-            $scope.enableRebalancing = function(enable) {
-                $('#portfolioPanel [name=constantAllocationRadio]').attr('disabled', !enable);
-                $scope.enableChangeAllocation(enable);
+            $scope.refreshRebalanceAnnuallyOptions = function(){
+  				if($scope.data.portfolio.rebalanceAnnually == false){
+  					$('select[ng-model="data.portfolio.constantAllocation"]').attr('disabled', true);
+  					$('select[ng-model="data.portfolio.constantAllocation"]').val("0");
+  				}else{
+  					$('select[ng-model="data.portfolio.constantAllocation"]').attr('disabled', false);
+  					$('select[ng-model="data.portfolio.constantAllocation"]').val("0");
+  				}
             }
-            $scope.enableChangeAllocation = function(enable) {
-                var inputs = $('#targetAssetsPanel input');
-                if (!enable) {
-                    inputs.val('');
-                }
-                inputs.attr('disabled', !enable);
+            $scope.refreshConstantAllocationOptions = function(){
+  				if($scope.data.portfolio.constantAllocation == false){
+  					$('select[ng-model="data.portfolio.rebalanceAnnually"]').attr('disabled', true);
+  					$('select[ng-model="data.portfolio.rebalanceAnnually"]').val("0");
+  					$('#targetAssets').show();
+  				}else{
+  					$('select[ng-model="data.portfolio.rebalanceAnnually"]').attr('disabled', false);
+  					$('select[ng-model="data.portfolio.rebalanceAnnually"]').val("0");
+  					$('#targetAssets').hide();
+  				}
             }
             // Adds a saving or pension object.
             $scope.addObject = function(array) {
