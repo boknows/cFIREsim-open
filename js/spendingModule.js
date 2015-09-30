@@ -136,6 +136,23 @@ var SpendingModule = {
             return Math.min(Math.max(uncappedSpending, floor), ceiling) * sim[i][j].cumulativeInflation;
         }
     },
+    "variableCAPE": {
+        calcSpending: function(form, sim, i, j) {
+            if(sim[i][j].cape === undefined)
+                return sim[i][j].portfolio.start * 0.04;
+            
+            var currentCAPEYield = 1 / sim[i][j].cape;
+            var multiplier = form.spending.variableCAPEMultiplier;
+            var constantAdjustment = form.spending.variableCAPEConstantAdjustment / 100;
+            
+            var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
+            var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
+
+            var spendingRate = currentCAPEYield * multiplier + constantAdjustment;
+
+            return Math.max(Math.min(sim[i][j].portfolio.start * spendingRate, ceiling), floor);
+        }
+    },
     calcBasicSpendingFloor: function(form, sim, i, j) {
         if(form.spending.floor == 'definedValue' && "floorValue" in form.spending) {
             return form.spending.floorValue * sim[i][j].cumulativeInflation;
