@@ -635,6 +635,22 @@
 									</div>
 								</label>
 							</div>
+							<div id="variableCAPEOptions" class="spendingOptions">
+								<label>Cyclically Adjusted Earnings Yield Multiplier:
+									<div class="input-group">
+										<input  type="text"
+										class="form-control"
+										ng-model="data.spending.variableCAPEMultiplier">
+										<span class="input-group-addon">*</span>
+									</div>
+								</label>
+								<label>Constant Adjustment:
+									<div class="input-group">
+										<input  type="text" class="form-control" ng-model="data.spending.variableCAPEConstantAdjustment">
+										<span class="input-group-addon">+</span>
+									</div>
+								</label>
+							</div>
 							<div id="retireAgainAndAgainOptions" class="spendingOptions">
 								<label>RAA Target Portfolio Amount:
 									<div class="input-group">
@@ -660,13 +676,6 @@
 										<span class="input-group-addon">%</span>
 									</div>
 								</label>
-							</div>
-							<div id="customVPWOptions" class="spendingOptions">
-								<div class="panel panel-default">
-									<div class="panel-body">
-										<p>The PMT function used in VPW is calculated based on the "Years to model" and your actual retirement year. The Initial Withdrawal Rate is based on the portfolio during the first year of retirement, and your "Yearly Spending" listed in the Spending Plan section.</p>
-									</div>
-								</div>
 							</div>
 							<div id="spendingLimitOptions" class="spendingOptions">
 								<label>Spending Floor (Inflation Adjusted):
@@ -1543,7 +1552,9 @@ angular.module('cFIREsim', [])
                     guytonKlingerRaise: 10,
                     guytonKlingerCut: 10,
                     vpwRateOfReturn: 4.3,
-                    vpwFutureValue: 0
+                    vpwFutureValue: 0,
+                    variableCAPEMultiplier: 0.5,
+                    variableCAPEConstantAdjustment: 1
                 },
                 extraIncome: {
                     socialSecurity: {
@@ -1723,6 +1734,13 @@ angular.module('cFIREsim', [])
                     value: 'vpw',
                     formInputs: [
                         'vpwOptions',
+                        'spendingLimitOptions'
+                    ]
+                }, {
+                    text: 'Variable CAPE',
+                    value: 'variableCAPE',
+                    formInputs: [
+                        'variableCAPEOptions',
                         'spendingLimitOptions'
                     ]
                 }
