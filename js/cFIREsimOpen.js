@@ -263,6 +263,7 @@ var Simulation = {
                     "val": null
                 },
                 "cumulativeInflation": this.cumulativeInflation(startCPI, data.cpi),
+                "cape": data.cape,
                 "socialSecurityAndPensionAdjustments": null,
                 "sumOfAdjustments": null,
             });
