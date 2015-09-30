@@ -85,7 +85,7 @@
 					</div>
 					<div class="modal-body">
 						<p class="alert alert-success">
-							 9-16-2015 - Added VPW Spending Method and Investigate Maximum Spending option. 
+							 9-30-2015 - Added Allocation Options for "Glide path" functionality. 
 						</p>
 						<p>
 							The cFIREsim Open Project is a completely rebuilt version of cFIREsim with efficiency and transparaceny in mind. Currently not <b>all</b> of the cFIREsim legacy capabilities exist here, but you can access the <a href="http://gator3089.hostgator.com/~boknows/input.php">old site</a> until they do.
