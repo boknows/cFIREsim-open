@@ -53,7 +53,7 @@
 		<script type="text/javascript" src="js/bootstrap.min.js"></script>
 		
 		<!-- Dependencies for cFIREsim tour -->
-		<script type="text/javascript" src="https://raw.githubusercontent.com/usablica/intro.js/master/intro.js"></script>
+		<script src="js/bootstrap-tour.min.js"></script>
 		<!-- End Tour dependencies -->
 		
 		<script type="text/javascript" src="js/bootstrap-select.min.js"></script>
@@ -70,7 +70,7 @@
 
 		<!-- Bootstrap core CSS -->
 		<link href="css/bootstrap.min.css" rel="stylesheet">
-		<link href="https://raw.githubusercontent.com/usablica/intro.js/master/introjs.css" rel="stylesheet"> <!-- Dependency for cFIREsim tour -->
+		<link href="css/bootstrap-tour.min.css" rel="stylesheet"> <!-- Dependency for cFIREsim tour -->
 		<link href="css/bootstrap-select.min.css" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/bs/dt-1.10.8/datatables.min.css"/>
 	</head>
@@ -165,7 +165,7 @@
 						</li>
 						<li>
 							<p class="navbar-btn">
-								<a data-toggle="modal" href="#" class="btn btn-default" id="tourBtn">Tour</a>
+								<a data-toggle="modal" href="#" class="btn btn-default" id="tutorialBtn">Tutorial</a>
 							</p>
 						</li>
 					<li class="dropdown">
@@ -225,8 +225,8 @@
 									<span class="sr-only">Error:</span>
 									Retirement Start must be >= Current Year. Retirement Start must be before Retirement End.
 								</div>
-								<label>Retirement Year:<input type="text" class="form-control toot" ng-model="data.retirementStartYear" id="startYear"></label>
-								<label>Retirement End Year:<input type="text" class="form-control" ng-model="data.retirementEndYear"></label>
+								<label>Retirement Year:<input type="text" class="form-control toot" ng-model="data.retirementStartYear" id="retirementStartYear"></label>
+								<label>Retirement End Year:<input type="text" class="form-control" ng-model="data.retirementEndYear" id="retirementEndYear"></label>
 
 								<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 								<!-- cFIREsim Open -->

@@ -47,31 +47,32 @@ $(document).ready(function() {
         window.location.href = "../phpBB3/login.php";
     });
     
-    $("#tourBtn").click(function(e) {
+    $("#tutorialBtn").click(function(e) {
     	e.stopImmediatePropagation();
-	    var steps = [{
-		  content: '<p>First look at this thing</p>',
-		  highlightTarget: true,
-		  nextButton: true,
-		  target: $('#startYear'),
-		  my: 'bottom center',
-		  at: 'top center'
-		}, {
-		  content: '<p>And then at this thing</p>',
-		  highlightTarget: true,
-		  nextButton: true,
-		  backButton: true,
-		  target: $('input[ng-model="data.retirementEndYear"]'),
-		  my: 'bottom center',
-		  at: 'top center'
-		}];
-		
-		var tour = new Tourist.Tour({
-		  steps: steps,
-		  tipClass: 'Bootstrap',
-		  tipOptions:{ showEffect: 'slidein' }
-		});
-		tour.start();
+	    var tour = new Tour({
+          steps: [
+          {
+            title: "How to use cFIREsim",
+            content: "Scenario: A married couple, age 45, have an expected 10 years left until retirement. \nThey intend to spend $35,000/yr in retirement. They currently have $500,000 in their portfolio, and intend to save $18,000/yr in their 401k\n and $5500/yr in their Traditional IRA before retiring. They will pay for 4 years of college for their child, starting in 2027. ",
+            orphan: true,
+          },
+          {
+            element: "#retirementStartYear",
+            title: "Retirement Start Year",
+            content: "Do it!"
+          },
+          {
+            element: "#retirementEndYear",
+            title: "Retirement End Year",
+            content: "Do more!"
+          }
+        ]});
+
+        // Initialize the tour
+        tour.init();
+
+        // Start the tour
+        tour.start();
 	});
     
 });
