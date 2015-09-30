@@ -264,6 +264,7 @@ var Simulation = {
                     "val": null
                 },
                 "cumulativeInflation": this.cumulativeInflation(startCPI, data.cpi),
+                "cape": data.cape,
                 "socialSecurityAndPensionAdjustments": null,
                 "sumOfAdjustments": null,
             });
@@ -273,7 +274,7 @@ var Simulation = {
 
     },
     roundTwoDecimals: function(num) {
-        return Math.ceil(num * 100) / 100;
+        return +parseFloat(num).toFixed(2);
     },
     cumulativeInflation: function(startCPI, endCPI) {
         return 1 + ((endCPI - startCPI) / startCPI);
@@ -290,7 +291,7 @@ var Simulation = {
         var spending;
         var currentYear = new Date().getFullYear();
         if (j >= (form.retirementStartYear - currentYear)) {
-            spending = SpendingModule[form.spending.method].calcSpending(form, this.sim, i, j);
+            spending = this.roundTwoDecimals(SpendingModule[form.spending.method].calcSpending(form, this.sim, i, j));
         } else {
             spending = 0;
         }
@@ -358,7 +359,7 @@ var Simulation = {
     calcMarketGains: function(form, i, j) {
         var portfolio = this.sim[i][j].portfolio.start;
         var sumOfAdjustments = this.sim[i][j].sumOfAdjustments; //Sum of all portfolio adjustments for this given year. SS/Pensions/Extra Income/Extra Spending.
-        portfolio = portfolio - this.sim[i][j].spending + sumOfAdjustments; //Take out spending and portfolio adjustments before calculating asset allocation. This simulates taking your spending out at the beginning of a year.
+        portfolio = this.roundTwoDecimals(portfolio - this.sim[i][j].spending + sumOfAdjustments); //Take out spending and portfolio adjustments before calculating asset allocation. This simulates taking your spending out at the beginning of a year.
 		this.sim[i][j].portfolio.start = portfolio;
         //Calculate value of each asset class based on allocation percentages
         var allocation = this.calcAllocation(form, i, j);
@@ -400,14 +401,15 @@ var Simulation = {
     },
     calcEndPortfolio: function(form, i, j) {
         if (form.portfolio.rebalanceAnnually == true) {
-            var feesIncurred = this.roundTwoDecimals((this.sim[i][j].portfolio.start - this.sim[i][j].spending + this.sim[i][j].equities.growth + this.sim[i][j].bonds.growth + this.sim[i][j].cash.growth + this.sim[i][j].gold.growth) * (form.portfolio.percentFees / 100));
+            var feesIncurred = this.roundTwoDecimals((this.sim[i][j].portfolio.start + this.sim[i][j].equities.growth + this.sim[i][j].bonds.growth + this.sim[i][j].cash.growth + this.sim[i][j].gold.growth) * (form.portfolio.percentFees / 100));
             this.sim[i][j].portfolio.fees = feesIncurred;
 
             //Calculate current allocation percentages after all market gains are taken into consideration
-            var curPercEquities = this.sim[i][j].equities.end / (this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end);
-            var currPercCash = this.sim[i][j].cash.end / (this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end);
-            var currPercBonds = this.sim[i][j].bonds.end / (this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end);
-            var currPercGold = this.sim[i][j].gold.end / (this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end);
+            var totalEnd = this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end;
+            var curPercEquities = this.sim[i][j].equities.end / totalEnd;
+            var currPercCash = this.sim[i][j].cash.end / totalEnd;
+            var currPercBonds = this.sim[i][j].bonds.end / totalEnd;
+            var currPercGold = this.sim[i][j].gold.end / totalEnd;
 
             //Equally distribute fees and portoflio adjustments amongst portfolio based on allocation percentages
             this.sim[i][j].equities.end = this.roundTwoDecimals(this.sim[i][j].equities.end - (curPercEquities * feesIncurred));
@@ -416,7 +418,8 @@ var Simulation = {
             this.sim[i][j].gold.end = this.roundTwoDecimals(this.sim[i][j].gold.end - (currPercGold * feesIncurred));
 
             //Sum all assets to determine portfolio end value.
-            this.sim[i][j].portfolio.end = this.roundTwoDecimals(this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end);
+            totalEnd = this.sim[i][j].equities.end + this.sim[i][j].bonds.end + this.sim[i][j].cash.end + this.sim[i][j].gold.end;
+            this.sim[i][j].portfolio.end = !isNaN(totalEnd) ? this.roundTwoDecimals(totalEnd) : 0;
             this.sim[i][j].portfolio.infAdjEnd = parseInt(this.sim[i][j].portfolio.end / this.sim[i][j].cumulativeInflation);
 
         } else { //Add logic for non-rebalancing portfolios
