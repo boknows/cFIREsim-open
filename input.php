@@ -85,6 +85,9 @@
 					</div>
 					<div class="modal-body">
 						<p class="alert alert-success">
+							 10-1-2015 - Added CAPE-based variable spending method. 
+						</p>
+						<p class="alert alert-success">
 							 9-30-2015 - Added Allocation Options for "Glide path" functionality. 
 						</p>
 						<p>
@@ -163,11 +166,11 @@
 								<a data-toggle="modal" href="#reportIssueModal" class="btn btn-default">Report an Issue</a>
 							</p>
 						</li>
-						<li>
+						<!--<li>
 							<p class="navbar-btn">
 								<a data-toggle="modal" href="#" class="btn btn-default" id="tutorialBtn">Tutorial</a>
 							</p>
-						</li>
+						</li>-->
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Blogs/Forums <span class="caret"></span></a>
 						<ul class="dropdown-menu">
