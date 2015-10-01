@@ -140,10 +140,9 @@ var SpendingModule = {
     },
     "variableCAPE": {
         calcSpending: function(form, sim, i, j) {
-            if(sim[i][j].cape === undefined)
-                return sim[i][j].portfolio.start * 0.04;
-            
-            var currentCAPEYield = 1 / sim[i][j].cape;
+            var CAPEHistoricalMedian = 16.01;
+            var currentCAPE = sim[i][j].cape === undefined ? CAPEHistoricalMedian : sim[i][j].cape;
+            var currentCAPEYield = 1 / currentCAPE;
             var multiplier = form.spending.variableCAPEMultiplier;
             var constantAdjustment = form.spending.variableCAPEConstantAdjustment / 100;
             
