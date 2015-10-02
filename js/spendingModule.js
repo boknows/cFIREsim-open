@@ -133,9 +133,8 @@ var SpendingModule = {
             var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
 
             var uncappedSpending = -SpendingModule.calcPayment(form.spending.vpwRateOfReturn / 100, yearsLeftInSimulation, sim[i][j].portfolio.start, Number(form.spending.vpwFutureValue * sim[i][j].cumulativeInflation));
-            var cappedSpending = Math.min(Math.max(uncappedSpending, floor), ceiling);
 
-            return Math.min(Math.max(uncappedSpending, floor), ceiling);
+            return Math.min(Math.max(uncappedSpending, floor), ceiling, sim[i][j].portfolio.start);
         }
     },
     "variableCAPE": {
@@ -156,9 +155,9 @@ var SpendingModule = {
     },
     calcBasicSpendingFloor: function(form, sim, i, j) {
         if(form.spending.floor == 'definedValue' && "floorValue" in form.spending) {
-            return Math.min(form.spending.floorValue * sim[i][j].cumulativeInflation, sim[i][j].portfolio.start);
+            return form.spending.floorValue * sim[i][j].cumulativeInflation;
         } else if (form.spending.floor == "pensions" && sim[i][j].socialSecurityAndPensionAdjustments != null){
-            return Math.min(sim[i][j].socialSecurityAndPensionAdjustments, sim[i][j].portfolio.start);
+            return sim[i][j].socialSecurityAndPensionAdjustments;
         }
         return 0;
     },
