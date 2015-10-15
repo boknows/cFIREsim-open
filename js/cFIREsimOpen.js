@@ -1,88 +1,87 @@
 $(document).ready(function() {
     //Launch Welcome Modal
     $('#welcomeModal').modal('show');
-    
-	//Full-screen modals	
-    $('#outputModal').on('shown.bs.modal', function () {
-        $(this).find('.modal-dialog').css({width:'auto',
-                                   height:'auto', 
-                                  'max-height':'100%'});
 
-		//Dygraphs window resize. Workaround for blank graphs at load time. This is for the initial load.
-		for(var i=0;i<Simulation.g.length;i++){
-			Simulation.g[i].resize();
-		}
-	});
+    //Full-screen modals
+    $('#outputModal').on('shown.bs.modal', function() {
+        $(this).find('.modal-dialog').css({
+            width: 'auto',
+            height: 'auto',
+            'max-height': '100%'
+        });
 
-	//Resizing dygraphs graphs when output tab is clicked. This allows graphs to be seen when switching tabs.
-	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-		//Dygraphs window resize. Workaround for blank graphs at load time. This is for resizing when changing tabs. 
-		for(var i=0;i<Simulation.g.length;i++){
-			Simulation.g[i].resize();
-		}
-	});
+        //Dygraphs window resize. Workaround for blank graphs at load time. This is for the initial load.
+        for (var i = 0; i < Simulation.g.length; i++) {
+            Simulation.g[i].resize();
+        }
+    });
+
+    //Resizing dygraphs graphs when output tab is clicked. This allows graphs to be seen when switching tabs.
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+        //Dygraphs window resize. Workaround for blank graphs at load time. This is for resizing when changing tabs. 
+        for (var i = 0; i < Simulation.g.length; i++) {
+            Simulation.g[i].resize();
+        }
+    });
 
     //Populate Saved Sims dropdown if user is logged in
     if ($("#username").html() != undefined) {
         Simulation.getQueries();
-		
-		//Open the Save Sim input field containing simName input and submit/cancel buttons
-		$('#saveSimBtn').click(function(e) {
-			$('#saveSimPopup').modal('show');
-		});
-		
-		//When Saved Sim is submitted, save to DB
-		$('#confirmSaveSim').click(function(e) {
-			e.stopImmediatePropagation();
-			Simulation.saveSim($("#username").html());
-		});  
 
-		//Close Save Sim success popup
-		$('#closeSaveSuccess').click(function(e) {
-			$('#saveSimSuccess').hide();
-		});
+        //Open the Save Sim input field containing simName input and submit/cancel buttons
+        $('#saveSimBtn').click(function(e) {
+            $('#saveSimPopup').modal('show');
+        });
+
+        //When Saved Sim is submitted, save to DB
+        $('#confirmSaveSim').click(function(e) {
+            e.stopImmediatePropagation();
+            Simulation.saveSim($("#username").html());
+        });
+
+        //Close Save Sim success popup
+        $('#closeSaveSuccess').click(function(e) {
+            $('#saveSimSuccess').hide();
+        });
     }
 
     $("#signInBtn").click(function() {
         window.location.href = "../phpBB3/login.php";
     });
-    
+
     $("#tutorialBtn").click(function(e) {
-    	e.stopImmediatePropagation();
-	    var tour = new Tour({
-          steps: [
-          {
-            title: "How to use cFIREsim",
-            content: "Scenario: A married couple, age 45, have an expected 10 years left until retirement. \nThey intend to spend $35,000/yr in retirement. They currently have $500,000 in their portfolio, and intend to save $18,000/yr in their 401k\n and $5500/yr in their Traditional IRA before retiring. They will pay for 4 years of college for their child, starting in 2027. ",
-            orphan: true,
-          },
-          {
-            element: "#retirementStartYear",
-            title: "Retirement Start Year",
-            content: "Do it!"
-          },
-          {
-            element: "#retirementEndYear",
-            title: "Retirement End Year",
-            content: "Do more!"
-          }
-        ]});
+        e.stopImmediatePropagation();
+        var tour = new Tour({
+            steps: [{
+                title: "How to use cFIREsim",
+                content: "Scenario: A married couple, age 45, have an expected 10 years left until retirement. \nThey intend to spend $35,000/yr in retirement. They currently have $500,000 in their portfolio, and intend to save $18,000/yr in their 401k\n and $5500/yr in their Traditional IRA before retiring. They will pay for 4 years of college for their child, starting in 2027. ",
+                orphan: true,
+            }, {
+                element: "#retirementStartYear",
+                title: "Retirement Start Year",
+                content: "Do it!"
+            }, {
+                element: "#retirementEndYear",
+                title: "Retirement End Year",
+                content: "Do more!"
+            }]
+        });
 
         // Initialize the tour
         tour.init();
 
         // Start the tour
         tour.start();
-	});
-    
+    });
+
 });
 
 var Simulation = {
     sim: [],
     tabs: 0,
-	g: [], //dygraph object
+    g: [], //dygraph object
     getQueries: function() {
-		var username = $("#username").html();
+        var username = $("#username").html();
         $.ajax({
             url: "getData.php",
             type: "POST",
@@ -91,8 +90,8 @@ var Simulation = {
                 param: "getNames",
                 username: username,
             },
-        }).success(function(data){
-			var html = "";
+        }).success(function(data) {
+            var html = "";
             for (var i = 0; i < data.qid.length; i++) {
                 html += "<li><a href='#' id='" + data.qid[i] + "' class='savedSim'>ID:" + data.qid[i] + " - " + data.simName[i] + "</a></li>"
             }
@@ -100,8 +99,8 @@ var Simulation = {
             $('.dropdown-menu a').click(function() {
                 var id = $(this).attr('id');
                 Simulation.getSavedSim(id);
-            });	
-		});
+            });
+        });
     },
     getSavedSim: function(qid) {
         $.ajax({
@@ -113,23 +112,23 @@ var Simulation = {
                 qid: qid,
             }
         }).success(function(data) {
-        	if(data == null){
-        		var html = "<p>Could not load ID:" + Simulation.getUrlVars(['id']) + ". There is no data for that ID.</p>";
-				$("#loadedSimFailText").html(html);
-				$("#loadedSimFail").show();
-        	}else{
-	            Simulation.loadSavedSim(data.data);  
-				var html = "<p>Successfully loaded ID#" + data.qid + " - '" + data.simName + "'</p>";
-				$("#loadedSimHeaderText").html(html);
-				$("#loadedSimHeader").show();
-        	}
+            if (data == null) {
+                var html = "<p>Could not load ID:" + Simulation.getUrlVars(['id']) + ". There is no data for that ID.</p>";
+                $("#loadedSimFailText").html(html);
+                $("#loadedSimFail").show();
+            } else {
+                Simulation.loadSavedSim(data.data);
+                var html = "<p>Successfully loaded ID#" + data.qid + " - '" + data.simName + "'</p>";
+                $("#loadedSimHeaderText").html(html);
+                $("#loadedSimHeader").show();
+            }
         });
     },
-    loadSavedSim: function(data){
+    loadSavedSim: function(data) {
         //Load in angular scope from outside the controller
         var scope = angular.element($("#input")).scope();
         scope.$apply(function() {
-            scope.data = JSON.parse(data); 
+            scope.data = JSON.parse(data);
             //Refresh form to show proper data options after loading
             scope.refreshDataForm();
             scope.refreshSpendingForm();
@@ -138,7 +137,7 @@ var Simulation = {
             scope.refreshRebalanceAnnuallyOptions();
         });
     },
-    saveSim: function(username){
+    saveSim: function(username) {
         var scope = angular.element($("#input")).scope();
         scope.$apply(function() {
             var json_savedSim = JSON.stringify(scope.data, null, 2);
@@ -152,11 +151,11 @@ var Simulation = {
                     username: username,
                     simName: $('#simNameInput').val(),
                 },
-            }).success(function(){
+            }).success(function() {
                 $('#saveSimPopup').modal('hide');
                 console.log("Save Success!");
-                $('#saveSimSuccess').fadeIn( 300, "linear" );
-				Simulation.getQueries();
+                $('#saveSimSuccess').fadeIn(300, "linear");
+                Simulation.getQueries();
             });
         });
     },
@@ -182,43 +181,43 @@ var Simulation = {
             cycleStart = parseInt(form.data.singleStart);
         }
         if (form.data.method == "singleCycle") {
-			console.log("Cycle Start:", cycleStart);
+            console.log("Cycle Start:", cycleStart);
             var cyc = this.cycle(cycleStart, cycleStart + cycleLength);
             this.sim.push(cyc);
-        } else if(form.data.method != "historicalSpecific"){
+        } else if (form.data.method != "historicalSpecific") {
             for (cycleStart; cycleStart < 1871 + numCycles; cycleStart++) {
                 var cyc = this.cycle(cycleStart, cycleStart + cycleLength);
                 this.sim.push(cyc);
             }
-        }else if(form.data.method == "historicalSpecific"){
-			for(var i=cycleStart; i < (cycleStart+numCycles); i++){
-				var cyc = this.cycle(i, i+cycleLength);
-				this.sim.push(cyc);
-			}
-		}
+        } else if (form.data.method == "historicalSpecific") {
+            for (var i = cycleStart; i < (cycleStart + numCycles); i++) {
+                var cyc = this.cycle(i, i + cycleLength);
+                this.sim.push(cyc);
+            }
+        }
 
-		if(form.investigate.type == 'none'){
-	        for (var i = 0; i < this.sim.length; i++) {
-	            for (var j = 0; j < this.sim[i].length; j++) {
-	                this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
-	                this.calcSumOfAdjustments(form, i, j);
-	                this.calcSpending(form, i, j); //Nominal spending for this specific cycle
-	                this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
-	                this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
-	            }
-	        }
-	        
+        if (form.investigate.type == 'none') {
+            for (var i = 0; i < this.sim.length; i++) {
+                for (var j = 0; j < this.sim[i].length; j++) {
+                    this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
+                    this.calcSumOfAdjustments(form, i, j);
+                    this.calcSpending(form, i, j); //Nominal spending for this specific cycle
+                    this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
+                    this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
+                }
+            }
+
             //Run post-simulation functions
-	        this.convertToCSV(this.sim);
-	        this.calcFailures(this.sim);
-	        this.displayGraph(this.sim, form);
-	
-	        //Initialize statistics calculations
-	        StatsModule.init(this.sim, form);
+            this.convertToCSV(this.sim);
+            this.calcFailures(this.sim);
+            this.displayGraph(this.sim, form);
 
-		}else{
-			this.calcInvestigation(this.sim, form);
-		}
+            //Initialize statistics calculations
+            StatsModule.init(this.sim, form);
+
+        } else {
+            this.calcInvestigation(this.sim, form);
+        }
 
     },
     cycle: function(startOfRange, endOfRange) {
@@ -299,72 +298,72 @@ var Simulation = {
         this.sim[i][j].spending = spending; //assign value to main sim container
         this.sim[i][j].infAdjSpending = Math.round(spending / this.sim[i][j].cumulativeInflation);
     },
-    calcAllocation: function(form, i, j){
-    	var ret = {
-    		"equities": null,
-    		"bonds": null,
-    		"gold": null,
-    		"cash": null
-    	};
-    	if(form.portfolio.rebalanceAnnually == true){
-    		if(form.portfolio.constantAllocation == true){
-	    		ret.equities = form.portfolio.percentEquities / 100;
-	    		ret.bonds = form.portfolio.percentBonds / 100;
-	    		ret.gold = form.portfolio.percentGold / 100;
-	    		ret.cash = form.portfolio.percentCash / 100;
-    		}else{//Glide path logic
-    			var currentYear = new Date().getFullYear();
-    			var range = {
-    				"start": (form.portfolio.changeAllocationStartYear - currentYear),
-    				"end": (form.portfolio.changeAllocationEndYear - currentYear),
-    				"total": null
-    			};
-    			range.total = range.end - range.start;
-    			if(j>=range.start && j<= range.end){ //This smooths the transition from one allocation level to another, by equal increments over the course of the entire time range.
-    				var allocationStep = j-range.start;
-					ret.equities = parseInt(form.portfolio.percentEquities-(((form.portfolio.percentEquities-form.portfolio.targetPercentEquities)/range.total)*allocationStep)) / 100;
-					ret.bonds = parseInt(form.portfolio.percentBonds-(((form.portfolio.percentBonds-form.portfolio.targetPercentBonds)/range.total)*allocationStep)) / 100;
-					ret.gold = parseInt(form.portfolio.percentGold-(((form.portfolio.percentGold-form.portfolio.targetPercentGold)/range.total)*allocationStep)) / 100;
-					ret.cash = parseInt(form.portfolio.percentCash-(((form.portfolio.percentCash-form.portfolio.targetPercentCash)/range.total)*allocationStep)) / 100;
-    			}
-    			if(j<range.start){
-    				ret.equities = form.portfolio.percentEquities / 100;
-		    		ret.bonds = form.portfolio.percentBonds / 100;
-		    		ret.gold = form.portfolio.percentGold / 100;
-		    		ret.cash = form.portfolio.percentCash / 100;	
-    			}
-    			if(j>range.end){ //If beyond the end range of allocation change, continue at the allocation target that was designated.
-    				ret.equities = form.portfolio.targetPercentEquities / 100;
-		    		ret.bonds = form.portfolio.targetPercentBonds / 100;
-		    		ret.gold = form.portfolio.targetPercentGold / 100;
-		    		ret.cash = form.portfolio.targetPercentCash / 100;
-    			}
-    		}
-    	}else{
-    		if(j>0){
-	    		var prev = j - 1;
-	    		ret.equities = this.sim[i][prev].equities.end / this.sim[i][prev].portfolio.end;
-	    		ret.bonds = this.sim[i][prev].bonds.end / this.sim[i][prev].portfolio.end;
-	    		ret.gold = this.sim[i][prev].gold.end / this.sim[i][prev].portfolio.end;
-	    		ret.cash = this.sim[i][prev].cash.end / this.sim[i][prev].portfolio.end;
-    		}else{
-    			ret.equities = form.portfolio.percentEquities / 100;
-	    		ret.bonds = form.portfolio.percentBonds / 100;
-	    		ret.gold = form.portfolio.percentGold / 100;
-	    		ret.cash = form.portfolio.percentCash / 100;
-    		}
-    	}
-    	return ret;
+    calcAllocation: function(form, i, j) {
+        var ret = {
+            "equities": null,
+            "bonds": null,
+            "gold": null,
+            "cash": null
+        };
+        if (form.portfolio.rebalanceAnnually == true) {
+            if (form.portfolio.constantAllocation == true) {
+                ret.equities = form.portfolio.percentEquities / 100;
+                ret.bonds = form.portfolio.percentBonds / 100;
+                ret.gold = form.portfolio.percentGold / 100;
+                ret.cash = form.portfolio.percentCash / 100;
+            } else { //Glide path logic
+                var currentYear = new Date().getFullYear();
+                var range = {
+                    "start": (form.portfolio.changeAllocationStartYear - currentYear),
+                    "end": (form.portfolio.changeAllocationEndYear - currentYear),
+                    "total": null
+                };
+                range.total = range.end - range.start;
+                if (j >= range.start && j <= range.end) { //This smooths the transition from one allocation level to another, by equal increments over the course of the entire time range.
+                    var allocationStep = j - range.start;
+                    ret.equities = parseInt(form.portfolio.percentEquities - (((form.portfolio.percentEquities - form.portfolio.targetPercentEquities) / range.total) * allocationStep)) / 100;
+                    ret.bonds = parseInt(form.portfolio.percentBonds - (((form.portfolio.percentBonds - form.portfolio.targetPercentBonds) / range.total) * allocationStep)) / 100;
+                    ret.gold = parseInt(form.portfolio.percentGold - (((form.portfolio.percentGold - form.portfolio.targetPercentGold) / range.total) * allocationStep)) / 100;
+                    ret.cash = parseInt(form.portfolio.percentCash - (((form.portfolio.percentCash - form.portfolio.targetPercentCash) / range.total) * allocationStep)) / 100;
+                }
+                if (j < range.start) {
+                    ret.equities = form.portfolio.percentEquities / 100;
+                    ret.bonds = form.portfolio.percentBonds / 100;
+                    ret.gold = form.portfolio.percentGold / 100;
+                    ret.cash = form.portfolio.percentCash / 100;
+                }
+                if (j > range.end) { //If beyond the end range of allocation change, continue at the allocation target that was designated.
+                    ret.equities = form.portfolio.targetPercentEquities / 100;
+                    ret.bonds = form.portfolio.targetPercentBonds / 100;
+                    ret.gold = form.portfolio.targetPercentGold / 100;
+                    ret.cash = form.portfolio.targetPercentCash / 100;
+                }
+            }
+        } else {
+            if (j > 0) {
+                var prev = j - 1;
+                ret.equities = this.sim[i][prev].equities.end / this.sim[i][prev].portfolio.end;
+                ret.bonds = this.sim[i][prev].bonds.end / this.sim[i][prev].portfolio.end;
+                ret.gold = this.sim[i][prev].gold.end / this.sim[i][prev].portfolio.end;
+                ret.cash = this.sim[i][prev].cash.end / this.sim[i][prev].portfolio.end;
+            } else {
+                ret.equities = form.portfolio.percentEquities / 100;
+                ret.bonds = form.portfolio.percentBonds / 100;
+                ret.gold = form.portfolio.percentGold / 100;
+                ret.cash = form.portfolio.percentCash / 100;
+            }
+        }
+        return ret;
     },
     calcMarketGains: function(form, i, j) {
         var portfolio = this.sim[i][j].portfolio.start;
         var sumOfAdjustments = this.sim[i][j].sumOfAdjustments; //Sum of all portfolio adjustments for this given year. SS/Pensions/Extra Income/Extra Spending.
         portfolio = this.roundTwoDecimals(portfolio - this.sim[i][j].spending + sumOfAdjustments); //Take out spending and portfolio adjustments before calculating asset allocation. This simulates taking your spending out at the beginning of a year.
-		this.sim[i][j].portfolio.start = portfolio;
+        this.sim[i][j].portfolio.start = portfolio;
         //Calculate value of each asset class based on allocation percentages
         var allocation = this.calcAllocation(form, i, j);
         this.sim[i][j].equities.start = (allocation.equities * portfolio);
-       	this.sim[i][j].bonds.start = (allocation.bonds * portfolio);
+        this.sim[i][j].bonds.start = (allocation.bonds * portfolio);
         this.sim[i][j].gold.start = (allocation.gold * portfolio);
         this.sim[i][j].cash.start = (allocation.cash * portfolio);
 
@@ -379,7 +378,7 @@ var Simulation = {
             this.sim[i][j].equities.growth = this.roundTwoDecimals(this.sim[i][j].equities.start * (this.sim[i][j].data.growth));
             this.sim[i][j].dividends.growth = this.roundTwoDecimals(this.sim[i][j].equities.start * this.sim[i][j].data.dividends);
 
-            //New Bond Calculation to incorporate capital appreciation. 
+            //New Bond Calculation to incorporate capital appreciation.
             if (typeof(Market[this.sim[i][j].year + 1]) == "undefined") {
                 this.sim[i][j].bonds.growth = this.roundTwoDecimals(this.sim[i][j].bonds.start * (this.sim[i][j].data.fixed_income));
             } else {
@@ -423,7 +422,7 @@ var Simulation = {
             this.sim[i][j].portfolio.infAdjEnd = parseInt(this.sim[i][j].portfolio.end / this.sim[i][j].cumulativeInflation);
 
         } else { //Add logic for non-rebalancing portfolios
-			var feesIncurred = this.roundTwoDecimals((this.sim[i][j].portfolio.start - this.sim[i][j].spending + this.sim[i][j].equities.growth + this.sim[i][j].bonds.growth + this.sim[i][j].cash.growth + this.sim[i][j].gold.growth) * (form.portfolio.percentFees / 100));
+            var feesIncurred = this.roundTwoDecimals((this.sim[i][j].portfolio.start - this.sim[i][j].spending + this.sim[i][j].equities.growth + this.sim[i][j].bonds.growth + this.sim[i][j].cash.growth + this.sim[i][j].gold.growth) * (form.portfolio.percentFees / 100));
             this.sim[i][j].portfolio.fees = feesIncurred;
 
             //Calculate current allocation percentages after all market gains are taken into consideration
@@ -457,10 +456,10 @@ var Simulation = {
             }
         }
         var ret = {
-        	'totalFailures': totalFailures,
-        	'totalCycles': results.length
+            'totalFailures': totalFailures,
+            'totalCycles': results.length
         };
-        return ret; 
+        return ret;
     },
     calcSumOfAdjustments: function(form, i, j) { //Calculate the sum of all portfolio adjustments for a given year (pensions, extra income, extra spending, etc)
         var currentYear = new Date().getFullYear();
@@ -527,46 +526,47 @@ var Simulation = {
             return parseInt(adj.val);
         }
     },
-    calcInvestigation: function(sim, form){
-    	if(form.investigate.type == 'maxInitialSpending'){
-			var min = 0, max = 1000000;
-			while (Math.round(min) <= Math.round(max)){
-				var mid = ((max-min)/2)+min;
-				form.spending.initial = mid;
-				for (var i = 0; i < this.sim.length; i++) {
-		            for (var j = 0; j < this.sim[i].length; j++) {
-		                this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
-		                this.calcSumOfAdjustments(form, i, j);
-		                this.calcSpending(form, i, j); //Nominal spending for this specific cycle
-		                this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
-		                this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
-		            }
-		        }
-		        var failures = this.calcFailures(this.sim);
-		        var success = (failures.totalCycles - failures.totalFailures) / failures.totalCycles;
-		        if (success<(form.investigate.successRate/100)){
-					max = mid;
-				}else{
-					min = mid;
-				}
-				if((max-min)>.5){
-					continue;
-				}else{
-					var html = "<b>Investigate Maximum Initial Spending</b>: Considering all other inputs, the maximum intiial spending would be <b style='color:#AAFF69'>" + accounting.formatMoney(Math.floor(mid), "$", 0) + "</b>.";
-					//Run post-simulation functions
-			        this.convertToCSV(this.sim);
-			        this.calcFailures(this.sim);
-			        this.displayGraph(this.sim, form);
-			
-			        //Initialize statistics calculations
-			        StatsModule.init(this.sim, form);
-			        
-			        //Display Investigation Results
-			        $("#graph" + Simulation.tabs).parent().prepend(html);
-					break;
-				}
-			}
-		}	
+    calcInvestigation: function(sim, form) {
+        if (form.investigate.type == 'maxInitialSpending') {
+            var min = 0,
+                max = 1000000;
+            while (Math.round(min) <= Math.round(max)) {
+                var mid = ((max - min) / 2) + min;
+                form.spending.initial = mid;
+                for (var i = 0; i < this.sim.length; i++) {
+                    for (var j = 0; j < this.sim[i].length; j++) {
+                        this.calcStartPortfolio(form, i, j); //Return Starting portfolio value to kick off yearly simulation cycles
+                        this.calcSumOfAdjustments(form, i, j);
+                        this.calcSpending(form, i, j); //Nominal spending for this specific cycle
+                        this.calcMarketGains(form, i, j); //Calculate market gains on portfolio based on allocation from form and data points
+                        this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
+                    }
+                }
+                var failures = this.calcFailures(this.sim);
+                var success = (failures.totalCycles - failures.totalFailures) / failures.totalCycles;
+                if (success < (form.investigate.successRate / 100)) {
+                    max = mid;
+                } else {
+                    min = mid;
+                }
+                if ((max - min) > .5) {
+                    continue;
+                } else {
+                    var html = "<b>Investigate Maximum Initial Spending</b>: Considering all other inputs, the maximum intiial spending would be <b style='color:#AAFF69'>" + accounting.formatMoney(Math.floor(mid), "$", 0) + "</b>.";
+                    //Run post-simulation functions
+                    this.convertToCSV(this.sim);
+                    this.calcFailures(this.sim);
+                    this.displayGraph(this.sim, form);
+
+                    //Initialize statistics calculations
+                    StatsModule.init(this.sim, form);
+
+                    //Display Investigation Results
+                    $("#graph" + Simulation.tabs).parent().prepend(html);
+                    break;
+                }
+            }
+        }
     },
     displayGraph: function(results, form) {
         var chartData = [];
@@ -584,9 +584,9 @@ var Simulation = {
                 spendingData[i].push(null);
             }
         }
-        for(var i=0; i < simLength; i++){
-            for(var j=0; j < results.length; j++){
-                for(var k =0; k < cycLength; k++){
+        for (var i = 0; i < simLength; i++) {
+            for (var j = 0; j < results.length; j++) {
+                for (var k = 0; k < cycLength; k++) {
                     if (results[j][k].year == (i + results[0][0].year)) {
                         chartData[i][j] = parseInt(results[j][k].portfolio.infAdjEnd);
                         spendingData[i][j] = results[j][k].infAdjSpending;
@@ -611,9 +611,8 @@ var Simulation = {
             labels[i + 1] = label;
         }
 
-		//Chart Series Colors Formatter
-        function rainbowColors(length, maxLength)
-        {
+        //Chart Series Colors Formatter
+        function rainbowColors(length, maxLength) {
             var i = (length * 255 / maxLength);
             var r = Math.round(Math.sin(0.024 * i + 0) * 127 + 128);
             var g = Math.round(Math.sin(0.024 * i + 2) * 127 + 128);
@@ -621,8 +620,8 @@ var Simulation = {
             return 'rgb(' + r + ',' + g + ',' + b + ')';
         }
         var colors = [];
-        for (var i=0; i<results.length; i++){
-            colors.push(rainbowColors(i,results.length));
+        for (var i = 0; i < results.length; i++) {
+            colors.push(rainbowColors(i, results.length));
         }
 
         //Portfolio Graph
@@ -724,7 +723,7 @@ var Simulation = {
         ));
 
         $('#tabNav a[href="#' + Simulation.tabs + 'a"]').tab('show');
-        $('a[href="#'+ Simulation.tabs+'a"]').parent('li').show();
+        $('a[href="#' + Simulation.tabs + 'a"]').parent('li').show();
     },
     convertToCSV: function(results) { //converts a random cycle of simulation into a CSV file, for users to easily view
         var csv = "";
@@ -768,7 +767,7 @@ var Simulation = {
         // Now the little tricky part.
         // you can use either>> window.open(uri);
         // but this will not work in some browsers
-        // or you will not get the correct file extension    
+        // or you will not get the correct file extension
 
         // See if the link already exists and if it does, delete it.
         var oldLink = document.getElementById("csvDownloadLink");
@@ -790,20 +789,16 @@ var Simulation = {
 
         //this part will append the anchor tag and remove it after automatic click
         document.body.appendChild(link);
-        $(link).appendTo("#download"+Simulation.tabs);
-		$(link).addClass("btn btn-success btn-lg");
+        $(link).appendTo("#download" + Simulation.tabs);
+        $(link).addClass("btn btn-success btn-lg");
         //link.click();
         //document.body.removeChild(link);
     },
-    getUrlVars: function() {  //Function to retrieve GET parameters in URL. Used in loading saved sim via URL.
-		var vars = {};
-		var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-			vars[key] = parseInt(value);
-		});
-		return vars.id;
-	}
+    getUrlVars: function() { //Function to retrieve GET parameters in URL. Used in loading saved sim via URL.
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+            vars[key] = parseInt(value);
+        });
+        return vars.id;
+    }
 };
-
-
-
-
