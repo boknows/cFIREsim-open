@@ -150,6 +150,7 @@ var SpendingModule = {
             var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
 
             var spendingRate = currentCAPEYield * multiplier + constantAdjustment;
+            var spending = sim[i][j].portfolio.start * spendingRate
 
             return Math.max(Math.min(sim[i][j].portfolio.start * spendingRate, ceiling), floor);
         }
