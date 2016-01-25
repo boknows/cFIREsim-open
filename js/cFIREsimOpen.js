@@ -182,7 +182,6 @@ var Simulation = {
             cycleStart = parseInt(form.data.singleStart);
         }
         if (form.data.method == "singleCycle") {
-			console.log("Cycle Start:", cycleStart);
             var cyc = this.cycle(cycleStart, cycleStart + cycleLength);
             this.sim.push(cyc);
         } else if(form.data.method != "historicalSpecific"){
@@ -764,7 +763,6 @@ var Simulation = {
            
                 }
             }
-            console.log(tmpStr);
             csv = csv.concat("Year,CumulativeInflation,portfolio.start,portfolio.infAdjStart,spending,infAdjSpending,PortfolioAdjustments,Equities,Bonds,Gold,Cash,equities.growth,dividends,bonds.growth,gold.growth,cash.growth,fees,portfolio.end,portfolio.infAdjEnd\r\n\r\n");
 
         }

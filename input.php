@@ -47,6 +47,41 @@
 			font-weight: bold;
 		}
 
+		.ot_banner {
+			color: white;
+			background-color: #e78f08;
+			width: 50%;
+			float: none;
+    		margin: 0 auto;
+    		border: 2px;
+    		border-radius: 8px;
+    		padding: 3px;
+    		text-align: center;
+    		margin-bottom: 5px;
+		}
+
+		.ot_banner a {
+			color: #23568f;
+		}
+
+		.ot_banner_output {
+			color: white;
+			background-color: #e78f08;
+			width: 50%;
+			float: none;
+    		border: 2px;
+    		border-radius: 8px;
+    		padding: 3px;
+    		text-align: center;
+    		margin-bottom: 5px;
+    		margin-top: 5px;
+		}
+
+		.ot_banner_output a {
+			color: #23568f;
+		}
+
+
 		</style>
 		<script src='https://code.jquery.com/jquery-1.11.3.min.js' language='Javascript' type='text/javascript'></script>
 		<script type="text/javascript" src="http://dygraphs.com/dygraph-combined.js"></script>
@@ -84,6 +119,9 @@
 						<h4 class="modal-title">Welcome to the cFIREsim Open Project</h4>
 					</div>
 					<div class="modal-body">
+						<p class="alert alert-info">
+							 1-25-2016 - Teaming up with <a href="http://www.ontrajectory.com">OnTrajectory.com</a> to provide users with a full "financial life planning tool"
+						</p>
 						<p class="alert alert-success">
 							 11-9-2015 - Fixed issue with statistics. Average and median Ending Portfolios were being incorrectly calculated.
 						</p>
@@ -118,6 +156,10 @@
 		</div>
 		<div class="page-header">
 			<h1 class="text-center">The Crowdsourced FIRE Simulator (cFIREsim) - Open Source</h1>
+		</div>
+		<div class="ot_banner">
+			<p>cFIREsim and OnTrajectory.com are teaming up to create a "financial life planning tool". </p>
+			<p><b><a href="http://www.ontrajectory.com">Come check us out!</a></b></p>
 		</div>
 		<nav class="navbar navbar-default">
 			<div class="container-fluid">
@@ -1100,6 +1142,10 @@
 								<div style="margin:15px">
 									<div id='graph1' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels1' style='background:white;width:800px;height:20px;' class='output'></div>
+									<div class="ot_banner_output">
+										<p>cFIREsim and OnTrajectory.com are teaming up to create a "financial life planning tool". </p>
+										<p><b><a href="http://www.ontrajectory.com">Come check us out!</a></b></p>
+									</div>
 									<div>
 										<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 										<!-- cFIREsim-open Leaderboard -->
@@ -1507,8 +1553,8 @@ angular.module('cFIREsim', [])
     .controller('simulationInputController', ['$scope',
         function($scope) {
             $scope.data = {
-                retirementStartYear: 2015,
-                retirementEndYear: 2044,
+                retirementStartYear: 2016,
+                retirementEndYear: 2045,
                 data: {
                     method: "historicalAll",
                     start: 1900,

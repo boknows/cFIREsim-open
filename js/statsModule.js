@@ -285,7 +285,7 @@ var StatsModule = {
             }
             totalWithdrawalsSummed.push(tempSummedWithdrawals.reduce(function(a,b,index,array){return a+b}));
         }
-        console.log("Ending:", endingPortfolios);
+
         //Sum up the total withdrawals from a given cycle, to determine the average total withdrawals for all cycles
         totalWithdrawalAvgs = this.average(yearlyWithdrawals);
 
