@@ -3,8 +3,8 @@ spendingModule.js - A template for modular spending methods for cFIREsim
 Each module object will have a standard set of properties that will allow the main cFIREsim function to properly determine spending for any given year, given this particular spending method. 
 
 Required properties:
-	- fullName - A textual representation of the name of this spending method
-	- calcSpending - this is the primary spending calculation. This must always have the parameters (form, sim, i, j) to represent the input form, the simulation container, i - the current simulation cycle, and j - the current year within the simulation cycle. 
+    - fullName - A textual representation of the name of this spending method
+    - calcSpending - this is the primary spending calculation. This must always have the parameters (form, sim, i, j) to represent the input form, the simulation container, i - the current simulation cycle, and j - the current year within the simulation cycle. 
 
 All other properties can support the main calcSpending function
 
@@ -43,9 +43,8 @@ var SpendingModule = {
     },
     "variableSpending": {
         calcSpending: function(form, sim, i, j) {
-            var currentYear = new Date().getFullYear();
-            var isInitialYearInCycle = j == (form.retirementStartYear - currentYear);
-            var isAfterInitialYearInCycle = j > (form.retirementStartYear - currentYear);
+            var isInitialYearInCycle = j == 0;
+            var isAfterInitialYearInCycle = j > 0;
 
             var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
             var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
@@ -62,11 +61,11 @@ var SpendingModule = {
     },
     "percentOfPortfolio": {
         calcSpending: function(form, sim, i, j) {
-        	var spending = 0;
+            var spending = 0;
 
-    		//Calculate floor value
-    		var floor = 0;
-			if (form.spending.percentageOfPortfolioFloorType == "percentageOfPortfolio" && "percentageOfPortfolioFloorValue" in form.spending) {
+            //Calculate floor value
+            var floor = 0;
+            if (form.spending.percentageOfPortfolioFloorType == "percentageOfPortfolio" && "percentageOfPortfolioFloorValue" in form.spending) {
                 floor = sim[0][0].portfolio.start * (form.spending.percentageOfPortfolioFloorValue / 100) * sim[i][j].cumulativeInflation;
             }else if(form.spending.percentageOfPortfolioFloorType == "percentageOfPreviousYear" && "percentageOfPortfolioFloorValue" in form.spending && form.spending.percentageOfPortfolioFloorValue != ""){
                 floor = (j == 0) ? 0 : (sim[i][j - 1].spending * (form.spending.percentageOfPortfolioFloorValue / 100)  * sim[i][j].cumulativeInflation / sim[i][j-1].cumulativeInflation);
@@ -78,7 +77,7 @@ var SpendingModule = {
 
             //Calculate Ceiling
             var ceiling = Number.POSITIVE_INFINITY;
-			if (form.spending.percentageOfPortfolioCeilingType == "percentageOfPortfolio" && "percentageOfPortfolioCeilingValue" in form.spending && form.spending.percentageOfPortfolioCeilingValue != "") {
+            if (form.spending.percentageOfPortfolioCeilingType == "percentageOfPortfolio" && "percentageOfPortfolioCeilingValue" in form.spending && form.spending.percentageOfPortfolioCeilingValue != "") {
                 ceiling = sim[0][0].portfolio.start * (form.spending.percentageOfPortfolioCeilingValue / 100) * sim[i][j].cumulativeInflation;
             }else if(form.spending.percentageOfPortfolioCeilingType == "definedValue" && "percentageOfPortfolioCeilingValue" in form.spending && form.spending.percentageOfPortfolioCeilingValue != "") {
                 ceiling = form.spending.percentageOfPortfolioCeilingValue * sim[i][j].cumulativeInflation;
@@ -88,7 +87,7 @@ var SpendingModule = {
             var baseSpending = sim[i][j].portfolio.start * (form.spending.percentageOfPortfolioPercentage/100);
             spending = Math.min(ceiling, Math.max(floor, baseSpending))
 
-        	return spending;
+            return spending;
         }
     },
     "guytonKlinger": {
@@ -98,7 +97,6 @@ var SpendingModule = {
                 return form.spending.initial;
             }
 
-            var currentYear = new Date().getFullYear();
             var initialWithdrawalRate = form.spending.initial / sim[i][0].portfolio.start;
             var exceeds = (form.spending.guytonKlingerExceeds / 100);
             var cut = form.spending.guytonKlingerCut / 100;
@@ -126,15 +124,49 @@ var SpendingModule = {
             return sim[i][j-1].spending * currentYearInflation;
         }
     },
+    "vpw": {
+        calcSpending: function(form, sim, i, j) {
+            var simulationDuration = form.retirementEndYear - form.retirementStartYear + 1;
+            var yearsLeftInSimulation = simulationDuration - j;
+            
+            var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
+            var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
+
+            var uncappedSpending = -SpendingModule.calcPayment(form.spending.vpwRateOfReturn / 100, yearsLeftInSimulation, sim[i][j].portfolio.start, Number(form.spending.vpwFutureValue * sim[i][j].cumulativeInflation));
+            var cappedSpending = Math.min(Math.max(uncappedSpending, floor), ceiling);
+
+            return Math.min(Math.max(uncappedSpending, floor), ceiling);
+        }
+    },
+    "variableCAPE": {
+        calcSpending: function(form, sim, i, j) {
+            var CAPEHistoricalMedian = 16.01;
+            var currentCAPE = sim[i][j].cape === undefined ? CAPEHistoricalMedian : sim[i][j].cape;
+            var currentCAPEYield = 1 / currentCAPE;
+            var multiplier = form.spending.variableCAPEMultiplier;
+            var constantAdjustment = form.spending.variableCAPEConstantAdjustment / 100;
+            
+            var floor = SpendingModule.calcBasicSpendingFloor(form, sim, i, j);
+            var ceiling = SpendingModule.calcBasicSpendingCeiling(form, sim, i, j);
+
+            var spendingRate = currentCAPEYield * multiplier + constantAdjustment;
+            var spending = sim[i][j].portfolio.start * spendingRate
+
+            return Math.max(Math.min(sim[i][j].portfolio.start * spendingRate, ceiling), floor);
+        }
+    },
     calcBasicSpendingFloor: function(form, sim, i, j) {
         if(form.spending.floor == 'definedValue' && "floorValue" in form.spending) {
-            return form.spending.floorValue * sim[i][j].cumulativeInflation;
+            return Math.min(form.spending.floorValue * sim[i][j].cumulativeInflation, sim[i][j].portfolio.start);
         } else if (form.spending.floor == "pensions" && sim[i][j].socialSecurityAndPensionAdjustments != null){
-            return sim[i][j].socialSecurityAndPensionAdjustments;
+            return Math.min(sim[i][j].socialSecurityAndPensionAdjustments, sim[i][j].portfolio.start);
         }
         return 0;
     },
     calcBasicSpendingCeiling: function(form, sim, i, j) {
         return form.spending.ceiling == "definedValue" && form.spending.ceilingValue != null ? form.spending.ceilingValue * sim[i][j].cumulativeInflation : Number.POSITIVE_INFINITY;
+    },
+    calcPayment: function(rate, nper, pv, fv) {
+        return -(rate * (pv * Math.pow(1 + rate, nper) + fv)) / ((Math.pow(1 + rate, nper) - 1) * (1 + rate));
     }
 };
