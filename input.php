@@ -196,7 +196,7 @@
 					<ul class="nav navbar-nav navbar-right">
 						<li>
 							<p class="navbar-btn">
-								<a href="phpBB3/index.php" class="btn btn-default">cFIREsim Forums</a>
+								<a href="faq.php" class="btn btn-default">FAQ/Tutorial</a>
 							</p>
 						</li>
 						<li>
@@ -206,7 +206,7 @@
 						</li>
 						<li>
 							<p class="navbar-btn">
-								<a data-toggle="modal" href="#reportIssueModal" class="btn btn-default">Report an Issue</a>
+								<a href="phpBB3/index.php" class="btn btn-default">cFIREsim Forums</a>
 							</p>
 						</li>
 						<!--<li>
@@ -1453,34 +1453,6 @@
 		      </div><!-- /.modal-content -->
 		    </div><!-- /.modal-dialog -->
 		  </div><!-- /.modal -->	
-
-			<!-- Report Issue Modal -->
-		  	<div class="modal fade" id="reportIssueModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-							<h4 class="modal-title">Report an Issue</h4>
-						</div>
-						<div class="modal-body">
-							<p>
-								There are 2 ways to report an issue or request a new feature.
-							</p>
-							<ul>
-								<li>
-									You can log in to the <a href="https://github.com/boknows/cFIREsim-open/issues">GitHub Issues page</a> and report your issue or request a new feature.
-								</li>
-								<li>
-									You can <a href="phpBB3/index.php">Log in to the forums</a> and post in the cFIREsim Bugs or cFIREsim Feature Requests forum.
-								</li>
-							</ul>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-						</div>
-					</div>
-			  </div>
-			</div>
 
 			<!-- Donate/Support Modal -->
 		  	<div class="modal fade" id="donateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
