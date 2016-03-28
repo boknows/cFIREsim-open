@@ -128,7 +128,7 @@ var StatsModule = {
 			"info": false,
 			"autoWidth": false
     	} );
-		
+
 		//Second Table - General Stats
 		var dataSet1b = [
 			["Average:", accounting.formatMoney(this.finalStats.average.endingPortfolios, "$", 0), accounting.formatMoney(this.finalStats.average.yearlyWithdrawals, "$", 0), accounting.formatMoney(this.finalStats.average.totalWithdrawals, "$", 0)],
@@ -220,6 +220,16 @@ var StatsModule = {
             "searching": false,
             "info": false
         } );
+
+        //Add mouseover info to output tabs
+        $('#tabNames li.active').tooltip({
+            trigger: 'hover',
+            html: true,
+            title: 'Retirement: '+form.retirementStartYear+'-'+form.retirementEndYear+
+                    '<br>Spending: '+accounting.formatMoney(form.spending.initial, "$", 0)+
+                    '<br>Avg. Portfolio: '+dataSet1a[0][1]+
+                    '<br>Success: '+dataSet1a[0][0]
+        });
     },
     //General Statistical Functions
     average: function(data) {
@@ -376,7 +386,7 @@ var StatsModule = {
         //call all time period functions
         first5years(sim, period);
         analyzeThirds(sim, period);
-       	
+
        	//Analysis functions for each time period
         function first5years(sim, period) {
             var withdrawals = [];
@@ -415,28 +425,28 @@ var StatsModule = {
 	            StatsModule.finalStats.withdrawalAnalysis.highest.thirds.push(StatsModule.max(withdrawals));
 	            StatsModule.finalStats.withdrawalAnalysis.lowest.thirds.push(StatsModule.min(withdrawals));
 	            StatsModule.finalStats.withdrawalAnalysis.failures.thirds.push(failures);
-				
+
             }
         }
     },
 	calcDipAnalysis: function (sim) {
 		//Initialize variables
         var dips = {
-            "portfolioDip10" : [], 
-            "portfolioDip20" : [], 
-            "portfolioDip40" : [], 
+            "portfolioDip10" : [],
+            "portfolioDip20" : [],
+            "portfolioDip40" : [],
             "portfolioDip60" : [],
-            "withdrawalDip10" : [], 
-            "withdrawalDip20" : [], 
-            "withdrawalDip40" : [], 
+            "withdrawalDip10" : [],
+            "withdrawalDip20" : [],
+            "withdrawalDip40" : [],
             "withdrawalDip60" : [],
-            "portfolioDip10MaxDips" : [], 
-            "portfolioDip20MaxDips" : [], 
-            "portfolioDip40MaxDips" : [], 
+            "portfolioDip10MaxDips" : [],
+            "portfolioDip20MaxDips" : [],
+            "portfolioDip40MaxDips" : [],
             "portfolioDip60MaxDips" : [],
-            "withdrawalDip10MaxDips" : [], 
-            "withdrawalDip20MaxDips" : [], 
-            "withdrawalDip40MaxDips" : [], 
+            "withdrawalDip10MaxDips" : [],
+            "withdrawalDip20MaxDips" : [],
+            "withdrawalDip40MaxDips" : [],
             "withdrawalDip60MaxDips" : []
         };
 		var initialPortfolio = sim[0][0].portfolio.start;
@@ -553,7 +563,7 @@ var StatsModule = {
                             }
                         }
                     }
-                    
+
                 }
             }
             return {"portfolioDips": lowestPortfolioDips, "withdrawalDips": lowestWithdrawalDips };
@@ -580,7 +590,7 @@ var StatsModule = {
         individualDips.withdrawalDips.sort(compareWithdrawal);
         StatsModule.finalStats.individualDips.portfolioDips = individualDips.portfolioDips;
         StatsModule.finalStats.individualDips.withdrawalDips = individualDips.withdrawalDips;
-        
+
         StatsModule.finalStats.dipAnalysis.below10.maxPortfolioDips = maxDipsSingleCycle(dips.portfolioDip10);
         StatsModule.finalStats.dipAnalysis.below20.maxPortfolioDips = maxDipsSingleCycle(dips.portfolioDip20);
         StatsModule.finalStats.dipAnalysis.below40.maxPortfolioDips = maxDipsSingleCycle(dips.portfolioDip40);
