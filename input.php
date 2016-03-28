@@ -119,14 +119,11 @@
 						<h4 class="modal-title">Welcome to the cFIREsim Open Project</h4>
 					</div>
 					<div class="modal-body">
+						<p class="alert alert-success">
+							 3-28-2016 - Finally started adding a FAQ/Tutorial to the site. This can be found here: <a href="faq.php">FAQ/Tutorial</a>. For now, it includes basic tutorial explanations, along with the explanations of the spending plans, but will include more information soon.
+						</p>
 						<p class="alert alert-info">
 							 1-25-2016 - Teaming up with <a href="http://www.ontrajectory.com">OnTrajectory.com</a> to provide users with a full "financial life planning tool"
-						</p>
-						<p class="alert alert-success">
-							 11-9-2015 - Fixed issue with statistics. Average and median Ending Portfolios were being incorrectly calculated.
-						</p>
-						<p class="alert alert-success">
-							 10-1-2015 - Added CAPE-based variable spending method. 
 						</p>
 						
 						<p>
