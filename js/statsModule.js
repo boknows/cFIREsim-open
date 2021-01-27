@@ -1,7 +1,7 @@
 /*
 statsModule.js - A template for modular statistical analysis methods for cFIREsim
 
-Required paramters:
+Required parameters:
 Functions must always have the parameters (form, sim) to represent the input form, the simulation container.
 
 All other properties can support the main statistical analysis functions
