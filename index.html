@@ -7,19 +7,21 @@
     <meta name="description" content="A Crowdsourced Financial Independence and Early Retirement Simulator and Calculator. Uses historic stock data to model your retirement and give you a success rate based on all of the possible periods of time in the stock market (good and bad)."><title>Crowdsourced Financial Independence and Early Retirement Simulator/Calculator</title>
      <style>
     .dygraph-axis-label-y { padding-right:10px; padding-left:10px;}
-    #labelsdiv > span { display: none; }
-    #labelsdiv > span.highlight { display: inline; }
-    #labelsdiv2 > span { display: none; }
-    #labelsdiv2 > span.highlight { display: inline; }
+    #labels1 > span { display: none; }
+    #labels1 > span.highlight { display: inline; }
+    #labels1b > span { display: none; }
+    #labels1b > span.highlight { display: inline; }
     </style>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.7/angular.min.js"></script>
-    <script async type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script async type="text/javascript" src="js/bootstrap-select.min.js"></script>
-    <script async type="text/javascript" src="js/formData-stub.js"></script>
-    <script async type="text/javascript" src="js/spendingModule.js"></script>
-    <script async type="text/javascript" src="js/statsModule.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-select.min.js"></script>
+    <!-- <script type="text/javascript" src="js/formData-stub.js"></script> -->
+    <script type="text/javascript" src="js/accounting.min.js"></script>
+    <script type="text/javascript" src="js/spendingModule.js"></script>
+    <script type="text/javascript" src="js/statsModule.js"></script>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -777,8 +779,11 @@
     </div>
     <script defer type="text/javascript" src="js/marketData.js"></script>
     <script defer type="text/javascript" src="js/cFIREsimOpen.js"></script>
-    <div id="graphdiv" style="width:1100px; height:550px;background:white"></div>
-    <div id="labelsdiv" style="background:white;width:1100px;height:20px;"></div>
+    <div id="graph1" style="width:1100px; height:550px;background:white"></div>
+    <div id="labels1" style="background:white;width:1100px;height:20px;"></div>
+
+    <div id="graph1b" style="width:1100px; height:550px;background:white"></div>
+    <div id="labels1b" style="background:white;width:1100px;height:20px;"></div>
 <script type="text/javascript">
     angular.module('cFIREsim', [])
         .controller('simulationInputController', ['$scope', function($scope) {
@@ -1251,16 +1256,6 @@
             // Setup the spending form when the controller loads.
             $scope.refreshSpendingForm()
         }]);
-
-</script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-42984907-1', 'auto');
-  ga('send', 'pageview');
 
 </script>
 </body>
